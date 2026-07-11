@@ -1,0 +1,8 @@
+{
+  "name": "StudyFlash",
+  "description": "A modern, ultra-fast competitive exam preparation platform for Indian government job aspirants with multi-lingual questions, personalized mock tests, previous year papers, AI explanations, and detailed study dashboards.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

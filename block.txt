@@ -1,0 +1,146 @@
+        {/* PREMIUM LOCK CUSTOM OVERLAY POPUP */}
+        {showPremiumLock && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in animate-duration-150" id="premium-lock-modal">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-md w-full p-6 relative shadow-2xl space-y-6">
+              <button 
+                onClick={() => {
+                  setShowPremiumLock(false);
+                  setPromoCode("");
+                }}
+                className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-white text-lg font-bold"
+              >
+                ✕
+              </button>
+              
+              <div className="text-center space-y-2">
+                <div className="w-16 h-16 bg-rose-50 dark:bg-rose-900/30 text-rose-500 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-rose-100 dark:border-rose-900/50 shadow-inner">
+                  <Lock className="w-8 h-8" />
+                </div>
+                <h3 className="text-xl font-extrabold text-slate-900 dark:text-white">
+                  {isHindi ? "प्रीमियम प्रो फीचर लॉक है" : "Premium Pro Feature Locked"}
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  {isHindi 
+                    ? \`"\${lockedFeature}" का उपयोग करने के लिए 12-अंकीय प्रोमो अनलॉक कोड दर्ज करें।\`
+                    : \`Enter your 12-digit student access PROMO code to unlock the "\${lockedFeature}" capability.\`}
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                <input 
+                  type="text" 
+                  placeholder={isHindi ? "XXXX-XXXX-XXXX" : "Promo Code (e.g. FREE-TEST-2026)"}
+                  value={promoCode}
+                  onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-center font-mono font-bold tracking-widest text-slate-900 dark:text-white focus:outline-none focus:border-rose-500"
+                />
+                <button 
+                  onClick={() => {
+                    const cleanCode = promoCode.replace(/-/g, "").trim();
+                    if (cleanCode.length >= 6) {
+                      alert(isHindi ? "प्रोमो कोड स्वीकार कर लिया गया है लेकिन सर्वर ऑफ़लाइन होने के कारण सक्रियण विफल रहा।" : "Promo code accepted but activation module holds pending server connection.");
+                      setShowPremiumLock(false);
+                      setPromoCode("");
+                    } else {
+                      alert(isHindi ? "कृपया वैध प्रोमो कोड दर्ज करें।" : "Please enter a valid institution promo access code.");
+                    }
+                  }}
+                  className="w-full bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 text-white font-extrabold text-xs py-3.5 rounded-xl shadow transition active:scale-95"
+                >
+                  {isHindi ? "विशेषता अनलॉक करें" : "Unlock Feature Now"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* AI GENERATOR OVERLAY POPUP */}
+        {showAiGenerator && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in animate-duration-150" id="ai-generator-modal">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-md w-full p-6 relative shadow-2xl space-y-6">
+              <button 
+                onClick={() => {
+                  if (!isAiGenerating) {
+                    setShowAiGenerator(false);
+                    setAiTopicInput("");
+                  }
+                }}
+                className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-white text-lg font-bold"
+              >
+                ✕
+              </button>
+
+              <div className="text-center space-y-1">
+                <div className="w-16 h-16 bg-blue-50 dark:bg-blue-900/30 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-blue-100 dark:border-blue-900/50 shadow-inner">
+                  <Sparkles className="w-8 h-8" />
+                </div>
+                <h3 className="text-xl font-extrabold text-slate-900 dark:text-white">
+                  {isHindi ? "एआई प्रश्न जेनरेटर" : "AI Custom Assessor Engine"}
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  {isHindi
+                    ? "जेमिनी द्वारा संचालित, किसी भी विषय पर लाइव एमसीक्यू बनाएं (Google Cloud)."
+                    : "Powered by Gemini 3.5. Formulate precise live multi-choice interrogations."}
+                </p>
+              </div>
+
+              {isAiGenerating ? (
+                <div className="py-8 space-y-4 text-center">
+                  <div className="relative w-16 h-16 mx-auto">
+                    <div className="absolute inset-0 rounded-full border-4 border-slate-100 dark:border-slate-800" />
+                    <div className="absolute inset-0 rounded-full border-4 border-blue-600 dark:border-sky-400 border-t-transparent animate-spin" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <p className="text-xs font-extrabold text-slate-800 dark:text-white animate-pulse">Running Gemini 3.5 Flash Model...</p>
+                    <p className="text-[10px] text-slate-400 leading-relaxed font-mono">Formulating bilingual translations, distractors, memory hacks and full explanations.</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="space-y-1.5 text-left">
+                    <label className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">{isHindi ? "शीर्षक / टॉपिक नाम" : "Topic / Syllabus Area"}</label>
+                    <input 
+                      type="text" 
+                      placeholder={isHindi ? "उदा. प्राचीन भारत का इतिहास, Thermodynamics" : "e.g. Akbar's Reign, G20 Summit, Physics Formulae"}
+                      value={aiTopicInput}
+                      onChange={(e) => setAiTopicInput(e.target.value)}
+                      className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-900 rounded-xl px-4 py-3 text-xs font-semibold focus:outline-none focus:border-blue-500 text-slate-900 dark:text-white"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5 text-left">
+                    <label className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">{isHindi ? "विषय श्रेणी" : "Meta-Subject Category"}</label>
+                    <select 
+                      id="ai-generator-subject-select"
+                      className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-900 rounded-xl px-4 py-3 text-xs font-semibold focus:outline-none focus:border-blue-500 text-slate-900 dark:text-white"
+                    >
+                      <option value="Static GK">General Knowledge / Static GK</option>
+                      <option value="Science">General Science</option>
+                      <option value="Mathematics">Mathematics</option>
+                      <option value="Reasoning">Reasoning Aptitude</option>
+                      <option value="History">Indian History & Constitution</option>
+                    </select>
+                  </div>
+
+                  <button 
+                    onClick={async () => {
+                      const topicText = aiTopicInput.trim();
+                      if (!topicText) {
+                        alert("Please enter a study topic.");
+                        return;
+                      }
+
+                      setIsAiGenerating(true);
+                      try {
+                        const selSubject = (document.getElementById("ai-generator-subject-select") as HTMLSelectElement)?.value || "Static GK";
+                        const res = await fetch("/api/admin/generate-questions", {
+                          method: "POST",
+                          headers: {
+                            "Content-Type": "application/json",
+                          },
+                          body: JSON.stringify({
+                            topic: topicText,
+                            subject: selSubject,
+                            count: 5 // Generate 5 fresh premium MCQs!
+                          })
+                        });

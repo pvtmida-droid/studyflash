@@ -1,0 +1,12 @@
+{
+  "collections": [
+    {
+      "name": "questions",
+      "rules": "allow read, write: if true;"
+    },
+    {
+      "name": "users",
+      "rules": "allow read, write: if true;"
+    }
+  ]
+}
