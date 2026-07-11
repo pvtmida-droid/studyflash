@@ -1,7 +1,6 @@
 import "dotenv/config";
 import express from "express";
 import path from "path";
-import { createServer as createViteServer } from "vite";
 import jwt from "jsonwebtoken";
 import { createClient } from "@supabase/supabase-js";
 import { GoogleGenAI } from "@google/genai";
@@ -1109,6 +1108,7 @@ Ensure your response is ONLY the raw JSON array (do not wrap in markdown like \`
   });
 
   if (process.env.NODE_ENV !== "production") {
+    const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
@@ -1122,10 +1122,19 @@ Ensure your response is ONLY the raw JSON array (do not wrap in markdown like \`
     });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`StudyFlash Server running on http://localhost:${PORT} in ${process.env.NODE_ENV || 'development'} mode`);
-  });
+  if (!process.env.VERCEL) {
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`StudyFlash Server running on http://localhost:${PORT} in ${process.env.NODE_ENV || 'development'} mode`);
+    });
+  }
+  
+  return app;
 }
 
-startServer();
+if (!process.env.VERCEL) {
+  startServer();
+}
+
+export { startServer };
+
 
