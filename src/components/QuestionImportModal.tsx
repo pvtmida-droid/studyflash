@@ -11,6 +11,7 @@ export interface QuestionImportModalProps {
 
 const COMMON_SUBJECTS = [
   { id: "GKGS", nameEn: "General Knowledge (GK/GS)", nameHi: "सामान्य ज्ञान (GK/GS)" },
+  { id: "Science", nameEn: "General Science", nameHi: "सामान्य विज्ञान" },
   { id: "Maths", nameEn: "Mathematics", nameHi: "गणित" },
   { id: "Reasoning", nameEn: "Reasoning", nameHi: "तर्कशक्ति" },
   { id: "Hindi", nameEn: "Hindi Language", nameHi: "हिन्दी भाषा" },
@@ -193,7 +194,7 @@ export default function QuestionImportModal({ isOpen, onClose, onQuestionsImport
             };
 
             const qEn = getVal("questionEn");
-            const qHi = getVal("questionHi") || qEn;
+            const qHi = getVal("questionHi");
 
             if (!qEn && !qHi) {
               throw new Error(isHindi
@@ -222,16 +223,6 @@ export default function QuestionImportModal({ isOpen, onClose, onQuestionsImport
               );
             }
 
-            const resolvedOptAEn = optAEn || optAHi;
-            const resolvedOptBEn = optBEn || optBHi;
-            const resolvedOptCEn = optCEn || optCHi;
-            const resolvedOptDEn = optDEn || optDHi;
-
-            const resolvedOptAHi = optAHi || optAEn;
-            const resolvedOptBHi = optBHi || optBEn;
-            const resolvedOptCHi = optCHi || optCEn;
-            const resolvedOptDHi = optDHi || optDEn;
-
             let ans = (getVal("correctAnswer").toUpperCase() || "A").trim();
             if (!["A", "B", "C", "D"].includes(ans)) {
               ans = "A"; // Auto-fallback
@@ -241,11 +232,11 @@ export default function QuestionImportModal({ isOpen, onClose, onQuestionsImport
               id: getVal("id") || `csv-import-q-${Date.now()}-${idx}-${Math.floor(Math.random() * 1000)}`,
               questionEn: qEn,
               questionHi: qHi,
-              optionsEn: [resolvedOptAEn, resolvedOptBEn, resolvedOptCEn, resolvedOptDEn] as [string, string, string, string],
-              optionsHi: [resolvedOptAHi, resolvedOptBHi, resolvedOptCHi, resolvedOptDHi] as [string, string, string, string],
+              optionsEn: [optAEn, optBEn, optCEn, optDEn] as [string, string, string, string],
+              optionsHi: [optAHi, optBHi, optCHi, optDHi] as [string, string, string, string],
               correctAnswer: ans as "A" | "B" | "C" | "D",
               explanationEn: getVal("explanationEn"),
-              explanationHi: getVal("explanationHi") || getVal("explanationEn"),
+              explanationHi: getVal("explanationHi"),
               subject: globalSubject,
               topic: globalTopic,
               examTags: globalExamTags ? globalExamTags.split(",").map(t => t.trim()).filter(Boolean) : ["Practice"],
