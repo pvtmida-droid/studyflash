@@ -472,10 +472,7 @@ async function startServer() {
     const inputEmail = (email || "").trim().toLowerCase().replace(/['"]/g, "");
     const inputPassword = (password || "").trim().replace(/['"]/g, "");
 
-    const isMatch = (
-      (inputEmail === adminEmail && inputPassword === adminPassword) ||
-      (inputEmail === "admin@studyflash.in" && inputPassword === "studyflash2026")
-    );
+    const isMatch = (inputEmail === adminEmail && inputPassword === adminPassword);
 
     if (isMatch) {
       const token = jwt.sign({ role: "admin", email: inputEmail }, JWT_SECRET, { expiresIn: "7d" });
@@ -491,7 +488,7 @@ async function startServer() {
     const adminPassword = await getAdminPassword();
     const inputCurrentPassword = (currentPassword || "").trim().replace(/['"]/g, "");
 
-    if (inputCurrentPassword === adminPassword || inputCurrentPassword === "studyflash2026") {
+    if (inputCurrentPassword === adminPassword) {
       process.env.ADMIN_PASSWORD = newPassword;
       
       const supabase = getSupabase();
