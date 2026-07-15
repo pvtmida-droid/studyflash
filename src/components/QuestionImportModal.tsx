@@ -157,13 +157,25 @@ export default function QuestionImportModal({ isOpen, onClose, onQuestionsImport
         // Verify only critical headers (question text and at least four options + correct answer)
         const missingCritical: string[] = [];
         if (headerIndices["questionEn"] === undefined && headerIndices["questionHi"] === undefined) {
-          missingCritical.push("questionEn");
+          missingCritical.push("questionEn/questionHi");
         }
-        if (headerIndices["optionAEn"] === undefined) missingCritical.push("Option A");
-        if (headerIndices["optionBEn"] === undefined) missingCritical.push("Option B");
-        if (headerIndices["optionCEn"] === undefined) missingCritical.push("Option C");
-        if (headerIndices["optionDEn"] === undefined) missingCritical.push("Option D");
         if (headerIndices["correctAnswer"] === undefined) missingCritical.push("correctAnswer");
+
+        const hasEnHeaders = 
+          headerIndices["optionAEn"] !== undefined &&
+          headerIndices["optionBEn"] !== undefined &&
+          headerIndices["optionCEn"] !== undefined &&
+          headerIndices["optionDEn"] !== undefined;
+
+        const hasHiHeaders = 
+          headerIndices["optionAHi"] !== undefined &&
+          headerIndices["optionBHi"] !== undefined &&
+          headerIndices["optionCHi"] !== undefined &&
+          headerIndices["optionDHi"] !== undefined;
+
+        if (!hasEnHeaders && !hasHiHeaders) {
+          missingCritical.push("optionA/B/C/D (English or Hindi)");
+        }
 
         if (missingCritical.length > 0) {
           throw new Error(isHindi 
@@ -195,12 +207,30 @@ export default function QuestionImportModal({ isOpen, onClose, onQuestionsImport
             const optCEn = getVal("optionCEn");
             const optDEn = getVal("optionDEn");
 
-            if (!optAEn || !optBEn || !optCEn || !optDEn) {
+            const optAHi = getVal("optionAHi");
+            const optBHi = getVal("optionBHi");
+            const optCHi = getVal("optionCHi");
+            const optDHi = getVal("optionDHi");
+
+            const hasAllEn = optAEn && optBEn && optCEn && optDEn;
+            const hasAllHi = optAHi && optBHi && optCHi && optDHi;
+
+            if (!hasAllEn && !hasAllHi) {
               throw new Error(isHindi
-                ? `पंक्ति ${idx + 2}: चारों विकल्प (A, B, C, D) आवश्यक हैं।`
-                : `Row ${idx + 2}: All four options (A, B, C, D) are required.`
+                ? `पंक्ति ${idx + 2}: चारों विकल्प (English या Hindi में) आवश्यक हैं।`
+                : `Row ${idx + 2}: All four options (in English or Hindi) are required.`
               );
             }
+
+            const resolvedOptAEn = optAEn || optAHi;
+            const resolvedOptBEn = optBEn || optBHi;
+            const resolvedOptCEn = optCEn || optCHi;
+            const resolvedOptDEn = optDEn || optDHi;
+
+            const resolvedOptAHi = optAHi || optAEn;
+            const resolvedOptBHi = optBHi || optBEn;
+            const resolvedOptCHi = optCHi || optCEn;
+            const resolvedOptDHi = optDHi || optDEn;
 
             let ans = (getVal("correctAnswer").toUpperCase() || "A").trim();
             if (!["A", "B", "C", "D"].includes(ans)) {
@@ -211,13 +241,8 @@ export default function QuestionImportModal({ isOpen, onClose, onQuestionsImport
               id: getVal("id") || `csv-import-q-${Date.now()}-${idx}-${Math.floor(Math.random() * 1000)}`,
               questionEn: qEn,
               questionHi: qHi,
-              optionsEn: [optAEn, optBEn, optCEn, optDEn] as [string, string, string, string],
-              optionsHi: [
-                getVal("optionAHi") || optAEn,
-                getVal("optionBHi") || optBEn,
-                getVal("optionCHi") || optCEn,
-                getVal("optionDHi") || optDEn
-              ] as [string, string, string, string],
+              optionsEn: [resolvedOptAEn, resolvedOptBEn, resolvedOptCEn, resolvedOptDEn] as [string, string, string, string],
+              optionsHi: [resolvedOptAHi, resolvedOptBHi, resolvedOptCHi, resolvedOptDHi] as [string, string, string, string],
               correctAnswer: ans as "A" | "B" | "C" | "D",
               explanationEn: getVal("explanationEn"),
               explanationHi: getVal("explanationHi") || getVal("explanationEn"),
