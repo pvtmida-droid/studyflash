@@ -415,6 +415,26 @@ async function startServer() {
     return supabaseClient;
   }
 
+  // Fetch admin password from Supabase or fallback to process.env
+  async function getAdminPassword() {
+    const supabase = getSupabase();
+    if (supabase) {
+      try {
+        const { data, error } = await supabase
+          .from("settings")
+          .select("value")
+          .eq("key", "admin_password")
+          .single();
+        if (!error && data && data.value) {
+          return data.value;
+        }
+      } catch (err) {
+        console.error("Failed to fetch admin password from Supabase:", err);
+      }
+    }
+    return process.env.ADMIN_PASSWORD || "studyflash2026";
+  }
+
   // Middleware to authenticate admin requests using JWT
   function authenticateAdmin(req: any, res: any, next: any) {
     const authHeader = req.headers.authorization;
@@ -438,7 +458,7 @@ async function startServer() {
     res.json({ status: "ok", time: new Date().toISOString() });
   });
 
-  app.post("/api/admin/login", (req, res) => {
+  app.post("/api/admin/login", async (req, res) => {
     const { email, password } = req.body;
     
     const cleanEnv = (val: string | undefined, defaultVal: string) => {
@@ -447,7 +467,7 @@ async function startServer() {
     };
 
     const adminEmail = cleanEnv(process.env.ADMIN_EMAIL, "admin@studyflash.in").toLowerCase();
-    const adminPassword = cleanEnv(process.env.ADMIN_PASSWORD, "studyflash2026");
+    const adminPassword = await getAdminPassword();
 
     const inputEmail = (email || "").trim().toLowerCase().replace(/['"]/g, "");
     const inputPassword = (password || "").trim().replace(/['"]/g, "");
@@ -465,19 +485,29 @@ async function startServer() {
     }
   });
 
-  app.post("/api/admin/change-password", authenticateAdmin, (req, res) => {
+  app.post("/api/admin/change-password", authenticateAdmin, async (req, res) => {
     const { currentPassword, newPassword } = req.body;
     
-    const cleanEnv = (val: string | undefined, defaultVal: string) => {
-      if (!val) return defaultVal;
-      return val.replace(/['"]/g, "").trim();
-    };
-
-    const adminPassword = cleanEnv(process.env.ADMIN_PASSWORD, "studyflash2026");
+    const adminPassword = await getAdminPassword();
     const inputCurrentPassword = (currentPassword || "").trim().replace(/['"]/g, "");
 
     if (inputCurrentPassword === adminPassword || inputCurrentPassword === "studyflash2026") {
       process.env.ADMIN_PASSWORD = newPassword;
+      
+      const supabase = getSupabase();
+      if (supabase) {
+        try {
+          const { error } = await supabase
+            .from("settings")
+            .upsert({ key: "admin_password", value: newPassword });
+          if (error) {
+            console.error("Failed to save admin password to Supabase:", error.message);
+          }
+        } catch (err) {
+          console.error("Failed to save admin password to Supabase:", err);
+        }
+      }
+      
       res.json({ success: true, message: "Password updated successfully" });
     } else {
       res.status(401).json({ success: false, error: "Current password is incorrect" });
