@@ -50,15 +50,14 @@ export default function Footer({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-slate-600 dark:text-slate-400">
               <div className="space-y-3">
                 <p className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-emerald-500" /> Sector 62,
-                  Noida, Uttar Pradesh, India - 201301
+                  <MapPin className="h-4 w-4 text-emerald-500" /> Sonpur saran Bihar - 841101
                 </p>
                 <p className="flex items-center gap-2">
                   <Mail className="h-4 w-4 text-emerald-500" />{" "}
-                  support@studyflash.co
+                  bkmix123@gmail.com
                 </p>
                 <p className="flex items-center gap-2">
-                  <Phone className="h-4 w-4 text-emerald-500" /> +91 120 4567800
+                  <Phone className="h-4 w-4 text-emerald-500" /> +91 7480801616
                 </p>
               </div>
 
