@@ -276,12 +276,8 @@ export default function Footer({
 
         <div className="mt-8 pt-8 border-t border-slate-100 dark:border-slate-900 text-center text-xs text-slate-400 flex flex-col sm:flex-row justify-between items-center gap-4">
           <p>
-            © 2026 StudyFlash.in EdTech. All Rights Reserved. Crafted with
-            Google Material Design 3 guidelines.
+            © 2026 StudyFlash.in. All content is free to use (Copyright Free).
           </p>
-          <span className="text-[9px] font-mono tracking-wider text-emerald-500">
-            POWERED BY GEMINI 3.5 FLASH
-          </span>
         </div>
       </div>
     </footer>
