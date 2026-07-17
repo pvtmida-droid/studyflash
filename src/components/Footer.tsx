@@ -22,6 +22,10 @@ export default function Footer({
 }: FooterProps) {
   const [newsLetterEmail, setNewsLetterEmail] = useState("");
   const [submittedFeedback, setSubmittedFeedback] = useState(false);
+  const [contactName, setContactName] = useState("");
+  const [contactInfo, setContactInfo] = useState("");
+  const [contactMessage, setContactMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   return (
     <footer className="mt-12 bg-transparent border-t border-slate-200 dark:border-slate-800/60 py-12 transition-colors duration-300">
@@ -62,16 +66,56 @@ export default function Footer({
               </div>
 
               <form
-                onSubmit={(e) => {
+                onSubmit={async (e) => {
                   e.preventDefault();
-                  setSubmittedFeedback(true);
+                  if (isSubmitting) return;
+                  setIsSubmitting(true);
+                  try {
+                    const res = await fetch("/api/contact", {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                      },
+                      body: JSON.stringify({
+                        name: contactName,
+                        contactInfo: contactInfo,
+                        message: contactMessage,
+                      }),
+                    });
+                    if (res.ok) {
+                      setSubmittedFeedback(true);
+                      setContactName("");
+                      setContactInfo("");
+                      setContactMessage("");
+                      setTimeout(() => setSubmittedFeedback(false), 5000);
+                    } else {
+                      alert(isHindi ? "संदेश भेजने में विफल। कृपया पुनः प्रयास करें।" : "Failed to send message. Please try again.");
+                    }
+                  } catch (err) {
+                    console.error("Feedback submit error:", err);
+                    alert(isHindi ? "नेटवर्क त्रुटि। कृपया बाद में प्रयास करें।" : "Network error. Please try again later.");
+                  } finally {
+                    setIsSubmitting(false);
+                  }
                 }}
                 className="space-y-3"
               >
                 <input
                   type="text"
                   placeholder={isHindi ? "अपना नाम लिखें" : "Full Name"}
+                  value={contactName}
+                  onChange={(e) => setContactName(e.target.value)}
                   className="w-full p-2 text-xs border rounded-xl bg-white dark:bg-slate-800 dark:text-white"
+                  disabled={isSubmitting}
+                  required
+                />
+                <input
+                  type="text"
+                  placeholder={isHindi ? "ईमेल आईडी या फ़ोन नंबर" : "Email ID or Phone Number"}
+                  value={contactInfo}
+                  onChange={(e) => setContactInfo(e.target.value)}
+                  className="w-full p-2 text-xs border rounded-xl bg-white dark:bg-slate-800 dark:text-white"
+                  disabled={isSubmitting}
                   required
                 />
                 <textarea
@@ -80,19 +124,25 @@ export default function Footer({
                       ? "अपनी समस्या या प्रतिक्रिया विस्तार से लिखें..."
                       : "Brief message explaining your inquiry..."
                   }
+                  value={contactMessage}
+                  onChange={(e) => setContactMessage(e.target.value)}
                   className="w-full p-2 text-xs border rounded-xl bg-white dark:bg-slate-800 dark:text-white"
                   rows={3}
+                  disabled={isSubmitting}
                   required
                 />
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow"
+                  disabled={isSubmitting}
+                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow disabled:opacity-50"
                 >
-                  {submittedFeedback
-                    ? "Sent!"
-                    : isHindi
-                      ? "संदेश भेजें"
-                      : "Send Query"}
+                  {isSubmitting
+                    ? (isHindi ? "भेजा जा रहा है..." : "Sending...")
+                    : submittedFeedback
+                      ? (isHindi ? "भेज दिया गया!" : "Sent!")
+                      : isHindi
+                        ? "संदेश भेजें"
+                        : "Send Query"}
                 </button>
               </form>
             </div>

@@ -458,6 +458,36 @@ async function startServer() {
     res.json({ status: "ok", time: new Date().toISOString() });
   });
 
+  app.post("/api/contact", async (req, res) => {
+    const { name, contactInfo, message } = req.body;
+    if (!name || !message) {
+      return res.status(400).json({ success: false, error: "Name and message are required." });
+    }
+    
+    const supabase = getSupabase();
+    if (supabase) {
+      try {
+        const { error } = await supabase
+          .from("contact_messages")
+          .insert({
+            name,
+            contact_info: contactInfo || "",
+            message,
+            created_at: new Date().toISOString()
+          });
+        if (error) {
+          console.error("Failed to save contact message to Supabase:", error.message);
+          return res.status(500).json({ success: false, error: error.message });
+        }
+        return res.json({ success: true, message: "Contact message sent successfully" });
+      } catch (err) {
+        console.error("Failed to save contact message to Supabase:", err);
+        return res.status(500).json({ success: false, error: "Database error" });
+      }
+    }
+    return res.status(503).json({ success: false, error: "Database not configured" });
+  });
+
   app.post("/api/admin/login", async (req, res) => {
     const { email, password } = req.body;
     
