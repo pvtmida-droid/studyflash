@@ -216,12 +216,6 @@ export default function Footer({
               >
                 All India Mock Series
               </button>
-              <button
-                onClick={() => setCurrentView("admin")}
-                className="text-left hover:underline"
-              >
-                Admin Login
-              </button>
             </div>
           </div>
 
