@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Flame,
   Search,
@@ -78,7 +78,71 @@ import { Question, MockTest, UserStats, LiveTestConfig } from "./types";
 export default function App() {
   const [isHindi, setIsHindi] = useState(false);
   const [isDark, setIsDark] = useState(false);
-  const [currentView, setCurrentView] = useState("home"); // home, questions, quizzes, dashboard, admin, etc.
+  // Mapping views to URL paths
+  const viewToPath: Record<string, string> = {
+    "home": "/",
+    "admin": "/admin",
+    "contact": "/contact",
+    "about": "/about",
+    "privacy": "/privacy",
+    "terms": "/terms",
+    "science-selection": "/science",
+    "gkgs-selection": "/gkgs",
+    "maths-selection": "/maths",
+    "reasoning-selection": "/reasoning",
+    "hindi-selection": "/hindi",
+    "english-selection": "/english",
+    "computer-selection": "/computer",
+    "ncert-selection": "/ncert",
+    "current-affairs-selection": "/current-affairs",
+    "central-exam-selection": "/central-exams",
+    "previous-year-selection": "/pyq",
+    "state-police-selection": "/state-police",
+    "questions": "/questions",
+    "quizzes": "/quizzes",
+    "live-test-auto": "/live-test",
+    "dashboard": "/dashboard"
+  };
+
+  const pathToView = useMemo(() => {
+    const mapping: Record<string, string> = {};
+    Object.entries(viewToPath).forEach(([view, path]) => {
+      mapping[path] = view;
+    });
+    return mapping;
+  }, []);
+
+  const getInitialView = () => {
+    const path = window.location.pathname;
+    return pathToView[path] || "home";
+  };
+
+  const [currentView, setRawView] = useState(getInitialView);
+
+  const setCurrentView = (viewOrFn: any) => {
+    setRawView((prev) => {
+      const nextView = typeof viewOrFn === "function" ? viewOrFn(prev) : viewOrFn;
+      const path = viewToPath[nextView];
+      if (path && window.location.pathname !== path) {
+        window.history.pushState({ view: nextView }, "", path);
+      }
+      return nextView;
+    });
+  };
+
+  useEffect(() => {
+    const handlePopState = () => {
+      const path = window.location.pathname;
+      const view = pathToView[path] || "home";
+      setRawView(view);
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [pathToView]);
+
   const [selectedFontSize, setSelectedFontSize] = useState(15);
 
   // Db lists states
