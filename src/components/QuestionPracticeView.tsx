@@ -73,6 +73,11 @@ export default function QuestionPracticeView({
   const [timeLeft, setTimeLeft] = useState(50);
   const [totalTimeSpent, setTotalTimeSpent] = useState(0);
   const [hasStarted, setHasStarted] = useState(autoStart);
+  const [displayLanguage, setDisplayLanguage] = useState<"en" | "hi">(isHindi ? "hi" : "en");
+
+  useEffect(() => {
+    setDisplayLanguage(isHindi ? "hi" : "en");
+  }, [isHindi]);
   const [questionCountLimit, setQuestionCountLimit] = useState<number>(20);
 
   // Timer countdown
@@ -779,6 +784,30 @@ export default function QuestionPracticeView({
                   {isHindi ? activeQuestion.subject : activeQuestion.subject}
                 </span>
 
+                {/* Language Preference Selector */}
+                <div className="flex items-center bg-slate-100 dark:bg-slate-800/80 p-0.5 rounded-full text-[10px] font-bold border border-slate-200 dark:border-slate-700">
+                  <button
+                    onClick={() => setDisplayLanguage("en")}
+                    className={`px-3 py-1 rounded-full transition-all ${
+                      displayLanguage === "en"
+                        ? "bg-white dark:bg-slate-700 text-blue-600 dark:text-sky-400 shadow-sm"
+                        : "text-slate-500 dark:text-slate-400 hover:text-slate-800"
+                    }`}
+                  >
+                    English
+                  </button>
+                  <button
+                    onClick={() => setDisplayLanguage("hi")}
+                    className={`px-3 py-1 rounded-full transition-all ${
+                      displayLanguage === "hi"
+                        ? "bg-white dark:bg-slate-700 text-blue-600 dark:text-sky-400 shadow-sm"
+                        : "text-slate-500 dark:text-slate-400 hover:text-slate-800"
+                    }`}
+                  >
+                    हिंदी
+                  </button>
+                </div>
+
                 <div
                   className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold font-mono transition-colors shadow-sm ${
                     timeLeft <= 30
@@ -806,9 +835,10 @@ export default function QuestionPracticeView({
                 style={{ fontSize: `${selectedFontSize}px` }}
               >
                 <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl mb-4 border border-slate-100 dark:border-slate-800">
-                  <p className="font-semibold">{activeQuestion.questionEn}</p>
-                  {activeQuestion.questionHi && (
-                    <p className="mt-3 text-slate-700 dark:text-slate-200 font-semibold pt-3 border-t border-dashed border-slate-200 dark:border-slate-700">
+                  {displayLanguage === "en" || !activeQuestion.questionHi ? (
+                    <p className="font-semibold">{activeQuestion.questionEn}</p>
+                  ) : (
+                    <p className="text-slate-700 dark:text-slate-200 font-semibold">
                       {activeQuestion.questionHi}
                     </p>
                   )}
@@ -863,11 +893,10 @@ export default function QuestionPracticeView({
                           {optId}
                         </span>
                         <div>
-                          <span>{optionLabelEn}</span>
-                          {optionLabelHi && optionLabelHi !== optionLabelEn && (
-                            <span className="block text-xs font-normal text-slate-500 dark:text-slate-400 mt-0.5">
-                              {optionLabelHi}
-                            </span>
+                          {displayLanguage === "en" || !optionLabelHi ? (
+                            <span>{optionLabelEn}</span>
+                          ) : (
+                            <span>{optionLabelHi}</span>
                           )}
                         </div>
                       </div>
@@ -898,13 +927,18 @@ export default function QuestionPracticeView({
                         ? "उत्तर कुंजी एवं विस्तृत स्पष्टीकरण"
                         : "EXPLANATION & ANALYSIS"}
                     </span>
-                    <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-sans">
-                      {activeQuestion.explanationEn}
-                    </p>
-                    {activeQuestion.explanationHi && (
-                      <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-sans pt-2 border-t border-dashed border-slate-100 dark:border-slate-800">
-                        {activeQuestion.explanationHi}
-                      </p>
+                    {displayLanguage === "en" || !activeQuestion.explanationHi ? (
+                      activeQuestion.explanationEn && (
+                        <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-sans">
+                          {activeQuestion.explanationEn}
+                        </p>
+                      )
+                    ) : (
+                      activeQuestion.explanationHi && (
+                        <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-sans">
+                          {activeQuestion.explanationHi}
+                        </p>
+                      )
                     )}
                   </div>
 
