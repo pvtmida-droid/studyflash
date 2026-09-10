@@ -401,13 +401,6 @@ export default function HomeView({
                     of Aspirants Nationwide
                   </p>
                 </div>
-
-                <p className="text-slate-600 dark:text-slate-400 text-base leading-relaxed text-center md:text-left">
-                  Designed for SSC, Railway, Banking, UP Police, State Exams,
-                  and other competitive examinations. Test your skills, track
-                  your performance, and see where you stand among India's top
-                  aspirants.
-                </p>
               </div>
               <div className="flex flex-col items-center md:items-end gap-3 w-full md:w-auto">
                 <button
