@@ -835,32 +835,97 @@ Ensure your response is ONLY the raw JSON array (do not wrap in markdown like \`
     }
   });
 
-  // Live Test Config Storage File & API
+  // Live Test Config Storage File & API (Backed by Supabase)
   const liveTestConfigFile = path.join(process.cwd(), "livetest_config.json");
 
-  app.get("/api/livetest", (req, res) => {
+  app.get("/api/livetest", async (req, res) => {
+    const supabase = getSupabase();
+    if (supabase) {
+      try {
+        const { data, error } = await supabase
+          .from("mock_tests")
+          .select("*")
+          .eq("id", "live_mega_test")
+          .single();
+
+        if (!error && data) {
+          let resultDate = "2026-09-15T23:59:59";
+          if (data.exam && data.exam.includes("RESULT_DATE:")) {
+            resultDate = data.exam.split("RESULT_DATE:")[1].trim();
+          }
+          const questions = typeof data.questions === "string" ? JSON.parse(data.questions) : (data.questions || []);
+          return res.json({
+            resultDate,
+            test: {
+              id: data.id,
+              titleEn: data.title_en || data.titleEn || "All India Live Test 2026",
+              titleHi: data.title_hi || data.titleHi || "ऑल इंडिया लाइव टेस्ट 2026",
+              subject: data.subject || "Static GK",
+              exam: data.exam || "Mega Battle",
+              duration: data.duration || 120,
+              totalQuestions: data.total_questions || questions.length,
+              totalMarks: data.total_marks || (questions.length * 2),
+              questions,
+              isPreviousYear: false
+            }
+          });
+        }
+      } catch (err) {
+        console.error("Error fetching live test from Supabase:", err);
+      }
+    }
+
     try {
       if (fs.existsSync(liveTestConfigFile)) {
         const content = fs.readFileSync(liveTestConfigFile, "utf-8");
-        const config = JSON.parse(content);
-        return res.json(config);
+        return res.json(JSON.parse(content));
       }
-    } catch (err) {
-      console.error("Error reading live test config file:", err);
-    }
+    } catch (err) {}
     return res.json(null);
   });
 
-  app.post("/api/livetest", authenticateAdmin, (req, res) => {
+  app.post("/api/livetest", authenticateAdmin, async (req, res) => {
     const config = req.body;
     if (!config || !config.resultDate) {
       return res.status(400).json({ success: false, error: "Invalid live test configuration" });
     }
+
+    const supabase = getSupabase();
+    if (supabase) {
+      try {
+        const examStr = `Mega Battle|RESULT_DATE:${config.resultDate}`;
+        const payload = {
+          id: "live_mega_test",
+          title_en: config.test?.titleEn || "All India Live Test 2026",
+          title_hi: config.test?.titleHi || "ऑल इंडिया लाइव टेस्ट 2026",
+          subject: config.test?.subject || "Static GK",
+          exam: examStr,
+          duration: config.test?.duration || 120,
+          total_questions: config.test?.questions?.length || 100,
+          total_marks: (config.test?.questions?.length || 100) * 2,
+          questions: config.test?.questions || [],
+          is_previous_year: false
+        };
+
+        const { error } = await supabase
+          .from("mock_tests")
+          .upsert([payload], { onConflict: "id" });
+
+        if (error) {
+          console.error("Supabase upsert live test error:", error.message);
+          return res.status(500).json({ success: false, error: error.message });
+        }
+        return res.json({ success: true, config });
+      } catch (err: any) {
+        console.error("Failed to save live test to Supabase:", err);
+        return res.status(500).json({ success: false, error: err.message });
+      }
+    }
+
     try {
       fs.writeFileSync(liveTestConfigFile, JSON.stringify(config, null, 2), "utf-8");
       return res.json({ success: true, config });
     } catch (err: any) {
-      console.error("Error saving live test config file:", err);
       return res.status(500).json({ success: false, error: err.message });
     }
   });
