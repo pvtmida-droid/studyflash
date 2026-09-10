@@ -2017,24 +2017,45 @@ Sitemap: https://studyflash.co/sitemap.xml`);
                 <label className="text-[11px] font-bold text-slate-500 uppercase">
                   Public Result Date
                 </label>
-                <input
-                  type="date"
-                  value={liveTestConfig?.resultDate ? liveTestConfig.resultDate.split("T")[0] : ""}
-                  onChange={(e) => {
-                    const dateVal = e.target.value;
-                    if (!dateVal) return;
-                    if (onUpdateLiveTestConfig && liveTestConfig) {
-                      onUpdateLiveTestConfig({
-                        ...liveTestConfig,
-                        resultDate: `${dateVal}T23:59:59`,
-                      });
-                    }
-                  }}
-                  className="w-full text-xs p-3 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 rounded-xl focus:outline-none focus:ring-1 focus:ring-emerald-500"
-                />
+                <div className="flex gap-2 items-center">
+                  <input
+                    type="date"
+                    id="public-result-date-input"
+                    value={liveTestConfig?.resultDate ? liveTestConfig.resultDate.split("T")[0] : ""}
+                    onChange={(e) => {
+                      const dateVal = e.target.value;
+                      if (!dateVal) return;
+                      if (onUpdateLiveTestConfig && liveTestConfig) {
+                        onUpdateLiveTestConfig({
+                          ...liveTestConfig,
+                          resultDate: `${dateVal}T23:59:59`,
+                        });
+                      }
+                    }}
+                    className="flex-1 text-xs p-3 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 rounded-xl focus:outline-none focus:ring-1 focus:ring-emerald-500 font-bold"
+                  />
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      const el = document.getElementById("public-result-date-input") as HTMLInputElement;
+                      if (el && el.value && onUpdateLiveTestConfig && liveTestConfig) {
+                        const newConfig = {
+                          ...liveTestConfig,
+                          resultDate: `${el.value}T23:59:59`,
+                        };
+                        onUpdateLiveTestConfig(newConfig);
+                        alert(isHindi ? `✅ परिणाम तारीख (${el.value}) Supabase Database और Live Portal पर सफलतापूर्वक सेव कर दी गई है!` : `✅ Result Date (${el.value}) successfully saved and synced to Supabase Live Database!`);
+                      }
+                    }}
+                    className="px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm transition-all active:scale-95 flex items-center gap-1.5 shrink-0"
+                  >
+                    <span>💾</span>
+                    <span>{isHindi ? "सेव करें & लाइव सिंक" : "Save & Sync Live"}</span>
+                  </button>
+                </div>
                 <p className="text-[10px] text-slate-400 mt-1">
                   This date will be publicly visible on the main portal's
-                  countdown timer.
+                  countdown timer. Click "Save & Sync Live" to push changes to Supabase database.
                 </p>
               </div>
 

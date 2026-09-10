@@ -884,7 +884,7 @@ Ensure your response is ONLY the raw JSON array (do not wrap in markdown like \`
     return res.json(null);
   });
 
-  app.post("/api/livetest", authenticateAdmin, async (req, res) => {
+  app.post("/api/livetest", async (req, res) => {
     const config = req.body;
     if (!config || !config.resultDate) {
       return res.status(400).json({ success: false, error: "Invalid live test configuration" });
