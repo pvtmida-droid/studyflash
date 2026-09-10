@@ -2019,15 +2019,17 @@ Sitemap: https://studyflash.co/sitemap.xml`);
                 </label>
                 <input
                   type="date"
-                  value={liveTestConfig?.resultDate.split("T")[0] || ""}
-                  onChange={(e) =>
-                    onUpdateLiveTestConfig &&
-                    liveTestConfig &&
-                    onUpdateLiveTestConfig({
-                      ...liveTestConfig,
-                      resultDate: e.target.value + "T00:00:00",
-                    })
-                  }
+                  value={liveTestConfig?.resultDate ? liveTestConfig.resultDate.split("T")[0] : ""}
+                  onChange={(e) => {
+                    const dateVal = e.target.value;
+                    if (!dateVal) return;
+                    if (onUpdateLiveTestConfig && liveTestConfig) {
+                      onUpdateLiveTestConfig({
+                        ...liveTestConfig,
+                        resultDate: `${dateVal}T23:59:59`,
+                      });
+                    }
+                  }}
                   className="w-full text-xs p-3 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 rounded-xl focus:outline-none focus:ring-1 focus:ring-emerald-500"
                 />
                 <p className="text-[10px] text-slate-400 mt-1">

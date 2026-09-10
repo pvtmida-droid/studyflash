@@ -165,6 +165,21 @@ export default function App() {
         console.error("Failed to fetch mock tests:", err);
       }
     };
+    const fetchLiveTestConfig = async () => {
+      try {
+        const res = await fetch("/api/livetest");
+        if (res.ok) {
+          const serverConfig = await res.json();
+          if (serverConfig && serverConfig.resultDate && serverConfig.test) {
+            setLiveTestConfig(serverConfig);
+            localStorage.setItem("studyflash_livetest_config", JSON.stringify(serverConfig));
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch live test config from server:", err);
+      }
+    };
+    fetchLiveTestConfig();
     fetchMockTests();
 
     const fetchQuestions = async () => {
@@ -291,13 +306,25 @@ export default function App() {
 
   const isAdmin = sessionStorage.getItem("admin_session") === "true";
 
-  const handleUpdateLiveTestConfig = (newConfig: LiveTestConfig) => {
+  const handleUpdateLiveTestConfig = async (newConfig: LiveTestConfig) => {
     setLiveTestConfig(newConfig);
     localStorage.setItem(
       "studyflash_livetest_config",
       JSON.stringify(newConfig),
     );
-    // Provide to Db if needed
+    try {
+      const token = localStorage.getItem("studyflash_admin_token");
+      await fetch("/api/livetest", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": token ? `Bearer ${token}` : ""
+        },
+        body: JSON.stringify(newConfig)
+      });
+    } catch (err) {
+      console.error("Failed to sync live test config to server:", err);
+    }
   };
 
   const [userStats, setUserStats] = useState<UserStats>(INITIAL_USER_STATS);

@@ -1,6 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import path from "path";
+import fs from "fs";
 import jwt from "jsonwebtoken";
 import { createClient } from "@supabase/supabase-js";
 import { GoogleGenAI } from "@google/genai";
@@ -831,6 +832,36 @@ Ensure your response is ONLY the raw JSON array (do not wrap in markdown like \`
       }
     } else {
       res.status(503).json({ success: false, error: "Supabase not configured" });
+    }
+  });
+
+  // Live Test Config Storage File & API
+  const liveTestConfigFile = path.join(process.cwd(), "livetest_config.json");
+
+  app.get("/api/livetest", (req, res) => {
+    try {
+      if (fs.existsSync(liveTestConfigFile)) {
+        const content = fs.readFileSync(liveTestConfigFile, "utf-8");
+        const config = JSON.parse(content);
+        return res.json(config);
+      }
+    } catch (err) {
+      console.error("Error reading live test config file:", err);
+    }
+    return res.json(null);
+  });
+
+  app.post("/api/livetest", authenticateAdmin, (req, res) => {
+    const config = req.body;
+    if (!config || !config.resultDate) {
+      return res.status(400).json({ success: false, error: "Invalid live test configuration" });
+    }
+    try {
+      fs.writeFileSync(liveTestConfigFile, JSON.stringify(config, null, 2), "utf-8");
+      return res.json({ success: true, config });
+    } catch (err: any) {
+      console.error("Error saving live test config file:", err);
+      return res.status(500).json({ success: false, error: err.message });
     }
   });
 

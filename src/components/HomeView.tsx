@@ -344,7 +344,7 @@ export default function HomeView({
                     <Calendar className="w-4 h-4 text-indigo-500 transition-transform duration-300 group-hover:scale-110" />
                     <span>
                       {new Date(
-                        liveTestConfig?.resultDate || "2026-06-30T00:00:00",
+                        liveTestConfig?.resultDate || "2026-12-31T23:59:59",
                       ).toLocaleDateString("en-GB", {
                         day: "numeric",
                         month: "long",
@@ -435,8 +435,8 @@ export default function HomeView({
                     } else {
                       alert(
                         isHindi
-                          ? `परिणाम ${new Date(liveTestConfig?.resultDate || "2026-06-30T00:00:00").toLocaleDateString("hi-IN")} को घोषित किए जाएंगे`
-                          : `Results will be declared on ${new Date(liveTestConfig?.resultDate || "2026-06-30T00:00:00").toLocaleDateString()}`
+                          ? `परिणाम ${new Date(liveTestConfig?.resultDate || "2026-12-31T23:59:59").toLocaleDateString("hi-IN")} को घोषित किए जाएंगे`
+                          : `Results will be declared on ${new Date(liveTestConfig?.resultDate || "2026-12-31T23:59:59").toLocaleDateString()}`
                       );
                     }
                   }}
