@@ -66,7 +66,7 @@ export default function HomeView({
 
     const calculateTimeLeft = () => {
       const difference =
-        +new Date(liveTestConfig?.resultDate || "2026-06-30T00:00:00") -
+        +new Date(liveTestConfig?.resultDate || "2026-12-31T23:59:59") -
         +new Date();
       if (difference > 0) {
         setTimeLeft({

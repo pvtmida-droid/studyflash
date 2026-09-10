@@ -265,10 +265,12 @@ export default function App() {
     if (cached) {
       try {
         const parsed = JSON.parse(cached);
-        if (parsed && parsed.test && Array.isArray(parsed.test.questions) && parsed.test.questions.length > 0) {
+        if (parsed && parsed.test && Array.isArray(parsed.test.questions) && parsed.test.questions.length >= defaultQs.length) {
           return parsed;
         }
       } catch (err) {}
+      // Clear old cached config if questions count is insufficient
+      localStorage.removeItem("studyflash_livetest_config");
     }
     return {
       resultDate: "2026-12-31T23:59:59",
