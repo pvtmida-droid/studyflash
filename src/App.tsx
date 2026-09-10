@@ -74,6 +74,7 @@ import {
 } from "./mockData";
 
 import { Question, MockTest, UserStats, LiveTestConfig } from "./types";
+import allIndiaLiveQuestions from "./allIndiaLiveQuestions.json";
 
 export default function App() {
   const [isHindi, setIsHindi] = useState(false);
@@ -172,8 +173,22 @@ export default function App() {
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data)) {
-            const uniqueQs = Array.from(new Map(data.map(q => [q.id, q])).values());
+            const uniqueQs: Question[] = Array.from(new Map(data.map((q: any) => [q.id, q])).values());
             setQuestions(uniqueQs);
+
+            // Sync live questions from Supabase database
+            const liveQs = uniqueQs.filter((q: Question) => q.id.startsWith("live2026-") || (Array.isArray(q.examTags) && q.examTags.includes("All India Live Test")));
+            if (liveQs.length > 0) {
+              setLiveTestConfig(prev => ({
+                ...prev,
+                test: {
+                  ...prev.test,
+                  totalQuestions: liveQs.length,
+                  totalMarks: liveQs.length * 2,
+                  questions: liveQs
+                }
+              }));
+            }
             return;
           }
         }
@@ -245,24 +260,28 @@ export default function App() {
   };
 
   const [liveTestConfig, setLiveTestConfig] = useState<LiveTestConfig>(() => {
+    const defaultQs = allIndiaLiveQuestions as any[];
     const cached = localStorage.getItem("studyflash_livetest_config");
     if (cached) {
       try {
-        return JSON.parse(cached);
+        const parsed = JSON.parse(cached);
+        if (parsed && parsed.test && Array.isArray(parsed.test.questions) && parsed.test.questions.length > 0) {
+          return parsed;
+        }
       } catch (err) {}
     }
     return {
-      resultDate: "2026-06-30T00:00:00",
+      resultDate: "2026-12-31T23:59:59",
       test: {
         id: "live_mega_test",
-        titleEn: "All India Mega Test 2026",
-        titleHi: "ऑल इंडिया मेगा टेस्ट 2026",
-        subject: "All Subjects",
+        titleEn: "All India Live Test 2026 (100 Questions)",
+        titleHi: "ऑल इंडिया लाइव टेस्ट 2026 (100 प्रश्न)",
+        subject: "Static GK & UP Police",
         exam: "Mega Battle",
-        duration: 60,
-        totalQuestions: 0,
-        totalMarks: 0,
-        questions: [],
+        duration: 120,
+        totalQuestions: defaultQs.length,
+        totalMarks: defaultQs.length * 2,
+        questions: defaultQs,
         isPreviousYear: false,
       },
     };

@@ -6,6 +6,7 @@ import {
   FAQItem,
   UserStats,
 } from "./types";
+import allIndiaLiveQuestions from "./allIndiaLiveQuestions.json";
 
 export const MOCK_QUESTIONS: Question[] = [
   {
@@ -1830,6 +1831,18 @@ export const MOCK_QUESTIONS: Question[] = [
 ];
 
 export const POPULAR_MOCK_TESTS: MockTest[] = [
+  {
+    id: "live_mega_test",
+    titleEn: "All India Live Test 2026 (100 Questions)",
+    titleHi: "ऑल इंडिया लाइव टेस्ट 2026 (100 प्रश्न)",
+    subject: "Static GK & UP Police",
+    exam: "All India Live Test",
+    duration: 120,
+    totalQuestions: (allIndiaLiveQuestions as any[]).length,
+    totalMarks: (allIndiaLiveQuestions as any[]).length * 2,
+    isPreviousYear: false,
+    questions: allIndiaLiveQuestions as any[],
+  },
   {
     id: "mock-1",
     titleEn: "SSC CGL Full Syllabus Premium Test - 1",
