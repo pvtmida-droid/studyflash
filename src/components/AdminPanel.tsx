@@ -158,6 +158,29 @@ export default function AdminPanel({
     "manage" | "bulk" | "seo" | "users" | "adsense" | "live" | "mocktests"
   >("manage");
 
+  // Live Visitors Real-Time Presence State
+  const [onlineCount, setOnlineCount] = useState<number>(1);
+  const [pageBreakdown, setPageBreakdown] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    const fetchOnlineCount = async () => {
+      try {
+        const res = await fetch("/api/presence/online-count");
+        if (res.ok) {
+          const data = await res.json();
+          if (data && typeof data.onlineCount === "number") {
+            setOnlineCount(data.onlineCount);
+            if (data.pageBreakdown) setPageBreakdown(data.pageBreakdown);
+          }
+        }
+      } catch (err) {}
+    };
+
+    fetchOnlineCount();
+    const interval = setInterval(fetchOnlineCount, 4000); // Poll every 4 seconds in Admin Panel
+    return () => clearInterval(interval);
+  }, []);
+
   // Live Test CSV States
   const [liveCsvRawText, setLiveCsvRawText] = useState("");
   const [liveCsvId, setLiveCsvId] = useState("");
@@ -1677,8 +1700,17 @@ Sitemap: https://studyflash.co/sitemap.xml`);
           </span>
         </div>
         <div className="flex items-center gap-3 shrink-0 self-end sm:self-center">
-          <span className="text-[11px] text-emerald-400 font-mono tracking-wide">
-            ● {isHindi ? "सक्रिय सुपरवाइजर सत्र" : "Active Supervisor"}
+          {/* Real-time Online Visitors Pulse Badge */}
+          <div className="flex items-center gap-2 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-3 py-1.5 rounded-xl text-xs font-extrabold font-mono shadow-sm">
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+            </span>
+            <span>{onlineCount} {isHindi ? "ऑनलाइन लाइव" : "Live Online"}</span>
+          </div>
+
+          <span className="text-[11px] text-slate-400 font-mono tracking-wide hidden sm:inline">
+            ● {isHindi ? "सक्रिय सुपरवाइजर" : "Active Supervisor"}
           </span>
           <button
             onClick={handleAdminLogout}

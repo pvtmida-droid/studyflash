@@ -214,6 +214,32 @@ export default function App() {
     fetchQuestions();
   }, []);
 
+  // Live Visitor Presence Heartbeat
+  useEffect(() => {
+    let visitorId = sessionStorage.getItem("studyflash_visitor_id");
+    if (!visitorId) {
+      visitorId = "v_" + Date.now() + "_" + Math.floor(Math.random() * 10000);
+      sessionStorage.setItem("studyflash_visitor_id", visitorId);
+    }
+
+    const sendPing = async () => {
+      try {
+        await fetch("/api/presence/ping", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            visitorId,
+            page: window.location.pathname
+          })
+        });
+      } catch (err) {}
+    };
+
+    sendPing();
+    const interval = setInterval(sendPing, 15000); // Ping every 15s
+    return () => clearInterval(interval);
+  }, [currentView]);
+
   // Redirect / Auto-load question when coming from SEO Q&A pages
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);

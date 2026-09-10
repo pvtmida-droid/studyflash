@@ -459,6 +459,80 @@ async function startServer() {
     res.json({ status: "ok", time: new Date().toISOString() });
   });
 
+  // Active Online Visitors Presence System
+  const activePresenceMap = new Map<string, { lastSeen: number; page: string }>();
+
+  function prunePresence() {
+    const now = Date.now();
+    for (const [id, data] of activePresenceMap.entries()) {
+      if (now - data.lastSeen > 45000) { // Prune if no ping for 45 seconds
+        activePresenceMap.delete(id);
+      }
+    }
+  }
+
+  app.post("/api/presence/ping", async (req, res) => {
+    const { visitorId, page } = req.body;
+    if (!visitorId) {
+      return res.status(400).json({ success: false, error: "visitorId is required" });
+    }
+
+    const now = Date.now();
+    activePresenceMap.set(visitorId, { lastSeen: now, page: page || "/" });
+    prunePresence();
+
+    const supabase = getSupabase();
+    if (supabase) {
+      try {
+        const isoNow = new Date().toISOString();
+        await supabase
+          .from("active_presence")
+          .upsert({
+            visitor_id: visitorId,
+            last_seen: isoNow,
+            page: page || "/"
+          }, { onConflict: "visitor_id" });
+      } catch (err) {}
+    }
+
+    return res.json({ success: true, onlineCount: activePresenceMap.size });
+  });
+
+  app.get("/api/presence/online-count", async (req, res) => {
+    prunePresence();
+    let onlineCount = activePresenceMap.size;
+    const pageBreakdown: Record<string, number> = {};
+
+    activePresenceMap.forEach(v => {
+      const p = v.page || "/";
+      pageBreakdown[p] = (pageBreakdown[p] || 0) + 1;
+    });
+
+    const supabase = getSupabase();
+    if (supabase) {
+      try {
+        const secondsAgo = new Date(Date.now() - 45000).toISOString();
+        const { data, error } = await supabase
+          .from("active_presence")
+          .select("visitor_id, page")
+          .gt("last_seen", secondsAgo);
+
+        if (!error && data) {
+          onlineCount = Math.max(onlineCount, data.length);
+          data.forEach((row: any) => {
+            const p = row.page || "/";
+            pageBreakdown[p] = (pageBreakdown[p] || 0) + 1;
+          });
+        }
+      } catch (err) {}
+    }
+
+    return res.json({
+      onlineCount: Math.max(1, onlineCount), // At least 1 (the admin)
+      pageBreakdown
+    });
+  });
+
   app.post("/api/contact", async (req, res) => {
     const { name, contactInfo, message } = req.body;
     if (!name || !message) {
