@@ -108,16 +108,17 @@ export default function QuestionPracticeView({
         const lower = (s || "").toLowerCase().trim();
         if (lower === "mathematics" || lower === "maths") return "maths";
         if (lower === "gkgs" || lower === "general knowledge" || lower === "gk/gs" || lower === "general knowledge (gk/gs)") return "gkgs";
+        if (lower === "computer" || lower === "computer gk" || lower === "computer knowledge") return "computer";
         return lower;
       };
 
       const matchesSubject =
         selectedSubject === "All" || normSubject(q.subject) === normSubject(selectedSubject);
-      const query = searchQuery.toLowerCase();
+      const rawQuery = searchQuery.toLowerCase().trim();
       
       // If searching for a central exam (doesn't have PYQ), don't match PYQ topics/tags
-      const isSearchingForNonPYQExam = !query.includes("pyq") && 
-        ["rrb", "ssc", "upsc", "police", "nda", "cds", "afcat", "railway", "ibps", "bank"].some(exam => query.includes(exam));
+      const isSearchingForNonPYQExam = !rawQuery.includes("pyq") && 
+        ["rrb", "ssc", "upsc", "police", "nda", "cds", "afcat", "railway", "ibps", "bank"].some(exam => rawQuery.includes(exam));
 
       const hasPYQTagOrTopic = 
         (q.id && q.id.toLowerCase().includes("pyq")) ||
@@ -129,16 +130,39 @@ export default function QuestionPracticeView({
         return false;
       }
 
-      const queryTerms = query.split(/\s+/).filter(t => t.length > 0);
+      const queryTerms = rawQuery.split(/\s+/).filter(t => t.length > 0);
       
-      const matchesSearch = queryTerms.length === 0 || queryTerms.every(term => 
-        (q.id && q.id.toLowerCase().includes(term)) ||
-        q.questionEn.toLowerCase().includes(term) ||
-        q.questionHi.toLowerCase().includes(term) ||
-        q.subject.toLowerCase().includes(term) ||
-        q.topic.toLowerCase().includes(term) ||
-        (q.examTags && q.examTags.some((tag) => tag.toLowerCase().includes(term)))
-      );
+      const matchesSearch = queryTerms.length === 0 || queryTerms.every(term => {
+        const variants: string[] = [term];
+        if (term.includes("_")) {
+          variants.push(term.replace(/_/g, " "));
+          variants.push(term.replace(/_/g, ""));
+        }
+        if (term === "ms_office" || term === "msoffice" || term === "office") {
+          variants.push("word", "excel", "powerpoint", "access", "ms word", "ms excel", "ms office", "dca", "adca");
+        }
+        if (term === "fundamentals_os" || term === "fundamentals") {
+          variants.push("fundamental", "os", "operating", "system", "windows", "hardware", "software");
+        }
+        if (term === "internet_networking" || term === "internet" || term === "networking") {
+          variants.push("network", "dbms", "html", "email", "sql", "multimedia", "ccc", "o level");
+        }
+
+        const checkInText = (text: string) => {
+          if (!text) return false;
+          const lowerText = text.toLowerCase();
+          return variants.some(v => lowerText.includes(v));
+        };
+
+        return (
+          checkInText(q.id) ||
+          checkInText(q.questionEn) ||
+          checkInText(q.questionHi) ||
+          checkInText(q.subject) ||
+          checkInText(q.topic) ||
+          (q.examTags && q.examTags.some(tag => checkInText(tag)))
+        );
+      });
       return matchesSubject && matchesSearch;
     });
 

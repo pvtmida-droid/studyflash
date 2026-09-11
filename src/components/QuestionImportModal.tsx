@@ -143,7 +143,10 @@ export default function QuestionImportModal({ isOpen, onClose, onQuestionsImport
           optionDHi: ["optiondhi", "optiond_hi", "optiondhindi", "optdhi"],
           correctAnswer: ["correctanswer", "correct", "answer", "correctoption", "ans", "correctans"],
           explanationEn: ["explanationen", "explanation", "exp", "explanationtext", "explanationenglish", "expen"],
-          explanationHi: ["explanationhi", "exphi", "explanationhindi"]
+          explanationHi: ["explanationhi", "exphi", "explanationhindi"],
+          subject: ["subject", "subjectname"],
+          topic: ["topic", "topicname", "chapter"],
+          examTags: ["examtags", "examtag", "tags", "tag", "exam"]
         };
 
         const headerIndices: Record<string, number> = {};
@@ -228,6 +231,10 @@ export default function QuestionImportModal({ isOpen, onClose, onQuestionsImport
               ans = "A"; // Auto-fallback
             }
 
+            const subFromCsv = getVal("subject");
+            const topFromCsv = getVal("topic");
+            const tagFromCsv = getVal("examTags");
+
             return {
               id: getVal("id") || `csv-import-q-${Date.now()}-${idx}-${Math.floor(Math.random() * 1000)}`,
               questionEn: qEn,
@@ -237,9 +244,11 @@ export default function QuestionImportModal({ isOpen, onClose, onQuestionsImport
               correctAnswer: ans as "A" | "B" | "C" | "D",
               explanationEn: getVal("explanationEn"),
               explanationHi: getVal("explanationHi"),
-              subject: globalSubject,
-              topic: globalTopic,
-              examTags: globalExamTags ? globalExamTags.split(",").map(t => t.trim()).filter(Boolean) : ["Practice"],
+              subject: subFromCsv || globalSubject,
+              topic: topFromCsv || globalTopic,
+              examTags: tagFromCsv 
+                ? tagFromCsv.split(",").map(t => t.trim()).filter(Boolean) 
+                : (globalExamTags ? globalExamTags.split(",").map(t => t.trim()).filter(Boolean) : ["Practice"]),
               likes: 0,
               dislikes: 0
             };
