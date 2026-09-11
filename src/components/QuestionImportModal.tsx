@@ -127,22 +127,22 @@ export default function QuestionImportModal({ isOpen, onClose, onQuestionsImport
         const headers = parsedData[0].map(h => h.trim().replace(/^"|"$/g, ""));
         const rows = parsedData.slice(1);
 
-        const normalize = (s: string) => s.toLowerCase().replace(/[\s_-]/g, "");
+        const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
         const aliases: Record<string, string[]> = {
           id: ["id"],
-          questionEn: ["questionen", "question", "questiontext", "questionenglish"],
-          questionHi: ["questionhi", "questionhindi"],
-          optionAEn: ["optionaen", "optiona", "option1", "a", "optionaenglish"],
-          optionBEn: ["optionben", "optionb", "option2", "b", "optionbenglish"],
-          optionCEn: ["optioncen", "optionc", "option3", "c", "optioncenglish"],
-          optionDEn: ["optionden", "optiond", "option4", "d", "optiondenglish"],
-          optionAHi: ["optionahi", "optiona_hi", "optionahindi"],
-          optionBHi: ["optionbhi", "optionb_hi", "optionbhindi"],
-          optionCHi: ["optionchi", "optionc_hi", "optionchindi"],
-          optionDHi: ["optiondhi", "optiond_hi", "optiondhindi"],
+          questionEn: ["questionen", "question", "questiontext", "questionenglish", "quesen", "qen"],
+          questionHi: ["questionhi", "questionhindi", "queshi", "qhi"],
+          optionAEn: ["optionaen", "optiona", "option1", "a", "optionaenglish", "optaen", "opta"],
+          optionBEn: ["optionben", "optionb", "option2", "b", "optionbenglish", "optben", "optb"],
+          optionCEn: ["optioncen", "optionc", "option3", "c", "optioncenglish", "optcen", "optc"],
+          optionDEn: ["optionden", "optiond", "option4", "d", "optiondenglish", "optden", "optd"],
+          optionAHi: ["optionahi", "optiona_hi", "optionahindi", "optahi"],
+          optionBHi: ["optionbhi", "optionb_hi", "optionbhindi", "optbhi"],
+          optionCHi: ["optionchi", "optionc_hi", "optionchindi", "optchi"],
+          optionDHi: ["optiondhi", "optiond_hi", "optiondhindi", "optdhi"],
           correctAnswer: ["correctanswer", "correct", "answer", "correctoption", "ans", "correctans"],
-          explanationEn: ["explanationen", "explanation", "exp", "explanationtext", "explanationenglish"],
+          explanationEn: ["explanationen", "explanation", "exp", "explanationtext", "explanationenglish", "expen"],
           explanationHi: ["explanationhi", "exphi", "explanationhindi"]
         };
 
