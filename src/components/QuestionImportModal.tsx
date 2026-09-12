@@ -11,6 +11,7 @@ export interface QuestionImportModalProps {
 
 const COMMON_SUBJECTS = [
   { id: "GKGS", nameEn: "General Knowledge (GK/GS)", nameHi: "सामान्य ज्ञान (GK/GS)" },
+  { id: "Current Affairs", nameEn: "Current Affairs", nameHi: "करेंट अफेयर्स" },
   { id: "Science", nameEn: "General Science", nameHi: "सामान्य विज्ञान" },
   { id: "Maths", nameEn: "Mathematics", nameHi: "गणित" },
   { id: "Reasoning", nameEn: "Reasoning", nameHi: "तर्कशक्ति" },

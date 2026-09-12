@@ -2715,6 +2715,7 @@ Sitemap: https://studyflash.co/sitemap.xml`);
                   <option value="Reasoning">Reasoning</option>
                   <option value="Computer">Computer GK</option>
                   <option value="Static GK">Static GK</option>
+                  <option value="Current Affairs">Current Affairs</option>
                   <option value="Hindi">General Hindi</option>
                   <option value="English">General English</option>
                 </select>
