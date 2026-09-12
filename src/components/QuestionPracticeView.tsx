@@ -109,6 +109,7 @@ export default function QuestionPracticeView({
         if (lower === "mathematics" || lower === "maths") return "maths";
         if (lower === "gkgs" || lower === "general knowledge" || lower === "gk/gs" || lower === "general knowledge (gk/gs)") return "gkgs";
         if (lower === "computer" || lower === "computer gk" || lower === "computer knowledge") return "computer";
+        if (lower === "current affairs" || lower === "currentaffairs" || lower === "current_affairs" || lower === "ca") return "current affairs";
         return lower;
       };
 
@@ -146,6 +147,15 @@ export default function QuestionPracticeView({
         }
         if (term === "internet_networking" || term === "internet" || term === "networking") {
           variants.push("network", "dbms", "html", "email", "sql", "multimedia", "ccc", "o level");
+        }
+        if (term === "6" || term === "month" || term === "6month") {
+          variants.push("6 month", "6month", "monthly", "monthly ca", "6 months");
+        }
+        if (term === "1" || term === "year" || term === "1year") {
+          variants.push("1 year", "1year", "yearly", "yearly ca", "annual");
+        }
+        if (term === "today" || term === "daily") {
+          variants.push("today", "daily", "daily ca", "today ca");
         }
 
         const checkInText = (text: string) => {
