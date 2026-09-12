@@ -1622,13 +1622,13 @@ Sitemap: https://studyflash.co/sitemap.xml`);
           <form onSubmit={handleAdminLogin} className="space-y-4 text-left">
             <div className="space-y-1.5">
               <label className="text-[11px] font-bold text-slate-500 block uppercase">
-                Admin Email
+                Admin Email / User ID
               </label>
               <input
-                type="email"
+                type="text"
                 value={adminEmail}
                 onChange={(e) => setAdminEmail(e.target.value)}
-                placeholder="administrator@studyflash.co"
+                placeholder="Enter email or admin ID"
                 className="w-full text-xs p-3 border border-slate-200 dark:border-slate-700 bg-transparent text-slate-800 dark:text-white rounded-xl focus:outline-none focus:ring-1 focus:ring-indigo-500 font-sans"
                 required
               />
