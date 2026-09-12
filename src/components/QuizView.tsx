@@ -16,8 +16,9 @@ import {
   CheckCircle,
   TrendingDown,
   Info,
+  Calendar,
 } from "lucide-react";
-import { MockTest, Question, UserStats } from "../types";
+import { MockTest, Question, UserStats, LiveTestConfig } from "../types";
 import { db, collection, setDoc, doc } from "../lib/firebase";
 
 interface QuizViewProps {
@@ -28,6 +29,8 @@ interface QuizViewProps {
   selectedFontSize: number;
   autoStartTestId?: string;
   onBack?: () => void;
+  liveTestConfig?: LiveTestConfig;
+  isAdmin?: boolean;
 }
 
 export default function QuizView({
@@ -38,6 +41,8 @@ export default function QuizView({
   selectedFontSize,
   autoStartTestId,
   onBack,
+  liveTestConfig,
+  isAdmin,
 }: QuizViewProps) {
   const [activeTest, setActiveTest] = useState<MockTest | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -272,6 +277,97 @@ export default function QuizView({
   };
 
   if (activeTest && isCompleted) {
+    const isAllIndia = activeTest.titleEn.toLowerCase().includes("all india");
+    const resultDateStr = liveTestConfig?.resultDate || "2026-09-15T00:00:00";
+    const isResultDeclared = new Date() >= new Date(resultDateStr);
+    const shouldHideResult = isAllIndia && !isResultDeclared && !isAdmin;
+
+    if (shouldHideResult) {
+      const formattedResultDate = new Date(resultDateStr).toLocaleDateString(
+        isHindi ? "hi-IN" : "en-GB",
+        { day: "numeric", month: "long", year: "numeric" }
+      );
+
+      return (
+        <div className="max-w-3xl mx-auto space-y-6 animate-fade-in py-6">
+          {/* Candidate Profile Details Card */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-3xl shadow-sm grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-800">
+              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-1">
+                {isHindi ? "उम्मीदवार का नाम" : "CANDIDATE NAME"}
+              </span>
+              <span className="text-sm font-extrabold text-indigo-600 dark:text-indigo-400">
+                {studentName || "Anonymous User"}
+              </span>
+            </div>
+            <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-800">
+              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-1">
+                {isHindi ? "पिता का नाम" : "FATHER'S NAME"}
+              </span>
+              <span className="text-sm font-extrabold text-slate-800 dark:text-slate-200">
+                {fatherName || "N/A"}
+              </span>
+            </div>
+            <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-800">
+              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-1">
+                {isHindi ? "रोल नंबर" : "ROLL NUMBER"}
+              </span>
+              <span className="text-sm font-extrabold font-mono text-emerald-600 dark:text-emerald-400">
+                {rollNumber || "N/A"}
+              </span>
+            </div>
+          </div>
+
+          {/* Main Submission Confirmation Card */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 md:p-12 text-center space-y-6 shadow-xl relative overflow-hidden">
+            <div className="w-20 h-20 bg-emerald-100 dark:bg-emerald-950/60 rounded-full flex items-center justify-center mx-auto text-emerald-600 dark:text-emerald-400 text-4xl shadow-inner animate-bounce">
+              ✓
+            </div>
+
+            <div className="space-y-2">
+              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 text-xs font-bold uppercase tracking-widest border border-emerald-200 dark:border-emerald-800">
+                {isHindi ? "टेस्ट सबमिट हो गया" : "TEST SUBMITTED SUCCESSFULLY"}
+              </span>
+              <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white pt-2">
+                {isHindi ? activeTest.titleHi : activeTest.titleEn}
+              </h2>
+              <p className="text-slate-500 dark:text-slate-400 text-sm max-w-lg mx-auto">
+                {isHindi
+                  ? "आपके उत्तर सफलतापूर्वक रिकॉर्ड कर लिए गए हैं। निष्पक्षता बनाए रखने के लिए सभी उम्मीदवारों के परिणाम एक साथ घोषित किए जाएंगे।"
+                  : "Your responses have been recorded successfully. To maintain competitive fairness, all candidate results will be declared simultaneously."}
+              </p>
+            </div>
+
+            {/* Result Date Banner */}
+            <div className="bg-gradient-to-r from-indigo-500 to-purple-600 p-6 rounded-2xl text-white max-w-md mx-auto shadow-lg space-y-2">
+              <div className="flex items-center justify-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-indigo-150">
+                <Calendar className="w-4 h-4" />
+                <span>{isHindi ? "परिणाम घोषणा तिथि" : "RESULT DECLARATION DATE"}</span>
+              </div>
+              <div className="text-2xl md:text-3xl font-extrabold font-sans">
+                {formattedResultDate}
+              </div>
+              <p className="text-[11px] text-indigo-100 opacity-90">
+                {isHindi
+                  ? "ऑल इंडिया रैंक (AIR) और विस्तृत स्कोरकार्ड इस तिथि पर उपलब्ध होगा।"
+                  : "Your All-India Rank (AIR) & detailed scorecard will be available on this date."}
+              </p>
+            </div>
+
+            {/* Action Button */}
+            <div className="pt-4">
+              <button
+                onClick={onBack || (() => window.location.reload())}
+                className="px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl shadow-lg hover:shadow-indigo-500/25 active:scale-95 transition-all text-sm"
+              >
+                {isHindi ? "होम पेज पर वापस जाएं" : "Return to Home Page"}
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     // Show Premium detailed analytics card
     let scoreMsg = "Outstanding! Exceptional grasp of this syllabus.";
     let scoreColor = "text-emerald-500";

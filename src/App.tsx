@@ -677,6 +677,8 @@ export default function App() {
             userStats={userStats}
             onUpdateStats={handleUpdateStats}
             selectedFontSize={selectedFontSize}
+            liveTestConfig={liveTestConfig}
+            isAdmin={isAdmin}
             onBack={() => setCurrentView("home")}
           />
         )}
@@ -689,6 +691,8 @@ export default function App() {
             onUpdateStats={handleUpdateStats}
             selectedFontSize={selectedFontSize}
             autoStartTestId={pyqTestId}
+            liveTestConfig={liveTestConfig}
+            isAdmin={isAdmin}
             onBack={() => setCurrentView("previous-year-selection")}
           />
         )}
@@ -701,6 +705,8 @@ export default function App() {
             onUpdateStats={handleUpdateStats}
             selectedFontSize={selectedFontSize}
             autoStartTestId={liveTestConfig.test.id}
+            liveTestConfig={liveTestConfig}
+            isAdmin={isAdmin}
             onBack={() => setCurrentView("home")}
           />
         )}
