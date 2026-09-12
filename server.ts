@@ -416,8 +416,12 @@ async function startServer() {
     return supabaseClient;
   }
 
-  // Fetch admin password from Supabase or fallback to process.env
+  // Fetch admin password (process.env priority, fallback to Supabase)
   async function getAdminPassword() {
+    const envPass = process.env.ADMIN_PASSWORD;
+    if (envPass && envPass.trim() !== "") {
+      return envPass.trim().replace(/['"]/g, "");
+    }
     const supabase = getSupabase();
     if (supabase) {
       try {
@@ -433,7 +437,7 @@ async function startServer() {
         console.error("Failed to fetch admin password from Supabase:", err);
       }
     }
-    return process.env.ADMIN_PASSWORD || "studyflash2026";
+    return "studyflash2026";
   }
 
   // Middleware to authenticate admin requests using JWT
@@ -594,14 +598,34 @@ async function startServer() {
     const inputCurrentPassword = (currentPassword || "").trim().replace(/['"]/g, "");
 
     if (inputCurrentPassword === adminPassword) {
-      process.env.ADMIN_PASSWORD = newPassword;
+      const cleanNewPass = (newPassword || "").trim().replace(/['"]/g, "");
+      process.env.ADMIN_PASSWORD = cleanNewPass;
+
+      // Also persist to .env file on disk if it exists
+      try {
+        const envPath = path.resolve(process.cwd(), ".env");
+        if (fs.existsSync(envPath)) {
+          let envContent = fs.readFileSync(envPath, "utf-8");
+          if (/ADMIN_PASSWORD=/g.test(envContent)) {
+            envContent = envContent.replace(
+              /ADMIN_PASSWORD=["']?.*["']?/g,
+              `ADMIN_PASSWORD="${cleanNewPass}"`
+            );
+          } else {
+            envContent += `\nADMIN_PASSWORD="${cleanNewPass}"\n`;
+          }
+          fs.writeFileSync(envPath, envContent, "utf-8");
+        }
+      } catch (envErr) {
+        console.error("Failed to write updated ADMIN_PASSWORD to .env file:", envErr);
+      }
       
       const supabase = getSupabase();
       if (supabase) {
         try {
           const { error } = await supabase
             .from("settings")
-            .upsert({ key: "admin_password", value: newPassword });
+            .upsert({ key: "admin_password", value: cleanNewPass });
           if (error) {
             console.error("Failed to save admin password to Supabase:", error.message);
           }
