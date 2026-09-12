@@ -132,8 +132,9 @@ export default function QuestionPracticeView({
       }
 
       const queryTerms = rawQuery.split(/\s+/).filter(t => t.length > 0);
+      const isCurrentAffairsFilter = normSubject(selectedSubject) === "current affairs";
       
-      const matchesSearch = queryTerms.length === 0 || queryTerms.every(term => {
+      const matchesSearch = queryTerms.length === 0 || isCurrentAffairsFilter || queryTerms.every(term => {
         const variants: string[] = [term];
         if (term.includes("_")) {
           variants.push(term.replace(/_/g, " "));
