@@ -109,7 +109,7 @@ export default function QuestionPracticeView({
         if (lower === "mathematics" || lower === "maths") return "maths";
         if (lower === "gkgs" || lower === "general knowledge" || lower === "gk/gs" || lower === "general knowledge (gk/gs)") return "gkgs";
         if (lower === "computer" || lower === "computer gk" || lower === "computer knowledge") return "computer";
-        if (lower === "current affairs" || lower === "currentaffairs" || lower === "current_affairs" || lower === "ca") return "current affairs";
+        if (lower === "current affairs" || lower === "currentaffairs" || lower === "current_affairs" || lower === "ca" || lower.includes("current") || lower.includes("affairs")) return "current affairs";
         return lower;
       };
 

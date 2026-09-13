@@ -9,6 +9,257 @@ import {
 import allIndiaLiveQuestions from "./allIndiaLiveQuestions.json";
 
 export const MOCK_QUESTIONS: Question[] = [
+  // --- CURRENT AFFAIRS 2026 MCQS ---
+  {
+    id: "ca-2026-1",
+    questionEn: "Which country hosted the ICC Men's T20 World Cup in 2026?",
+    questionHi: "2026 में आईसीसी पुरुष टी20 विश्व कप की मेजबानी किन देशों ने संयुक्त रूप से की?",
+    optionsEn: [
+      "India & Sri Lanka",
+      "Australia & New Zealand",
+      "USA & West Indies",
+      "England & Wales"
+    ],
+    optionsHi: [
+      "भारत और श्रीलंका",
+      "ऑस्ट्रेलिया और न्यूजीलैंड",
+      "अमेरिका और वेस्टइंडीज",
+      "इंग्लैंड और वेल्स"
+    ],
+    correctAnswer: "A",
+    explanationEn: "The 2026 ICC Men's T20 World Cup was jointly hosted by India and Sri Lanka in February-March 2026.",
+    explanationHi: "2026 आईसीसी पुरुष टी20 विश्व कप की संयुक्त मेजबानी भारत और श्रीलंका द्वारा फरवरी-मार्च 2026 में की गई थी।",
+    subject: "Current Affairs",
+    topic: "Current Affairs 2026 - Sports",
+    examTags: ["Current Affairs 2026", "Sports", "SSC CGL", "Railway", "UPSC"],
+    year: "2026",
+    likes: 450,
+    dislikes: 2,
+  },
+  {
+    id: "ca-2026-2",
+    questionEn: "What is the primary objective of ISRO's Gaganyaan Mission launched in 2026?",
+    questionHi: "2026 में इसरो के गगनयान मिशन का मुख्य उद्देश्य क्या है?",
+    optionsEn: [
+      "Demonstrate human spaceflight capability into Low Earth Orbit",
+      "Establish a permanent lunar habitat base",
+      "Explore the polar atmosphere of Venus",
+      "Deploy deep sea exploration submarines"
+    ],
+    optionsHi: [
+      "निम्न पृथ्वी कक्षा (LEO) में मानव अंतरिक्ष उड़ान क्षमता का प्रदर्शन",
+      "चंद्रमा पर स्थायी निवास स्थान आधार स्थापित करना",
+      "शुक्र के ध्रुवीय वायुमंडल की खोज करना",
+      "गहरे समुद्र में खोज पनडुब्बियों की तैनाती"
+    ],
+    correctAnswer: "A",
+    explanationEn: "ISRO's Gaganyaan mission aims to demonstrate human spaceflight capability by launching a crew of Indian astronauts to Low Earth Orbit (LEO) and bringing them back safely.",
+    explanationHi: "इसरो के गगनयान मिशन का उद्देश्य भारतीय अंतरिक्ष यात्रियों के चालक दल को निम्न पृथ्वी कक्षा (LEO) में भेजकर और उन्हें सुरक्षित वापस लाकर मानव अंतरिक्ष उड़ान क्षमता का प्रदर्शन करना है।",
+    subject: "Current Affairs",
+    topic: "Current Affairs 2026 - Science & Tech",
+    examTags: ["Current Affairs 2026", "ISRO", "Science", "UPSC", "Defence"],
+    year: "2026",
+    likes: 512,
+    dislikes: 4,
+  },
+  {
+    id: "ca-2026-3",
+    questionEn: "Who was awarded the prestigious Bharat Ratna in the 2026 National Honors list?",
+    questionHi: "2026 की राष्ट्रीय सम्मान सूची में किसे देश के सर्वोच्च नागरिक सम्मान 'भारत रत्न' से सम्मानित किया गया?",
+    optionsEn: [
+      "Distinguished Scientists & Social Reformers",
+      "Foreign Head of States",
+      "International Olympic Committee Chief",
+      "UN Secretary General"
+    ],
+    optionsHi: [
+      "विशिष्ट वैज्ञानिक एवं समाज सुधारक",
+      "विदेशी राष्ट्राध्यक्ष",
+      "अंतर्राष्ट्रीय ओलंपिक समिति प्रमुख",
+      "संयुक्त राष्ट्र महासचिव"
+    ],
+    correctAnswer: "A",
+    explanationEn: "Bharat Ratna is India's highest civilian award presented for exceptional service toward advancement of art, literature, science, and public service.",
+    explanationHi: "भारत रत्न भारत का सर्वोच्च नागरिक सम्मान है जो कला, साहित्य, विज्ञान और सार्वजनिक सेवा में असाधारण योगदान के लिए प्रदान किया जाता है।",
+    subject: "Current Affairs",
+    topic: "Current Affairs 2026 - Awards & Honors",
+    examTags: ["Current Affairs 2026", "Awards", "SSC", "State PCS"],
+    year: "2026",
+    likes: 380,
+    dislikes: 1,
+  },
+  {
+    id: "ca-2026-4",
+    questionEn: "What is India's target year to achieve Net Zero Carbon Emissions as highlighted in recent COP summits?",
+    questionHi: "हालिया कॉप (COP) सम्मेलनों में रेखांकित किए अनुसार भारत का 'नेट जीरो' कार्बन उत्सर्जन प्राप्त करने का लक्ष्य वर्ष क्या है?",
+    optionsEn: ["2050", "2060", "2070", "2080"],
+    optionsHi: ["2050", "2060", "2070", "2080"],
+    correctAnswer: "C",
+    explanationEn: "India has officially committed to achieving Net Zero carbon emissions by the year 2070 and achieving 50% non-fossil fuel capacity by 2030.",
+    explanationHi: "भारत ने वर्ष 2070 तक शुद्ध शून्य (Net Zero) कार्बन उत्सर्जन प्राप्त करने और 2030 तक 50% गैर-जीवाश्म ईंधन क्षमता का लक्ष्य रखा है।",
+    subject: "Current Affairs",
+    topic: "Current Affairs 2026 - Environment & Summit",
+    examTags: ["Current Affairs 2026", "Environment", "UPSC", "State Exams"],
+    year: "2026",
+    likes: 420,
+    dislikes: 3,
+  },
+  {
+    id: "ca-2026-5",
+    questionEn: "Which state in India inaugurated the world's highest railway bridge over the Chenab River?",
+    questionHi: "भारत के किस राज्य/केंद्र शासित प्रदेश में चिनाब नदी पर बने विश्व के सबसे ऊंचे रेलवे पुल का उद्घाटन किया गया?",
+    optionsEn: [
+      "Jammu & Kashmir",
+      "Himachal Pradesh",
+      "Uttarakhand",
+      "Sikkim"
+    ],
+    optionsHi: [
+      "जम्मू और कश्मीर",
+      "हिमाचल प्रदेश",
+      "उत्तराखंड",
+      "सिक्किम"
+    ],
+    correctAnswer: "A",
+    explanationEn: "The Chenab Railway Bridge in Jammu & Kashmir stands at 359 meters above the river bed, making it the highest arch railway bridge in the world.",
+    explanationHi: "जम्मू-कश्मीर में चिनाब नदी पर बना रेलवे आर्क पुल नदी के तल से 359 मीटर की ऊंचाई पर स्थित है, जो इसे दुनिया का सबसे ऊंचा रेलवे पुल बनाता है।",
+    subject: "Current Affairs",
+    topic: "Current Affairs 2026 - National Infrastructure",
+    examTags: ["Current Affairs 2026", "Railway", "SSC CGL", "Police"],
+    year: "2026",
+    likes: 610,
+    dislikes: 5,
+  },
+  {
+    id: "ca-2026-6",
+    questionEn: "Which country hosted the G20 Summit in 2026?",
+    questionHi: "वर्ष 2026 में जी-20 (G20) शिखर सम्मेलन की मेजबानी किस देश ने की?",
+    optionsEn: [
+      "United States",
+      "South Africa",
+      "United Kingdom",
+      "France"
+    ],
+    optionsHi: [
+      "संयुक्त राज्य अमेरिका (USA)",
+      "दक्षिण अफ्रीका",
+      "यूनाइटेड किंगडम",
+      "फ्रांस"
+    ],
+    correctAnswer: "A",
+    explanationEn: "Following South Africa's presidency, the United States assumed the G20 leadership role in 2026.",
+    explanationHi: "दक्षिण अफ्रीका की अध्यक्षता के बाद 2026 में जी-20 शिखर सम्मेलन का नेतृत्व संयुक्त राज्य अमेरिका (USA) ने संभाला।",
+    subject: "Current Affairs",
+    topic: "Current Affairs 2026 - International Summits",
+    examTags: ["Current Affairs 2026", "G20", "UPSC", "SSC"],
+    year: "2026",
+    likes: 490,
+    dislikes: 3,
+  },
+  {
+    id: "ca-2026-7",
+    questionEn: "What is the rank of India in the Global Innovation Index 2026?",
+    questionHi: "ग्लोबल इनोवेशन इंडेक्स (Global Innovation Index) 2026 में भारत की स्थिति क्या है?",
+    optionsEn: [
+      "Top 40 countries",
+      "Top 10 countries",
+      "75th rank",
+      "92nd rank"
+    ],
+    optionsHi: [
+      "शीर्ष 40 देशों में शामिल",
+      "शीर्ष 10 देशों में शामिल",
+      "75 वां स्थान",
+      "92 वां स्थान"
+    ],
+    correctAnswer: "A",
+    explanationEn: "India has consistently improved its position in the Global Innovation Index published by WIPO, maintaining its spot among the top 40 innovative economies globally.",
+    explanationHi: "WIPO द्वारा प्रकाशित वैश्विक नवाचार सूचकांक में भारत ने अपनी स्थिति में लगातार सुधार करते हुए दुनिया की शीर्ष 40 नवाचार अर्थव्यवस्थाओं में अपनी जगह बनाई है।",
+    subject: "Current Affairs",
+    topic: "Current Affairs 2026 - Reports & Index",
+    examTags: ["Current Affairs 2026", "Index", "Banking", "UPSC"],
+    year: "2026",
+    likes: 330,
+    dislikes: 2,
+  },
+  {
+    id: "ca-2026-8",
+    questionEn: "Which Indian digital payment system has expanded to over 10 foreign countries including France, UAE, and Singapore?",
+    questionHi: "भारत की किस डिजिटल भुगतान प्रणाली का विस्तार फ्रांस, यूएई और सिंगापुर सहित 10 से अधिक विदेशी देशों में हो चुका है?",
+    optionsEn: [
+      "UPI (Unified Payments Interface)",
+      "NEFT",
+      "RTGS",
+      "IMPS"
+    ],
+    optionsHi: [
+      "यूपीआई (UPI)",
+      "एनईएफटी (NEFT)",
+      "आरटीजीएस (RTGS)",
+      "आईएमपीएस (IMPS)"
+    ],
+    correctAnswer: "A",
+    explanationEn: "NPCI's Unified Payments Interface (UPI) has established cross-border linkage with Singapore (PayNow), UAE, France, Mauritius, Sri Lanka, and Nepal for seamless digital transactions.",
+    explanationHi: "एनपीसीआई (NPCI) की यूनिफाइड पेमेंट्स इंटरफेस (UPI) ने निर्बाध लेनदेन के लिए सिंगापुर, यूएई, फ्रांस, मॉरीशस, श्रीलंका और नेपाल जैसे देशों के साथ अंतरराष्ट्रीय संबंध स्थापित किए हैं।",
+    subject: "Current Affairs",
+    topic: "Current Affairs 2026 - Economy & Banking",
+    examTags: ["Current Affairs 2026", "Banking", "UPI", "SSC"],
+    year: "2026",
+    likes: 580,
+    dislikes: 3,
+  },
+  {
+    id: "ca-2026-9",
+    questionEn: "Who is the Chief Election Commissioner of India in 2026?",
+    questionHi: "वर्ष 2026 में भारत के मुख्य चुनाव आयुक्त (Chief Election Commissioner) कौन हैं?",
+    optionsEn: [
+      "Gyanesh Kumar",
+      "Rajiv Kumar",
+      "Sukhbir Singh Sandhu",
+      "Sunil Arora"
+    ],
+    optionsHi: [
+      "ज्ञानेश कुमार",
+      "राजीव कुमार",
+      "सुखबीर सिंह संधू",
+      "सुनील अरोड़ा"
+    ],
+    correctAnswer: "A",
+    explanationEn: "Gyanesh Kumar serves as the Chief Election Commissioner of the Election Commission of India.",
+    explanationHi: "ज्ञानेश कुमार भारत के निर्वाचन आयोग के मुख्य चुनाव आयुक्त के रूप में कार्यरत हैं।",
+    subject: "Current Affairs",
+    topic: "Current Affairs 2026 - Appointments",
+    examTags: ["Current Affairs 2026", "Appointments", "Polity", "SSC GD"],
+    year: "2026",
+    likes: 395,
+    dislikes: 2,
+  },
+  {
+    id: "ca-2026-10",
+    questionEn: "Which supercomputer was developed under India's National Supercomputing Mission (NSM) to power AI research in 2026?",
+    questionHi: "2026 में एआई अनुसंधान को सशक्त बनाने के लिए राष्ट्रीय सुपरकंप्यूटिंग मिशन (NSM) के तहत कौन सा भारतीय सुपरकंप्यूटर विकसित किया गया?",
+    optionsEn: [
+      "AIRAWAT / PARAM Siddhi AI",
+      "Param Ananta",
+      "Param Ganga",
+      "Pratyush"
+    ],
+    optionsHi: [
+      "ऐरावत (AIRAWAT) / परम सिद्धि AI",
+      "परम अनंता",
+      "परम गंगा",
+      "प्रत्युष"
+    ],
+    correctAnswer: "A",
+    explanationEn: "AIRAWAT (AI Research Analytics and Knowledge Dissemination Platform) is India's fastest AI supercomputing system, ranked among the top global AI supercomputers.",
+    explanationHi: "ऐरावत (AIRAWAT) भारत की सबसे तेज AI सुपरकंप्यूटिंग प्रणाली है, जिसे वैश्विक शीर्ष एआई सुपरकंप्यूटरों की सूची में स्थान प्राप्त है।",
+    subject: "Current Affairs",
+    topic: "Current Affairs 2026 - Technology",
+    examTags: ["Current Affairs 2026", "AI", "Computer", "Defence"],
+    year: "2026",
+    likes: 470,
+    dislikes: 4,
+  },
   {
     id: "sp-1",
     questionEn: "Which is the headquarters of Uttar Pradesh Police?",
