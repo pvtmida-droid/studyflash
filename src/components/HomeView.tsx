@@ -13,6 +13,17 @@ import {
   Megaphone,
   Zap,
   ArrowRight,
+  Rocket,
+  Eye,
+  Key,
+  FileText,
+  BarChart3,
+  User,
+  Camera,
+  Globe,
+  Calculator,
+  Brain,
+  HelpCircle,
 } from "lucide-react";
 import { MOCK_LEADERBOARD, MOCK_TESTIMONIALS, MOCK_FAQS } from "../mockData";
 
@@ -431,116 +442,239 @@ export default function HomeView({
             </button>
           </div>
 
-          {/* HALF SIDE 2: ALL INDIA MOCK TEST CARD */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-indigo-200 dark:hover:border-indigo-800/50 rounded-[32px] p-6 md:p-8 shadow-xl relative overflow-hidden transition-all duration-500 hover:shadow-2xl flex flex-col justify-between group">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 blur-3xl rounded-full mix-blend-screen pointer-events-none transition-transform duration-700 group-hover:scale-125 group-hover:bg-indigo-500/20" />
+          {/* HALF SIDE 2: ALL INDIA MOCK TEST CARD (EXACT ATTACHED DESIGN) */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-emerald-200 dark:hover:border-emerald-800/50 rounded-[32px] p-5 md:p-6 shadow-xl relative overflow-hidden transition-all duration-500 hover:shadow-2xl flex flex-col justify-between group">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 blur-3xl rounded-full mix-blend-screen pointer-events-none transition-transform duration-700 group-hover:scale-125 group-hover:bg-emerald-500/20" />
 
-            <div className="relative z-10 space-y-5">
-              {/* Header Badge & Timer */}
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 text-xs font-bold tracking-wide uppercase border border-red-200 dark:border-red-500/20">
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
-                  </span>
-                  Live Battle
-                </div>
-
-                <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800/50 px-3 py-1 rounded-xl border border-slate-100 dark:border-slate-800 text-xs font-semibold text-slate-600 dark:text-slate-300">
-                  <Calendar className="w-3.5 h-3.5 text-indigo-500" />
-                  <span>
-                    {new Date(
-                      liveTestConfig?.resultDate || "2026-12-31T23:59:59",
-                    ).toLocaleDateString("en-GB", {
-                      day: "numeric",
-                      month: "short",
-                      year: "numeric",
-                    })}
-                  </span>
-                </div>
-              </div>
-
-              {/* Title & Countdown */}
-              <div className="space-y-3">
-                <h3 className="text-xl md:text-2xl font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-                  <span>🏆 All India Mega Test 2026</span>
-                </h3>
-
-                <div className="inline-flex items-center gap-2 bg-amber-50 dark:bg-amber-950/40 px-3.5 py-1.5 rounded-xl border border-amber-200 dark:border-amber-800/50 text-xs font-bold text-amber-700 dark:text-amber-400">
-                  <Trophy className="w-4 h-4 text-amber-500 shrink-0" />
-                  {isCountingDown ? (
-                    <div className="flex items-center gap-1 font-mono text-sm">
-                      <span>{String(timeLeft.days).padStart(2, "0")}d</span>
-                      <span>:</span>
-                      <span>{String(timeLeft.hours).padStart(2, "0")}h</span>
-                      <span>:</span>
-                      <span>{String(timeLeft.minutes).padStart(2, "0")}m</span>
-                      <span>:</span>
-                      <span>{String(timeLeft.seconds).padStart(2, "0")}s</span>
-                      <span className="ml-1 text-[11px] font-sans text-amber-600 dark:text-amber-500 uppercase tracking-wider">
-                        {isHindi ? "शेष" : "left"}
-                      </span>
+            <div className="relative z-10 space-y-4">
+              {/* TOP ROW: Profile Pic + 5 Subject Badges */}
+              <div className="flex flex-col xl:flex-row items-stretch gap-4">
+                {/* Profile Picture with Camera Icon */}
+                <div className="relative shrink-0 flex items-center justify-center">
+                  <div className="relative w-28 h-28 md:w-32 md:h-32 rounded-2xl overflow-hidden border-2 border-emerald-500 shadow-md group/pic">
+                    <img
+                      src="/teacher_avatar.png"
+                      alt="Teacher Avatar"
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover/pic:scale-105"
+                      onError={(e: any) => {
+                        e.target.onerror = null;
+                        e.target.src = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80";
+                      }}
+                    />
+                    <div className="absolute bottom-1 right-1 bg-emerald-600 text-white rounded-full p-1.5 border-2 border-white dark:border-slate-900 shadow-md flex items-center justify-center">
+                      <Camera className="w-3.5 h-3.5" />
                     </div>
-                  ) : (
-                    <span>{isHindi ? "परिणाम घोषित" : "Results Declared"}</span>
-                  )}
+                  </div>
+                </div>
+
+                {/* 5 Subjects Cards Grid */}
+                <div className="flex-1 grid grid-cols-5 gap-1.5 sm:gap-2 items-center justify-between">
+                  {/* Hindi */}
+                  <div className="flex flex-col items-center justify-between p-2 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 text-center h-full space-y-1.5 hover:border-emerald-200 transition-colors">
+                    <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 font-extrabold text-sm md:text-base flex items-center justify-center shadow-xs">
+                      अ
+                    </div>
+                    <span className="text-[11px] md:text-xs font-semibold text-slate-600 dark:text-slate-300">Hindi</span>
+                    <div className="w-full py-0.5 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-800/60 text-emerald-700 dark:text-emerald-400 font-extrabold text-xs md:text-sm rounded-lg">
+                      20
+                    </div>
+                  </div>
+
+                  {/* English */}
+                  <div className="flex flex-col items-center justify-between p-2 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 text-center h-full space-y-1.5 hover:border-blue-200 transition-colors">
+                    <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300 font-bold text-[9px] md:text-[10px] flex items-center justify-center shadow-xs leading-tight">
+                      A B C
+                    </div>
+                    <span className="text-[11px] md:text-xs font-semibold text-slate-600 dark:text-slate-300">English</span>
+                    <div className="w-full py-0.5 bg-blue-50 dark:bg-blue-950/60 border border-blue-200/80 dark:border-blue-800/60 text-blue-700 dark:text-blue-400 font-extrabold text-xs md:text-sm rounded-lg">
+                      20
+                    </div>
+                  </div>
+
+                  {/* GK/GS */}
+                  <div className="flex flex-col items-center justify-between p-2 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 text-center h-full space-y-1.5 hover:border-amber-200 transition-colors">
+                    <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300 font-bold text-xs flex items-center justify-center shadow-xs">
+                      <Globe className="w-4 h-4" />
+                    </div>
+                    <span className="text-[11px] md:text-xs font-semibold text-slate-600 dark:text-slate-300">GK/GS</span>
+                    <div className="w-full py-0.5 bg-amber-50 dark:bg-amber-950/60 border border-amber-200/80 dark:border-amber-800/60 text-amber-700 dark:text-amber-400 font-extrabold text-xs md:text-sm rounded-lg">
+                      20
+                    </div>
+                  </div>
+
+                  {/* Math */}
+                  <div className="flex flex-col items-center justify-between p-2 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 text-center h-full space-y-1.5 hover:border-purple-200 transition-colors">
+                    <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-purple-100 dark:bg-purple-900/50 text-purple-800 dark:text-purple-300 font-bold text-xs flex items-center justify-center shadow-xs">
+                      <Calculator className="w-4 h-4" />
+                    </div>
+                    <span className="text-[11px] md:text-xs font-semibold text-slate-600 dark:text-slate-300">Math</span>
+                    <div className="w-full py-0.5 bg-purple-50 dark:bg-purple-950/60 border border-purple-200/80 dark:border-purple-800/60 text-purple-700 dark:text-purple-400 font-extrabold text-xs md:text-sm rounded-lg">
+                      20
+                    </div>
+                  </div>
+
+                  {/* Reasoning */}
+                  <div className="flex flex-col items-center justify-between p-2 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 text-center h-full space-y-1.5 hover:border-emerald-200 transition-colors">
+                    <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 font-bold text-xs flex items-center justify-center shadow-xs">
+                      <Brain className="w-4 h-4" />
+                    </div>
+                    <span className="text-[11px] md:text-xs font-semibold text-slate-600 dark:text-slate-300">Reasoning</span>
+                    <div className="w-full py-0.5 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-800/60 text-emerald-700 dark:text-emerald-400 font-extrabold text-xs md:text-sm rounded-lg">
+                      20
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              {/* Key Features */}
-              <div className="space-y-2 text-xs md:text-sm text-slate-700 dark:text-slate-300 font-medium">
-                <p className="flex items-center gap-2">
-                  <span>🎯</span> {isHindi ? "अपनी वास्तविक तैयारी के स्तर को जांचें" : "Know Your Real Preparation Level"}
-                </p>
-                <p className="flex items-center gap-2">
-                  <span>📈</span> {isHindi ? "ऑल इंडिया रैंक (AIR) प्राप्त करें" : "Get Your All India Rank"}
-                </p>
-                <p className="flex items-center gap-2">
-                  <span>🏆</span> {isHindi ? "देशभर के हजारों परीक्षार्थियों से प्रतिस्पर्धा करें" : "Compete With Thousands Nationwide"}
-                </p>
+              {/* ACTION BUTTONS PANEL */}
+              <div className="space-y-2.5 pt-1">
+                {/* Big Dark Green Attempt Free Test Button */}
+                <button
+                  onClick={handleAttemptBattle}
+                  disabled={hasAttemptedBattle && !isAdmin}
+                  className={`w-full py-3.5 px-5 font-extrabold rounded-2xl transition-all text-sm md:text-base shadow-lg flex items-center justify-between group/mainbtn ${
+                    hasAttemptedBattle && !isAdmin
+                      ? "bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed shadow-none"
+                      : "bg-emerald-700 hover:bg-emerald-800 active:scale-98 text-white shadow-emerald-700/20 hover:shadow-emerald-700/40"
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Rocket className="w-5 h-5 transition-transform group-hover/mainbtn:translate-x-0.5 group-hover/mainbtn:-translate-y-0.5" />
+                    <span>
+                      {hasAttemptedBattle && !isAdmin
+                        ? isHindi ? "आप टेस्ट दे चुके हैं" : "Already Attempted"
+                        : "Attempt Free Test"}
+                    </span>
+                  </div>
+                  <ArrowRight className="w-5 h-5 transition-transform group-hover/mainbtn:translate-x-1" />
+                </button>
+
+                {/* 2x2 Grid of Secondary Action Buttons */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {/* View Results */}
+                  <button
+                    onClick={() => {
+                      if (!isCountingDown || isAdmin) {
+                        setCurrentView("battle_results");
+                      } else {
+                        alert(
+                          isHindi
+                            ? `परिणाम ${new Date(liveTestConfig?.resultDate || "2026-12-31T23:59:59").toLocaleDateString("hi-IN")} को घोषित किए जाएंगे`
+                            : `Results will be declared on ${new Date(liveTestConfig?.resultDate || "2026-12-31T23:59:59").toLocaleDateString()}`
+                        );
+                      }
+                    }}
+                    className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/60 hover:bg-blue-50/50 dark:hover:bg-slate-800 transition-all flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-200 group/subbtn"
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 rounded-lg bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400">
+                        <Eye className="w-3.5 h-3.5" />
+                      </div>
+                      <span>{isHindi ? "परिणाम देखें" : "View Results"}</span>
+                    </div>
+                    <ChevronRight className="w-3.5 h-3.5 text-blue-500 group-hover/subbtn:translate-x-0.5 transition-transform" />
+                  </button>
+
+                  {/* Buy 20 /- */}
+                  <button
+                    onClick={() => {
+                      alert(isHindi ? "यह टेस्ट पूर्णतः निःशुल्क (FREE) उपलब्ध है!" : "This test is 100% FREE for all aspirants!");
+                    }}
+                    className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/60 hover:bg-emerald-50/50 dark:hover:bg-slate-800 transition-all flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-200 group/subbtn"
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 rounded-lg bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400">
+                        <Key className="w-3.5 h-3.5" />
+                      </div>
+                      <span>Buy 20 /-</span>
+                    </div>
+                    <ChevronRight className="w-3.5 h-3.5 text-emerald-500 group-hover/subbtn:translate-x-0.5 transition-transform" />
+                  </button>
+
+                  {/* Answer Key */}
+                  <button
+                    onClick={() => {
+                      if (!isCountingDown || isAdmin) {
+                        setCurrentView("battle_results");
+                      } else {
+                        alert(isHindi ? "उत्तर कुंजी परीक्षा समाप्ति के बाद जारी होगी।" : "Answer key will be available after test ends.");
+                      }
+                    }}
+                    className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/60 hover:bg-purple-50/50 dark:hover:bg-slate-800 transition-all flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-200 group/subbtn"
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 rounded-lg bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400">
+                        <FileText className="w-3.5 h-3.5" />
+                      </div>
+                      <span>{isHindi ? "उत्तर कुंजी" : "Answer Key"}</span>
+                    </div>
+                    <ChevronRight className="w-3.5 h-3.5 text-purple-500 group-hover/subbtn:translate-x-0.5 transition-transform" />
+                  </button>
+
+                  {/* How to Attempt This Test */}
+                  <button
+                    onClick={() => {
+                      alert(
+                        isHindi
+                          ? "गाइड:\n1. Attempt Free Test पर क्लिक करें\n2. 100 प्रश्नों के उत्तर दें (प्रत्येक विषय के 20 प्रश्न)\n3. टेस्ट सबमिट करके अपना ऑल इंडिया रैंक देखें!"
+                          : "Guide:\n1. Click Attempt Free Test\n2. Solve 100 questions (20 per subject)\n3. Submit test to get your All India Rank!"
+                      );
+                    }}
+                    className="p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/60 hover:bg-emerald-50/50 dark:hover:bg-slate-800 transition-all flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-200 group/subbtn text-left"
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 rounded-lg bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 shrink-0">
+                        <BarChart3 className="w-3.5 h-3.5" />
+                      </div>
+                      <div className="leading-tight">
+                        <div className="text-[11px] font-bold">How to Attempt This Test</div>
+                        <div className="text-[9px] text-slate-400 font-normal">(Step by Step Guide)</div>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-3.5 h-3.5 text-emerald-500 group-hover/subbtn:translate-x-0.5 transition-transform shrink-0" />
+                  </button>
+                </div>
               </div>
-            </div>
 
-            {/* Action Buttons */}
-            <div className="relative z-10 flex flex-col gap-2.5 mt-5">
-              <button
-                onClick={handleAttemptBattle}
-                disabled={hasAttemptedBattle && !isAdmin}
-                className={`w-full py-3.5 px-6 font-bold rounded-2xl transition-all text-sm md:text-base shadow-md active:scale-95 duration-200 flex items-center justify-center gap-2 ${
-                  hasAttemptedBattle && !isAdmin
-                    ? "bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed shadow-none"
-                    : "bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-600/20 hover:shadow-indigo-600/40 hover:-translate-y-0.5"
-                }`}
-              >
-                {hasAttemptedBattle && !isAdmin
-                  ? isHindi
-                    ? "आप टेस्ट दे चुके हैं"
-                    : "Already Attempted"
-                  : "🚀 Attempt Free Test"}
-              </button>
+              {/* BOTTOM FOOTER STRIP */}
+              <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs font-semibold text-slate-700 dark:text-slate-300">
+                {/* Test Date */}
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 rounded-lg bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400">
+                    <Calendar className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <div className="text-[10px] text-slate-400 font-normal">Test Date</div>
+                    <div className="font-extrabold text-slate-800 dark:text-slate-200">15 September 2026</div>
+                  </div>
+                </div>
 
-              <button
-                onClick={() => {
-                  if (!isCountingDown || isAdmin) {
-                    setCurrentView("battle_results");
-                  } else {
-                    alert(
-                      isHindi
-                        ? `परिणाम ${new Date(liveTestConfig?.resultDate || "2026-12-31T23:59:59").toLocaleDateString("hi-IN")} को घोषित किए जाएंगे`
-                        : `Results will be declared on ${new Date(liveTestConfig?.resultDate || "2026-12-31T23:59:59").toLocaleDateString()}`
-                    );
-                  }
-                }}
-                disabled={isCountingDown && !isAdmin}
-                className={`w-full py-2.5 px-6 font-bold rounded-2xl transition-all text-xs md:text-sm border-2 flex items-center justify-center gap-2 ${
-                  !isCountingDown || isAdmin
-                    ? "border-indigo-100 dark:border-indigo-900/50 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 active:scale-95 duration-200"
-                    : "border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-slate-800 cursor-not-allowed"
-                }`}
-              >
-                {isCountingDown && !isAdmin && <Lock className="w-3.5 h-3.5" />}
-                {isHindi ? "परिणाम देखें" : "View Results"}
-              </button>
+                <div className="hidden sm:block w-px h-8 bg-slate-200 dark:bg-slate-700" />
+
+                {/* Total Marks */}
+                <div className="flex items-center gap-2">
+                  <div className="px-2.5 py-1 bg-emerald-800 text-white rounded-lg font-black text-sm">
+                    100
+                  </div>
+                  <div>
+                    <div className="text-[10px] text-slate-400 font-normal">Total Marks</div>
+                    <div className="font-extrabold text-slate-800 dark:text-slate-200">100</div>
+                  </div>
+                </div>
+
+                <div className="hidden sm:block w-px h-8 bg-slate-200 dark:bg-slate-700" />
+
+                {/* User ID */}
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 rounded-lg bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400">
+                    <User className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <div className="text-[10px] text-slate-400 font-normal">User ID</div>
+                    <div className="font-extrabold text-slate-800 dark:text-slate-200">Rakesh yadav</div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
