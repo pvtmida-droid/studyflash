@@ -67,7 +67,7 @@ const MOCK_TEST_CARDS = [
     titleHi: "ऑल इंडिया मेगा टेस्ट #2",
     price: 30,
     answerKeyPdfUrl: "",
-    imageUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
+    imageUrl: "https://i.ibb.co/RT60SJpr/munna-sir.jpg",
     testDate: "10 September 2026",
     totalMarks: 100,
     userId: "Munna Sir",
