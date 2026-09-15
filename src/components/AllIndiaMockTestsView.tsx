@@ -127,6 +127,8 @@ export default function AllIndiaMockTestsView({
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTestForPayment, setSelectedTestForPayment] = useState<any | null>(null);
   const [utrNumber, setUtrNumber] = useState("");
+  const [transactionId, setTransactionId] = useState("");
+  const [activePaymentTab, setActivePaymentTab] = useState<"utr" | "txn">("utr");
   const [copiedUpi, setCopiedUpi] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -153,18 +155,45 @@ export default function AllIndiaMockTestsView({
   };
 
   const handleUnlockTest = (testId: string) => {
+    const enteredUtr = utrNumber.trim();
+    const enteredTxn = transactionId.trim();
+
+    if (!enteredUtr && !enteredTxn) {
+      alert(
+        isHindi
+          ? "कृपया भुगतान सत्यापित करने के लिए UTR नंबर या Transaction ID दर्ज करें।"
+          : "Please enter UTR Number or Transaction ID to verify payment."
+      );
+      return;
+    }
+
     setIsVerifying(true);
     setTimeout(() => {
       setIsVerifying(false);
       const updated = Array.from(new Set([...purchasedTests, testId]));
       setPurchasedTests(updated);
       localStorage.setItem("studyflash_purchased_tests", JSON.stringify(updated));
+
+      // Save payment log for admin audit
+      try {
+        const logs = JSON.parse(localStorage.getItem("studyflash_all_india_payments") || "[]");
+        logs.push({
+          testId,
+          utrNumber: enteredUtr || "N/A",
+          transactionId: enteredTxn || "N/A",
+          amount: TEST_PRICE,
+          date: new Date().toLocaleString(),
+        });
+        localStorage.setItem("studyflash_all_india_payments", JSON.stringify(logs));
+      } catch {}
+
       setSelectedTestForPayment(null);
       setUtrNumber("");
+      setTransactionId("");
       showToast(
         isHindi
-          ? "🎉 भुगतान सफल! टेस्ट अनलॉक हो गया है। अब आप टेस्ट दे सकते हैं।"
-          : "🎉 Payment Verified! Test Unlocked successfully. You can now start the test!"
+          ? "🎉 भुगतान सफलता से सत्यापित! टेस्ट अनलॉक हो गया है।"
+          : "🎉 Payment Verified! Test Unlocked successfully."
       );
     }, 1200);
   };
@@ -649,26 +678,72 @@ export default function AllIndiaMockTestsView({
               </div>
             </div>
 
-            {/* TRANSACTION / UTR INPUT */}
-            <div className="space-y-2 pt-1 border-t border-slate-100 dark:border-slate-800">
-              <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">
-                {isHindi
-                  ? "पेमेंट के बाद UTR / Transaction ID (12 अंक) दर्ज करें:"
-                  : "Enter UTR / Transaction ID (12 Digits) after Payment:"}
+            {/* TRANSACTION / UTR DUAL OPTION INPUTS */}
+            <div className="space-y-2.5 pt-1 border-t border-slate-100 dark:border-slate-800">
+              <label className="text-xs font-extrabold text-slate-800 dark:text-slate-200 flex items-center justify-between">
+                <span>{isHindi ? "पेमेंट वेरिफिकेशन विवरण दर्ज करें:" : "Enter Payment Verification Details:"}</span>
               </label>
+
+              {/* TAB SELECTOR BUTTONS */}
+              <div className="flex rounded-xl bg-slate-100 dark:bg-slate-800 p-1 border border-slate-200 dark:border-slate-700">
+                <button
+                  type="button"
+                  onClick={() => setActivePaymentTab("utr")}
+                  className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                    activePaymentTab === "utr"
+                      ? "bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-xs"
+                      : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
+                  }`}
+                >
+                  {isHindi ? "1. UTR नंबर (12 अंक)" : "1. UTR Number (12 Digits)"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActivePaymentTab("txn")}
+                  className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                    activePaymentTab === "txn"
+                      ? "bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-xs"
+                      : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
+                  }`}
+                >
+                  {isHindi ? "2. Transaction ID / Ref No" : "2. Transaction ID / Ref No"}
+                </button>
+              </div>
+
+              {/* ACTIVE TAB INPUT */}
               <div className="space-y-2">
-                <input
-                  type="text"
-                  placeholder="e.g. 425189012345 or Ref No."
-                  value={utrNumber}
-                  onChange={(e) => setUtrNumber(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-semibold focus:outline-none focus:border-emerald-500"
-                />
+                {activePaymentTab === "utr" ? (
+                  <div>
+                    <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block mb-1">
+                      {isHindi ? "12-अंकों का UTR नंबर:" : "Enter 12-Digit UTR Number:"}
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 425189012345"
+                      value={utrNumber}
+                      onChange={(e) => setUtrNumber(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-semibold focus:outline-none focus:border-emerald-500"
+                    />
+                  </div>
+                ) : (
+                  <div>
+                    <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block mb-1">
+                      {isHindi ? "ट्रांजैक्शन आईडी / रेफरेंस नंबर:" : "Enter Transaction ID / Ref No:"}
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. T26091512345678 or Paytm Ref ID"
+                      value={transactionId}
+                      onChange={(e) => setTransactionId(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-semibold focus:outline-none focus:border-emerald-500"
+                    />
+                  </div>
+                )}
 
                 <button
                   onClick={() => handleUnlockTest(selectedTestForPayment.id)}
                   disabled={isVerifying}
-                  className="w-full py-3.5 px-5 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-sm md:text-base flex items-center justify-center gap-2 shadow-lg transition-all active:scale-98 disabled:opacity-50"
+                  className="w-full py-3.5 px-5 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-sm md:text-base flex items-center justify-center gap-2 shadow-lg transition-all active:scale-98 disabled:opacity-50 mt-1"
                 >
                   {isVerifying ? (
                     <div className="flex items-center gap-2">
