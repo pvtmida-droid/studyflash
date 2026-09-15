@@ -155,8 +155,65 @@ export default function AdminPanel({
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   const [activeTab, setActiveTab] = useState<
-    "manage" | "bulk" | "seo" | "users" | "adsense" | "live" | "mocktests"
+    "manage" | "bulk" | "seo" | "users" | "adsense" | "live" | "mocktests" | "payments"
   >("manage");
+
+  // Payment Approvals State
+  const [paymentLogs, setPaymentLogs] = useState<any[]>(() => {
+    try {
+      return JSON.parse(localStorage.getItem("studyflash_all_india_payments") || "[]");
+    } catch {
+      return [];
+    }
+  });
+
+  const refreshPaymentLogs = () => {
+    try {
+      setPaymentLogs(JSON.parse(localStorage.getItem("studyflash_all_india_payments") || "[]"));
+    } catch {}
+  };
+
+  const handleApprovePayment = (id: string, testId: string) => {
+    try {
+      const logs = JSON.parse(localStorage.getItem("studyflash_all_india_payments") || "[]");
+      const updated = logs.map((log: any) =>
+        log.id === id ? { ...log, status: "approved" } : log
+      );
+      localStorage.setItem("studyflash_all_india_payments", JSON.stringify(updated));
+      setPaymentLogs(updated);
+
+      // Add to purchased tests
+      const purchased = JSON.parse(localStorage.getItem("studyflash_purchased_tests") || "[]");
+      if (!purchased.includes(testId)) {
+        purchased.push(testId);
+        localStorage.setItem("studyflash_purchased_tests", JSON.stringify(purchased));
+      }
+
+      triggerToast("Payment Approved! Test unlocked for user.");
+    } catch (e) {}
+  };
+
+  const handleRejectPayment = (id: string) => {
+    try {
+      const logs = JSON.parse(localStorage.getItem("studyflash_all_india_payments") || "[]");
+      const updated = logs.map((log: any) =>
+        log.id === id ? { ...log, status: "rejected" } : log
+      );
+      localStorage.setItem("studyflash_all_india_payments", JSON.stringify(updated));
+      setPaymentLogs(updated);
+      triggerToast("Payment Rejected.");
+    } catch (e) {}
+  };
+
+  const handleDeletePaymentLog = (id: string) => {
+    try {
+      const logs = JSON.parse(localStorage.getItem("studyflash_all_india_payments") || "[]");
+      const updated = logs.filter((log: any) => log.id !== id);
+      localStorage.setItem("studyflash_all_india_payments", JSON.stringify(updated));
+      setPaymentLogs(updated);
+      triggerToast("Log deleted.");
+    } catch (e) {}
+  };
 
   // Live Visitors Real-Time Presence State
   const [onlineCount, setOnlineCount] = useState<number>(1);
@@ -1731,6 +1788,7 @@ Sitemap: https://studyflash.co/sitemap.xml`);
           },
           { id: "mocktests", label: isHindi ? "मॉक टेस्ट" : "Mock Tests", icon: FileText },
           { id: "live", label: isHindi ? "लाइव टेस्ट" : "Live Test", icon: Activity },
+          { id: "payments", label: isHindi ? "पेमेंट सत्यापन" : "Test Payments & Approvals", icon: Key },
           { id: "seo", label: isHindi ? "सेटिंग्स और SEO" : "Settings & SEO", icon: Settings },
           { id: "users", label: isHindi ? "उम्मीदवार" : "Candidates", icon: Users },
           { id: "adsense", label: isHindi ? "गूगल एडसेंस" : "AdSense Placeholders", icon: Layout },
@@ -1754,6 +1812,107 @@ Sitemap: https://studyflash.co/sitemap.xml`);
       </div>
 
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm">
+        {/* PAYMENTS APPROVAL TAB */}
+        {activeTab === "payments" && (
+          <div className="space-y-6 animate-fade-in">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-4">
+              <div>
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 text-xs font-bold uppercase mb-1">
+                  <Key className="w-3.5 h-3.5" />
+                  <span>₹20 Paid Test Series Approvals</span>
+                </div>
+                <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+                  {isHindi ? "पेमेंट वेरिफिकेशन & UTR अप्रूवल" : "All India Test Payments & UTR Approvals"}
+                </h2>
+                <p className="text-xs text-slate-500 font-medium">
+                  {isHindi
+                    ? "छात्रों द्वारा जमा किए गए यूटीआर (UTR) और पेमेंट विवरण को सत्यापित करें और टेस्ट अनलॉक करें।"
+                    : "Verify UTR / Transaction ID submitted by students to approve and unlock tests."}
+                </p>
+              </div>
+
+              <button
+                onClick={refreshPaymentLogs}
+                className="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-bold flex items-center gap-2 transition-all self-start sm:self-auto"
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+                <span>{isHindi ? "रिफ्रेश लिस्ट" : "Refresh List"}</span>
+              </button>
+            </div>
+
+            {paymentLogs.length === 0 ? (
+              <div className="p-12 text-center text-slate-400 font-medium space-y-2">
+                <Key className="w-10 h-10 mx-auto opacity-30 text-emerald-500" />
+                <p>{isHindi ? "अभी तक कोई पेमेंट रिक्वेस्ट प्राप्त नहीं हुई है।" : "No payment verification requests submitted yet."}</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead>
+                    <tr className="border-b border-slate-200 dark:border-slate-800 text-slate-400 uppercase font-bold text-[10px] tracking-wider">
+                      <th className="p-3">Student Name</th>
+                      <th className="p-3">Test Title</th>
+                      <th className="p-3">UTR / Txn ID</th>
+                      <th className="p-3">Date & Time</th>
+                      <th className="p-3">Status</th>
+                      <th className="p-3 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 font-semibold">
+                    {paymentLogs.map((log) => (
+                      <tr key={log.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                        <td className="p-3 font-extrabold text-slate-900 dark:text-white">{log.studentName}</td>
+                        <td className="p-3 text-slate-700 dark:text-slate-300">{log.testTitle}</td>
+                        <td className="p-3 font-mono text-emerald-600 dark:text-emerald-400">
+                          <div>UTR: {log.utrNumber}</div>
+                          {log.transactionId && log.transactionId !== "N/A" && (
+                            <div className="text-[10px] text-slate-400">Txn: {log.transactionId}</div>
+                          )}
+                        </td>
+                        <td className="p-3 text-slate-400 text-[11px]">{log.date}</td>
+                        <td className="p-3">
+                          {log.status === "approved" ? (
+                            <span className="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">APPROVED ✓</span>
+                          ) : log.status === "rejected" ? (
+                            <span className="px-2.5 py-1 rounded-full bg-red-100 text-red-800 text-[10px] font-bold">REJECTED ✗</span>
+                          ) : (
+                            <span className="px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold animate-pulse">PENDING REVIEW ⏳</span>
+                          )}
+                        </td>
+                        <td className="p-3 text-right space-x-2">
+                          {log.status !== "approved" && (
+                            <button
+                              onClick={() => handleApprovePayment(log.id, log.testId)}
+                              className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold text-xs shadow-xs transition-all"
+                            >
+                              Approve & Unlock
+                            </button>
+                          )}
+                          {log.status !== "rejected" && (
+                            <button
+                              onClick={() => handleRejectPayment(log.id)}
+                              className="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-bold text-xs shadow-xs transition-all"
+                            >
+                              Reject
+                            </button>
+                          )}
+                          <button
+                            onClick={() => handleDeletePaymentLog(log.id)}
+                            className="p-1.5 text-slate-400 hover:text-red-600 rounded-lg transition-colors"
+                            title="Delete Log"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Manage Questions List Grid */}
         {activeTab === "manage" && (
           <div className="space-y-6">

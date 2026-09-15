@@ -134,7 +134,7 @@ export default function AllIndiaMockTestsView({
   const [isVerifying, setIsVerifying] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Purchased test IDs stored in localStorage
+  // Purchased test IDs & Payment logs stored in localStorage
   const [purchasedTests, setPurchasedTests] = useState<string[]>(() => {
     try {
       const saved = localStorage.getItem("studyflash_purchased_tests");
@@ -143,6 +143,29 @@ export default function AllIndiaMockTestsView({
       return [];
     }
   });
+
+  const [paymentLogs, setPaymentLogs] = useState<any[]>(() => {
+    try {
+      return JSON.parse(localStorage.getItem("studyflash_all_india_payments") || "[]");
+    } catch {
+      return [];
+    }
+  });
+
+  // Sync payments from localStorage periodically
+  useEffect(() => {
+    const syncPayments = () => {
+      try {
+        const logs = JSON.parse(localStorage.getItem("studyflash_all_india_payments") || "[]");
+        const purchased = JSON.parse(localStorage.getItem("studyflash_purchased_tests") || "[]");
+        setPaymentLogs(logs);
+        setPurchasedTests(purchased);
+      } catch {}
+    };
+    syncPayments();
+    const interval = setInterval(syncPayments, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -177,22 +200,24 @@ export default function AllIndiaMockTestsView({
     setIsVerifying(true);
     setTimeout(() => {
       setIsVerifying(false);
-      const updated = Array.from(new Set([...purchasedTests, testId]));
-      setPurchasedTests(updated);
-      localStorage.setItem("studyflash_purchased_tests", JSON.stringify(updated));
 
-      // Save payment log for admin audit
+      const newLog = {
+        id: "pay_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
+        studentName: enteredName,
+        testId,
+        testTitle: selectedTestForPayment ? selectedTestForPayment.titleEn : "All India Test",
+        utrNumber: enteredUtr || "N/A",
+        transactionId: enteredTxn || "N/A",
+        amount: TEST_PRICE,
+        status: "pending", // PENDING ADMIN APPROVAL!
+        date: new Date().toLocaleString(),
+      };
+
       try {
-        const logs = JSON.parse(localStorage.getItem("studyflash_all_india_payments") || "[]");
-        logs.push({
-          studentName: enteredName,
-          testId,
-          utrNumber: enteredUtr || "N/A",
-          transactionId: enteredTxn || "N/A",
-          amount: TEST_PRICE,
-          date: new Date().toLocaleString(),
-        });
-        localStorage.setItem("studyflash_all_india_payments", JSON.stringify(logs));
+        const existingLogs = JSON.parse(localStorage.getItem("studyflash_all_india_payments") || "[]");
+        const updatedLogs = [newLog, ...existingLogs];
+        localStorage.setItem("studyflash_all_india_payments", JSON.stringify(updatedLogs));
+        setPaymentLogs(updatedLogs);
       } catch {}
 
       setSelectedTestForPayment(null);
@@ -201,10 +226,17 @@ export default function AllIndiaMockTestsView({
       setTransactionId("");
       showToast(
         isHindi
-          ? `🎉 भुगतान सत्यापित! ${enteredName} के लिए टेस्ट अनलॉक हो गया है।`
-          : `🎉 Payment Verified! Test Unlocked for ${enteredName}.`
+          ? `⏳ भुगतान विवरण सबमिट हो गया! एडमिन (Admin) द्वारा UTR सत्यापित करने के बाद टेस्ट अनलॉक होगा।`
+          : `⏳ Payment details submitted! Test will be unlocked after Admin verifies your UTR.`
       );
     }, 1200);
+  };
+
+  const getCardPaymentStatus = (testId: string) => {
+    if (purchasedTests.includes(testId)) return "approved";
+    const testLogs = paymentLogs.filter((log: any) => log.testId === testId);
+    if (testLogs.length === 0) return "none";
+    return testLogs[0].status || "pending"; // "pending" | "approved" | "rejected" | "none"
   };
 
   const filteredTests = MOCK_TEST_CARDS.filter(
@@ -311,7 +343,7 @@ export default function AllIndiaMockTestsView({
       {/* 5 TEST CARDS GRID */}
       <div className="space-y-6">
         {filteredTests.map((testCard) => {
-          const isPurchased = purchasedTests.includes(testCard.id);
+          const cardStatus = getCardPaymentStatus(testCard.id);
 
           return (
             <div
@@ -336,12 +368,20 @@ export default function AllIndiaMockTestsView({
                   </div>
 
                   <div className="flex items-center gap-2">
-                    {isPurchased ? (
+                    {cardStatus === "approved" ? (
                       <span className="px-3.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 text-xs font-black uppercase tracking-wider flex items-center gap-1 border border-emerald-300">
                         <CheckCircle2 className="w-3.5 h-3.5" /> UNLOCKED
                       </span>
+                    ) : cardStatus === "pending" ? (
+                      <span className="px-3.5 py-1 rounded-full bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-300 text-xs font-black uppercase tracking-wider flex items-center gap-1 border border-amber-300 animate-pulse">
+                        <Clock className="w-3.5 h-3.5 text-amber-600" /> PENDING APPROVAL
+                      </span>
+                    ) : cardStatus === "rejected" ? (
+                      <span className="px-3.5 py-1 rounded-full bg-red-100 dark:bg-red-900/60 text-red-800 dark:text-red-300 text-xs font-black uppercase tracking-wider flex items-center gap-1 border border-red-300">
+                        <AlertCircle className="w-3.5 h-3.5" /> PAYMENT REJECTED
+                      </span>
                     ) : (
-                      <span className="px-3.5 py-1 rounded-full bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300 text-xs font-black uppercase tracking-wider flex items-center gap-1 border border-amber-300">
+                      <span className="px-3.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 text-xs font-black uppercase tracking-wider flex items-center gap-1 border border-emerald-300">
                         <Lock className="w-3.5 h-3.5" /> ₹{TEST_PRICE} ONLY
                       </span>
                     )}
@@ -441,7 +481,7 @@ export default function AllIndiaMockTestsView({
                 {/* ACTION BUTTONS PANEL */}
                 <div className="space-y-3 pt-1">
                   {/* MAIN BIG ACTION BUTTON */}
-                  {isPurchased ? (
+                  {cardStatus === "approved" ? (
                     <button
                       onClick={() => onAttemptTest(testCard.id)}
                       className="w-full py-4 px-6 font-extrabold rounded-2xl transition-all text-base md:text-lg shadow-lg flex items-center justify-between bg-emerald-700 hover:bg-emerald-800 active:scale-98 text-white shadow-emerald-700/20 hover:shadow-emerald-700/40 group/mainbtn"
@@ -449,6 +489,34 @@ export default function AllIndiaMockTestsView({
                       <div className="flex items-center gap-3">
                         <Rocket className="w-5 h-5 transition-transform group-hover/mainbtn:translate-x-0.5 group-hover/mainbtn:-translate-y-0.5" />
                         <span>{isHindi ? "टेस्ट शुरू करें (Attempt Test)" : "Start Test (Unlocked)"}</span>
+                      </div>
+                      <ArrowRight className="w-6 h-6 transition-transform group-hover/mainbtn:translate-x-1" />
+                    </button>
+                  ) : cardStatus === "pending" ? (
+                    <button
+                      onClick={() => {
+                        alert(
+                          isHindi
+                            ? "⏳ आपका भुगतान विवरण (नाम और UTR) सबमिट हो चुका है। एडमिन द्वारा UTR सत्यापित करने के बाद टेस्ट अनलॉक हो जाएगा।"
+                            : "⏳ Your payment details are submitted. Admin is verifying your UTR number."
+                        );
+                      }}
+                      className="w-full py-4 px-6 font-extrabold rounded-2xl transition-all text-base md:text-lg shadow-lg flex items-center justify-between bg-amber-600 hover:bg-amber-700 active:scale-98 text-white shadow-amber-600/20 group/mainbtn"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Clock className="w-5 h-5 animate-spin" />
+                        <span>{isHindi ? "स्वीकृति लंबित है (Approval Pending)" : "Approval Pending (Admin Review)"}</span>
+                      </div>
+                      <ArrowRight className="w-6 h-6 transition-transform group-hover/mainbtn:translate-x-1" />
+                    </button>
+                  ) : cardStatus === "rejected" ? (
+                    <button
+                      onClick={() => setSelectedTestForPayment(testCard)}
+                      className="w-full py-4 px-6 font-extrabold rounded-2xl transition-all text-base md:text-lg shadow-lg flex items-center justify-between bg-red-600 hover:bg-red-700 active:scale-98 text-white shadow-red-600/20 group/mainbtn"
+                    >
+                      <div className="flex items-center gap-3">
+                        <AlertCircle className="w-5 h-5" />
+                        <span>{isHindi ? "पेमेंट अस्वीकृत - पुनः प्रयास करें (₹20)" : "Payment Rejected - Retry (₹20)"}</span>
                       </div>
                       <ArrowRight className="w-6 h-6 transition-transform group-hover/mainbtn:translate-x-1" />
                     </button>
@@ -489,7 +557,7 @@ export default function AllIndiaMockTestsView({
                     {/* Buy 20 /- Button */}
                     <button
                       onClick={() => {
-                        if (isPurchased) {
+                        if (cardStatus === "approved") {
                           onAttemptTest(testCard.id);
                         } else {
                           setSelectedTestForPayment(testCard);
@@ -501,7 +569,7 @@ export default function AllIndiaMockTestsView({
                         <div className="p-2 rounded-xl bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400">
                           <Key className="w-4 h-4" />
                         </div>
-                        <span>{isPurchased ? "Unlocked ✓" : `Buy ${TEST_PRICE} /-`}</span>
+                        <span>{cardStatus === "approved" ? "Unlocked ✓" : cardStatus === "pending" ? "Pending..." : `Buy ${TEST_PRICE} /-`}</span>
                       </div>
                       <ChevronRight className="w-4 h-4 text-emerald-500 group-hover/subbtn:translate-x-0.5 transition-transform" />
                     </button>
