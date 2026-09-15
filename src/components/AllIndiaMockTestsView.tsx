@@ -669,20 +669,44 @@ export default function AllIndiaMockTestsView({
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                     {/* View Results */}
                     <button
-                      onClick={onViewResults}
-                      className="p-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/60 hover:bg-blue-50/50 dark:hover:bg-slate-800 transition-all flex items-center justify-between text-xs md:text-sm font-bold text-slate-700 dark:text-slate-200 group/subbtn"
+                      type="button"
+                      onClick={() => {
+                        if (cardStatus === "approved") {
+                          onViewResults();
+                        } else {
+                          alert(
+                            isHindi
+                              ? "🔒 परिणाम देखने के लिए पहले एडमिन (Admin) द्वारा पेमेंट सत्यापित होना अनिवार्य है।"
+                              : "🔒 Payment verification required by Admin before viewing results."
+                          );
+                        }
+                      }}
+                      className={`p-3 rounded-2xl border transition-all flex items-center justify-between text-xs md:text-sm font-bold ${
+                        cardStatus === "approved"
+                          ? "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/60 hover:bg-blue-50/50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 group/subbtn cursor-pointer"
+                          : "border-slate-200/60 dark:border-slate-800/40 bg-slate-100/50 dark:bg-slate-900/40 text-slate-400 dark:text-slate-500 opacity-60 grayscale cursor-not-allowed"
+                      }`}
                     >
                       <div className="flex items-center gap-2.5">
-                        <div className="p-2 rounded-xl bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400">
-                          <Eye className="w-4 h-4" />
+                        <div className={`p-2 rounded-xl ${
+                          cardStatus === "approved"
+                            ? "bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400"
+                            : "bg-slate-200 dark:bg-slate-800 text-slate-400"
+                        }`}>
+                          {cardStatus === "approved" ? <Eye className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
                         </div>
                         <span>{isHindi ? "परिणाम देखें" : "View Results"}</span>
                       </div>
-                      <ChevronRight className="w-4 h-4 text-blue-500 group-hover/subbtn:translate-x-0.5 transition-transform" />
+                      {cardStatus === "approved" ? (
+                        <ChevronRight className="w-4 h-4 text-blue-500 group-hover/subbtn:translate-x-0.5 transition-transform" />
+                      ) : (
+                        <span className="text-[10px] font-extrabold uppercase bg-slate-200 dark:bg-slate-800 px-2 py-0.5 rounded-md text-slate-500">Locked</span>
+                      )}
                     </button>
 
-                    {/* Buy 20 /- Button */}
+                    {/* Buy Button */}
                     <button
+                      type="button"
                       onClick={() => {
                         if (cardStatus === "approved") {
                           onAttemptTest(testCard.id);
@@ -696,23 +720,46 @@ export default function AllIndiaMockTestsView({
                         <div className="p-2 rounded-xl bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400">
                           <Key className="w-4 h-4" />
                         </div>
-                        <span>{cardStatus === "approved" ? "Unlocked ✓" : cardStatus === "pending" ? "Pending..." : `Buy ${testPrice} /-`}</span>
+                        <span>{cardStatus === "approved" ? "Unlocked ✓" : cardStatus === "pending" ? "Pending..." : `Buy ₹${getTestPrice(testCard)} /-`}</span>
                       </div>
                       <ChevronRight className="w-4 h-4 text-emerald-500 group-hover/subbtn:translate-x-0.5 transition-transform" />
                     </button>
 
                     {/* Answer Key */}
                     <button
-                      onClick={onViewResults}
-                      className="p-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/60 hover:bg-purple-50/50 dark:hover:bg-slate-800 transition-all flex items-center justify-between text-xs md:text-sm font-bold text-slate-700 dark:text-slate-200 group/subbtn"
+                      type="button"
+                      onClick={() => {
+                        if (cardStatus === "approved") {
+                          onViewResults();
+                        } else {
+                          alert(
+                            isHindi
+                              ? "🔒 उत्तर कुंजी (Answer Key) देखने के लिए पहले पेमेंट सत्यापित होना अनिवार्य है।"
+                              : "🔒 Payment verification required before accessing answer key."
+                          );
+                        }
+                      }}
+                      className={`p-3 rounded-2xl border transition-all flex items-center justify-between text-xs md:text-sm font-bold ${
+                        cardStatus === "approved"
+                          ? "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/60 hover:bg-purple-50/50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 group/subbtn cursor-pointer"
+                          : "border-slate-200/60 dark:border-slate-800/40 bg-slate-100/50 dark:bg-slate-900/40 text-slate-400 dark:text-slate-500 opacity-60 grayscale cursor-not-allowed"
+                      }`}
                     >
                       <div className="flex items-center gap-2.5">
-                        <div className="p-2 rounded-xl bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400">
-                          <FileText className="w-4 h-4" />
+                        <div className={`p-2 rounded-xl ${
+                          cardStatus === "approved"
+                            ? "bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400"
+                            : "bg-slate-200 dark:bg-slate-800 text-slate-400"
+                        }`}>
+                          {cardStatus === "approved" ? <FileText className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
                         </div>
                         <span>{isHindi ? "उत्तर कुंजी" : "Answer Key"}</span>
                       </div>
-                      <ChevronRight className="w-4 h-4 text-purple-500 group-hover/subbtn:translate-x-0.5 transition-transform" />
+                      {cardStatus === "approved" ? (
+                        <ChevronRight className="w-4 h-4 text-purple-500 group-hover/subbtn:translate-x-0.5 transition-transform" />
+                      ) : (
+                        <span className="text-[10px] font-extrabold uppercase bg-slate-200 dark:bg-slate-800 px-2 py-0.5 rounded-md text-slate-500">Locked</span>
+                      )}
                     </button>
 
                     {/* How to Attempt This Test */}
