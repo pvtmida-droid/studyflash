@@ -136,6 +136,15 @@ export default function AllIndiaMockTestsView({
   const [isVerifying, setIsVerifying] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  // Dynamic Payment Settings State
+  const [upiId, setUpiId] = useState<string>(() => {
+    return localStorage.getItem("studyflash_upi_id") || DEFAULT_UPI_ID;
+  });
+  const [testPrice, setTestPrice] = useState<number>(() => {
+    const saved = localStorage.getItem("studyflash_test_price");
+    return saved ? Number(saved) || TEST_PRICE : TEST_PRICE;
+  });
+
   // Purchased test IDs & Payment logs stored in localStorage + Firebase
   const [purchasedTests, setPurchasedTests] = useState<string[]>(() => {
     try {
@@ -171,8 +180,25 @@ export default function AllIndiaMockTestsView({
         const parsedPurchased = rawPurchased ? JSON.parse(rawPurchased) : [];
         let purchased: string[] = Array.isArray(parsedPurchased) ? parsedPurchased : [];
 
-        // Try syncing from Firebase Firestore
+        // Try syncing settings & payments from Firebase Firestore
         try {
+          // 1. Sync Settings
+          const settingsSnap = await getDocs(collection(db, "settings"));
+          settingsSnap.forEach((docSnap) => {
+            if (docSnap.id === "payment_settings") {
+              const data = docSnap.data();
+              if (data.upiId && isMounted) {
+                setUpiId(data.upiId);
+                localStorage.setItem("studyflash_upi_id", data.upiId);
+              }
+              if (data.testPrice && isMounted) {
+                setTestPrice(Number(data.testPrice));
+                localStorage.setItem("studyflash_test_price", String(data.testPrice));
+              }
+            }
+          });
+
+          // 2. Sync Payments
           const snapshot = await getDocs(collection(db, "all_india_payments"));
           if (!snapshot.empty) {
             const firestoreLogs: any[] = [];
@@ -227,7 +253,7 @@ export default function AllIndiaMockTestsView({
   };
 
   const handleCopyUpi = () => {
-    navigator.clipboard.writeText(DEFAULT_UPI_ID);
+    navigator.clipboard.writeText(upiId);
     setCopiedUpi(true);
     setTimeout(() => setCopiedUpi(false), 2000);
   };
@@ -266,7 +292,7 @@ export default function AllIndiaMockTestsView({
       testTitle: currentTestTitle,
       utrNumber: enteredUtr || "N/A",
       transactionId: enteredTxn || "N/A",
-      amount: TEST_PRICE,
+      amount: testPrice,
       status: "pending", // PENDING ADMIN APPROVAL!
       date: new Date().toLocaleString(),
     };
@@ -458,7 +484,7 @@ export default function AllIndiaMockTestsView({
                       </span>
                     ) : (
                       <span className="px-3.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 text-xs font-black uppercase tracking-wider flex items-center gap-1 border border-emerald-300">
-                        <Lock className="w-3.5 h-3.5" /> ₹{TEST_PRICE} ONLY
+                        <Lock className="w-3.5 h-3.5" /> ₹{testPrice} ONLY
                       </span>
                     )}
                   </div>
@@ -607,7 +633,7 @@ export default function AllIndiaMockTestsView({
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="text-xs bg-emerald-800 px-3 py-1 rounded-full font-bold border border-emerald-500">
-                          ₹{TEST_PRICE}
+                          ₹{testPrice}
                         </span>
                         <ArrowRight className="w-6 h-6 transition-transform group-hover/mainbtn:translate-x-1" />
                       </div>
@@ -645,7 +671,7 @@ export default function AllIndiaMockTestsView({
                         <div className="p-2 rounded-xl bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400">
                           <Key className="w-4 h-4" />
                         </div>
-                        <span>{cardStatus === "approved" ? "Unlocked ✓" : cardStatus === "pending" ? "Pending..." : `Buy ${TEST_PRICE} /-`}</span>
+                        <span>{cardStatus === "approved" ? "Unlocked ✓" : cardStatus === "pending" ? "Pending..." : `Buy ${testPrice} /-`}</span>
                       </div>
                       <ChevronRight className="w-4 h-4 text-emerald-500 group-hover/subbtn:translate-x-0.5 transition-transform" />
                     </button>
@@ -669,8 +695,8 @@ export default function AllIndiaMockTestsView({
                       onClick={() => {
                         alert(
                           isHindi
-                            ? "ऑल इंडिया टेस्ट गाइड:\n1. 'Buy Test ₹20' बटन पर क्लिक करें\n2. UPI QR Code (PhonePe, Google Pay, Paytm) से ₹20 का पेमेंट करें\n3. UTR / Transaction ID डालकर 'Verify & Unlock' करें\n4. टेस्ट स्टार्ट करके 100 प्रश्न हल करें और रैंक देखें!"
-                            : "All India Test Guide:\n1. Click 'Buy Test ₹20'\n2. Scan UPI QR Code with Google Pay, PhonePe, Paytm\n3. Enter UTR / Transaction ID & click Verify\n4. Start test, attempt 100 questions and get your rank!"
+                            ? `ऑल इंडिया टेस्ट गाइड:\n1. 'Buy Test ₹${testPrice}' बटन पर क्लिक करें\n2. UPI QR Code (PhonePe, Google Pay, Paytm) से ₹${testPrice} का पेमेंट करें\n3. UTR / Transaction ID डालकर 'Verify & Unlock' करें\n4. टेस्ट स्टार्ट करके 100 प्रश्न हल करें और रैंक देखें!`
+                            : `All India Test Guide:\n1. Click 'Buy Test ₹${testPrice}'\n2. Scan UPI QR Code with Google Pay, PhonePe, Paytm\n3. Enter UTR / Transaction ID & click Verify\n4. Start test, attempt 100 questions and get your rank!`
                         );
                       }}
                       className="p-2.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/60 hover:bg-emerald-50/50 dark:hover:bg-slate-800 transition-all flex items-center justify-between text-xs md:text-sm font-bold text-slate-700 dark:text-slate-200 group/subbtn text-left"
@@ -775,7 +801,7 @@ export default function AllIndiaMockTestsView({
                 <div className="bg-gradient-to-r from-emerald-50 via-emerald-100/50 to-emerald-50 dark:from-slate-800 dark:via-slate-800/80 dark:to-slate-800 p-3.5 rounded-2xl border border-emerald-200/80 dark:border-emerald-800 flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
                     <div className="p-2 rounded-xl bg-emerald-600 text-white font-black text-base">
-                      ₹{TEST_PRICE}
+                      ₹{testPrice}
                     </div>
                     <div>
                       <div className="text-xs font-bold text-slate-800 dark:text-slate-200">
@@ -822,7 +848,7 @@ export default function AllIndiaMockTestsView({
                   </label>
                   <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 p-2.5 rounded-2xl border border-slate-200 dark:border-slate-700">
                     <code className="text-sm font-extrabold text-emerald-700 dark:text-emerald-400 flex-1 px-2 select-all">
-                      {DEFAULT_UPI_ID}
+                      {upiId}
                     </code>
                     <button
                       onClick={handleCopyUpi}

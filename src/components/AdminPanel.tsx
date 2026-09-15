@@ -286,6 +286,36 @@ export default function AdminPanel({
     } catch (e) {}
   };
 
+  // Dynamic Payment Config Settings
+  const [adminUpiId, setAdminUpiId] = useState<string>(() => {
+    return localStorage.getItem("studyflash_upi_id") || "8825227701@ybl";
+  });
+  const [adminTestPrice, setAdminTestPrice] = useState<number>(() => {
+    const saved = localStorage.getItem("studyflash_test_price");
+    return saved ? Number(saved) || 20 : 20;
+  });
+
+  const handleSavePaymentSettings = async () => {
+    try {
+      const trimmedUpi = adminUpiId.trim();
+      const numPrice = Number(adminTestPrice) || 20;
+      localStorage.setItem("studyflash_upi_id", trimmedUpi);
+      localStorage.setItem("studyflash_test_price", String(numPrice));
+
+      try {
+        await setDoc(doc(db, "settings", "payment_settings"), {
+          upiId: trimmedUpi,
+          testPrice: numPrice,
+          updatedAt: new Date().toISOString(),
+        });
+      } catch (fbErr) {}
+
+      triggerToast("Payment Settings (UPI ID & Price) saved live!");
+    } catch (e) {
+      alert("Failed to save settings.");
+    }
+  };
+
   // Live Visitors Real-Time Presence State
   const [onlineCount, setOnlineCount] = useState<number>(1);
   const [pageBreakdown, setPageBreakdown] = useState<Record<string, number>>({});
@@ -1908,6 +1938,54 @@ Sitemap: https://studyflash.co/sitemap.xml`);
               >
                 <RefreshCw className="w-3.5 h-3.5" />
                 <span>{isHindi ? "रिफ्रेश लिस्ट" : "Refresh List"}</span>
+              </button>
+            </div>
+
+            {/* PAYMENT SETTINGS & CONFIGURATION CARD */}
+            <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 p-5 rounded-2xl space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-3">
+                <div className="flex items-center gap-2 font-bold text-slate-800 dark:text-white text-sm">
+                  <Settings className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  <span>{isHindi ? "लाइव पेमेंट सेटिंग्स (UPI ID & शुल्क)" : "Live Payment Settings (UPI ID & Price)"}</span>
+                </div>
+                <span className="text-[11px] text-slate-500 font-medium">Auto-synced to Cloud</span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                    {isHindi ? "UPI ID (पेमेंट QR और कॉपी के लिए):" : "UPI ID (For QR & Copy Strip):"}
+                  </label>
+                  <input
+                    type="text"
+                    value={adminUpiId}
+                    onChange={(e) => setAdminUpiId(e.target.value)}
+                    placeholder="e.g. 8825227701@ybl"
+                    className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                    {isHindi ? "टेस्ट शुल्क (₹ Amount):" : "Test Access Fee Amount (₹):"}
+                  </label>
+                  <input
+                    type="number"
+                    value={adminTestPrice}
+                    onChange={(e) => setAdminTestPrice(Number(e.target.value))}
+                    placeholder="20"
+                    className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-extrabold focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleSavePaymentSettings}
+                className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all shadow-md active:scale-98"
+              >
+                <Save className="w-4 h-4" />
+                <span>{isHindi ? "सेटिंग्स सेव करें (Save Live Settings)" : "Save Live Payment Settings"}</span>
               </button>
             </div>
 
