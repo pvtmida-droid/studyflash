@@ -47,6 +47,7 @@ const MOCK_TEST_CARDS = [
     id: "mega-test-1",
     titleEn: "All India Mega Test #1",
     titleHi: "ऑल इंडिया मेगा टेस्ट #1",
+    price: 50,
     testDate: "15 September 2026",
     totalMarks: 100,
     userId: "Rakesh yadav",
@@ -62,6 +63,7 @@ const MOCK_TEST_CARDS = [
     id: "mega-test-2",
     titleEn: "All India Mega Test #2",
     titleHi: "ऑल इंडिया मेगा टेस्ट #2",
+    price: 30,
     testDate: "10 September 2026",
     totalMarks: 100,
     userId: "Rakesh yadav",
@@ -77,6 +79,7 @@ const MOCK_TEST_CARDS = [
     id: "mega-test-3",
     titleEn: "All India Mega Test #3",
     titleHi: "ऑल इंडिया मेगा टेस्ट #3",
+    price: 20,
     testDate: "05 September 2026",
     totalMarks: 100,
     userId: "Rakesh yadav",
@@ -92,6 +95,7 @@ const MOCK_TEST_CARDS = [
     id: "mega-test-4",
     titleEn: "All India Special Test #4",
     titleHi: "ऑल इंडिया स्पेशल टेस्ट #4",
+    price: 20,
     testDate: "01 September 2026",
     totalMarks: 100,
     userId: "Rakesh yadav",
@@ -107,6 +111,7 @@ const MOCK_TEST_CARDS = [
     id: "mega-test-5",
     titleEn: "All India Practice Test #5",
     titleHi: "ऑल इंडिया प्रैक्टिस टेस्ट #5",
+    price: 10,
     testDate: "25 August 2026",
     totalMarks: 100,
     userId: "Rakesh yadav",
@@ -144,6 +149,22 @@ export default function AllIndiaMockTestsView({
     const saved = localStorage.getItem("studyflash_test_price");
     return saved ? Number(saved) || TEST_PRICE : TEST_PRICE;
   });
+  const [customTestPrices, setCustomTestPrices] = useState<Record<string, number>>(() => {
+    try {
+      const saved = localStorage.getItem("studyflash_test_prices_custom");
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+
+  const getTestPrice = (testCard: any) => {
+    if (!testCard) return testPrice || 20;
+    if (customTestPrices && customTestPrices[testCard.id] !== undefined && customTestPrices[testCard.id] !== null) {
+      return Number(customTestPrices[testCard.id]);
+    }
+    return testCard.price !== undefined ? Number(testCard.price) : testPrice;
+  };
 
   // Purchased test IDs & Payment logs stored in localStorage + Firebase
   const [purchasedTests, setPurchasedTests] = useState<string[]>(() => {
@@ -194,6 +215,10 @@ export default function AllIndiaMockTestsView({
               if (data.testPrice && isMounted) {
                 setTestPrice(Number(data.testPrice));
                 localStorage.setItem("studyflash_test_price", String(data.testPrice));
+              }
+              if (data.customTestPrices && isMounted) {
+                setCustomTestPrices(data.customTestPrices);
+                localStorage.setItem("studyflash_test_prices_custom", JSON.stringify(data.customTestPrices));
               }
             }
           });
@@ -292,7 +317,7 @@ export default function AllIndiaMockTestsView({
       testTitle: currentTestTitle,
       utrNumber: enteredUtr || "N/A",
       transactionId: enteredTxn || "N/A",
-      amount: testPrice,
+      amount: getTestPrice(selectedTestForPayment),
       status: "pending", // PENDING ADMIN APPROVAL!
       date: new Date().toLocaleString(),
     };

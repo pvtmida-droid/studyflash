@@ -288,11 +288,19 @@ export default function AdminPanel({
 
   // Dynamic Payment Config Settings
   const [adminUpiId, setAdminUpiId] = useState<string>(() => {
-    return localStorage.getItem("studyflash_upi_id") || "8825227701@ybl";
+    return localStorage.getItem("studyflash_upi_id") || "blasterking@ybl";
   });
   const [adminTestPrice, setAdminTestPrice] = useState<number>(() => {
     const saved = localStorage.getItem("studyflash_test_price");
     return saved ? Number(saved) || 20 : 20;
+  });
+  const [adminCustomPrices, setAdminCustomPrices] = useState<Record<string, number>>(() => {
+    try {
+      const saved = localStorage.getItem("studyflash_test_prices_custom");
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
   });
 
   const handleSavePaymentSettings = async () => {
@@ -301,16 +309,18 @@ export default function AdminPanel({
       const numPrice = Number(adminTestPrice) || 20;
       localStorage.setItem("studyflash_upi_id", trimmedUpi);
       localStorage.setItem("studyflash_test_price", String(numPrice));
+      localStorage.setItem("studyflash_test_prices_custom", JSON.stringify(adminCustomPrices));
 
       try {
         await setDoc(doc(db, "settings", "payment_settings"), {
           upiId: trimmedUpi,
           testPrice: numPrice,
+          customTestPrices: adminCustomPrices,
           updatedAt: new Date().toISOString(),
         });
       } catch (fbErr) {}
 
-      triggerToast("Payment Settings (UPI ID & Price) saved live!");
+      triggerToast("Payment Settings (UPI ID & Per-Test Prices) saved live!");
     } catch (e) {
       alert("Failed to save settings.");
     }
@@ -1967,7 +1977,7 @@ Sitemap: https://studyflash.co/sitemap.xml`);
 
                 <div>
                   <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
-                    {isHindi ? "टेस्ट शुल्क (₹ Amount):" : "Test Access Fee Amount (₹):"}
+                    {isHindi ? "डिफ़ॉल्ट टेस्ट शुल्क (Default ₹ Amount):" : "Default Test Fee Amount (₹):"}
                   </label>
                   <input
                     type="number"
@@ -1976,6 +1986,38 @@ Sitemap: https://studyflash.co/sitemap.xml`);
                     placeholder="20"
                     className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-extrabold focus:outline-none focus:border-emerald-500"
                   />
+                </div>
+              </div>
+
+              {/* PER-TEST CUSTOM PRICING GRID */}
+              <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-2">
+                  {isHindi ? "प्रत्येक टेस्ट की अलग फीस सेट करें (Per-Test Custom Price):" : "Set Individual Custom Price per Test Card:"}
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                  {[
+                    { id: "mega-test-1", title: "Mega Test #1", defaultPrice: 50 },
+                    { id: "mega-test-2", title: "Mega Test #2", defaultPrice: 30 },
+                    { id: "mega-test-3", title: "Mega Test #3", defaultPrice: 20 },
+                    { id: "mega-test-4", title: "Special Test #4", defaultPrice: 20 },
+                    { id: "mega-test-5", title: "Practice Test #5", defaultPrice: 10 },
+                  ].map((testItem) => (
+                    <div key={testItem.id} className="bg-white dark:bg-slate-900 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-xs">
+                      <div className="text-[10px] font-extrabold text-slate-500 truncate mb-1">{testItem.title}</div>
+                      <div className="flex items-center gap-1">
+                        <span className="text-xs font-bold text-emerald-600">₹</span>
+                        <input
+                          type="number"
+                          value={adminCustomPrices[testItem.id] !== undefined ? adminCustomPrices[testItem.id] : testItem.defaultPrice}
+                          onChange={(e) => {
+                            const val = Number(e.target.value);
+                            setAdminCustomPrices(prev => ({ ...prev, [testItem.id]: val }));
+                          }}
+                          className="w-full px-2 py-1 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-extrabold focus:outline-none focus:border-emerald-500"
+                        />
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
 
