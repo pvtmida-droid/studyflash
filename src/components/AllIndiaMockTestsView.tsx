@@ -1,4 +1,5 @@
 import { useState } from "react";
+import upiQrCode from "../assets/upi_qr_code.png";
 import {
   ArrowLeft,
   Calendar,
@@ -607,15 +608,11 @@ export default function AllIndiaMockTestsView({
 
             {/* QR CODE CONTAINER */}
             <div className="bg-slate-50 dark:bg-slate-800/60 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center space-y-3 text-center">
-              <div className="p-3 bg-white rounded-2xl shadow-md border-2 border-emerald-500 relative group">
+              <div className="p-2.5 bg-slate-950 rounded-2xl shadow-xl border-2 border-emerald-500 relative group flex items-center justify-center">
                 <img
-                  src="/upi_qr_code.png"
+                  src={upiQrCode}
                   alt="PhonePe UPI QR Code"
-                  className="w-52 h-52 md:w-56 md:h-56 object-contain rounded-lg"
-                  onError={(e: any) => {
-                    e.target.onerror = null;
-                    e.target.src = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=upi://pay?pa=${DEFAULT_UPI_ID}&pn=StudyFlash&am=${TEST_PRICE}&cu=INR`;
-                  }}
+                  className="w-56 h-56 md:w-64 md:h-64 object-contain rounded-xl"
                 />
               </div>
 
