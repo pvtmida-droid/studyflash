@@ -9,6 +9,10 @@ import {
   Trophy,
   Calendar,
   Swords,
+  Bell,
+  Megaphone,
+  Zap,
+  ArrowRight,
 } from "lucide-react";
 import { MOCK_LEADERBOARD, MOCK_TESTIMONIALS, MOCK_FAQS } from "../mockData";
 
@@ -317,135 +321,226 @@ export default function HomeView({
         </div>
       </section>
 
-      {/* 2. LIVE BATTLE */}
+      {/* 2. LATEST UPDATES & LIVE BATTLE (SPLIT SECTION) */}
       <section className="space-y-6">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-4">
-          <div className="space-y-3">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 text-sm font-bold tracking-wide uppercase border border-red-200 dark:border-red-500/20">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
-              </span>
-              Live Battle
-            </div>
-            <h2 className="text-2xl md:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-              {isHindi ? "ऑल इंडिया लाइव टेस्ट" : "All India Live Test"}
-            </h2>
-          </div>
-        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 items-stretch">
+          {/* HALF SIDE 1: LATEST UPDATES CARD */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-emerald-200 dark:hover:border-emerald-800/50 rounded-[32px] p-6 md:p-8 shadow-xl relative overflow-hidden transition-all duration-500 hover:shadow-2xl flex flex-col justify-between group">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 blur-3xl rounded-full mix-blend-screen pointer-events-none transition-transform duration-700 group-hover:scale-125 group-hover:bg-emerald-500/20" />
 
-        <div className="relative z-10 group">
-          <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-indigo-200 dark:hover:border-indigo-800/50 rounded-[32px] p-8 md:p-12 shadow-xl relative overflow-hidden transition-all duration-500 hover:shadow-2xl hover:-translate-y-1">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 blur-3xl rounded-full mix-blend-screen pointer-events-none transition-transform duration-700 group-hover:scale-125 group-hover:bg-indigo-500/20" />
-            <div className="relative z-10 flex flex-col md:flex-row gap-8 items-center justify-between">
-              <div className="space-y-6 max-w-2xl">
-                <div className="flex flex-wrap items-center gap-3 text-slate-500 dark:text-slate-400 font-medium text-sm">
-                  <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800/50 px-4 py-2 rounded-xl border border-slate-100 dark:border-slate-800 transition-colors duration-300 group-hover:bg-white dark:group-hover:bg-slate-800 group-hover:border-indigo-100 dark:group-hover:border-indigo-900/50 group-hover:shadow-sm">
-                    <Calendar className="w-4 h-4 text-indigo-500 transition-transform duration-300 group-hover:scale-110" />
-                    <span>
-                      {new Date(
-                        liveTestConfig?.resultDate || "2026-12-31T23:59:59",
-                      ).toLocaleDateString("en-GB", {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                      })}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800/50 px-4 py-2 rounded-xl border border-slate-100 dark:border-slate-800 transition-colors duration-300 group-hover:bg-white dark:group-hover:bg-slate-800 group-hover:border-amber-100 dark:group-hover:border-amber-900/30 group-hover:shadow-sm">
-                    <Trophy className="w-4 h-4 text-amber-500 transition-transform duration-300 group-hover:scale-110" />
-                    {isCountingDown ? (
-                      <div className="flex items-center gap-1.5 font-mono text-amber-600 dark:text-amber-500 font-bold text-sm">
-                        <span>{String(timeLeft.days).padStart(2, "0")}d</span>
-                        <span className="text-amber-300 dark:text-amber-700/50">
-                          :
-                        </span>
-                        <span>{String(timeLeft.hours).padStart(2, "0")}h</span>
-                        <span className="text-amber-300 dark:text-amber-700/50">
-                          :
-                        </span>
-                        <span>
-                          {String(timeLeft.minutes).padStart(2, "0")}m
-                        </span>
-                        <span className="text-amber-300 dark:text-amber-700/50">
-                          :
-                        </span>
-                        <span>
-                          {String(timeLeft.seconds).padStart(2, "0")}s
-                        </span>
-                        <span className="ml-1 text-slate-500 font-sans text-xs uppercase tracking-wider">
-                          {isHindi ? "शेष" : "left"}
-                        </span>
-                      </div>
-                    ) : (
-                      <span>
-                        {isHindi ? "परिणाम घोषित" : "Results Declared"}
-                      </span>
-                    )}
-                  </div>
+            <div className="relative z-10 space-y-5">
+              {/* Header Badge & Title */}
+              <div className="flex items-center justify-between gap-3">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-bold tracking-wide uppercase border border-emerald-200 dark:border-emerald-500/20">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  </span>
+                  <Megaphone className="w-3.5 h-3.5" />
+                  {isHindi ? "नवीनतम अपडेट्स" : "Latest Updates"}
                 </div>
-                <h3 className="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white flex items-center md:items-start md:flex-row flex-col gap-3 text-center md:text-left mb-2">
+                <span className="text-[11px] font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg">
+                  15 Sep 2026
+                </span>
+              </div>
+
+              <h3 className="text-xl md:text-2xl font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                <span>📢 {isHindi ? "परीक्षा अपडेट्स & सूचनाएं" : "Exam Updates & News"}</span>
+              </h3>
+
+              {/* Updates List */}
+              <div className="space-y-3 pt-1">
+                <div
+                  onClick={() => setCurrentView("central-exam-selection")}
+                  className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 hover:bg-emerald-50/50 dark:hover:bg-slate-800 transition-all border border-slate-100 dark:border-slate-800/80 flex items-start justify-between gap-3 group/item cursor-pointer"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 rounded-xl bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 mt-0.5 shrink-0">
+                      <Zap className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 group-hover/item:text-emerald-600 dark:group-hover/item:text-emerald-400 transition-colors">
+                          {isHindi ? "RRB NTPC & Group D 2026 सीरीज" : "RRB NTPC & Group D 2026 Series"}
+                        </h4>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500 text-white">NEW</span>
+                      </div>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+                        {isHindi ? "50+ नए मॉक टेस्ट एवं पिछले वर्षों के प्रश्न पत्र जारी।" : "50+ new full mock tests & PYQs released."}
+                      </p>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-slate-400 group-hover/item:translate-x-1 transition-transform shrink-0 self-center" />
+                </div>
+
+                <div
+                  onClick={() => setCurrentView("current-affairs-selection")}
+                  className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 hover:bg-purple-50/50 dark:hover:bg-slate-800 transition-all border border-slate-100 dark:border-slate-800/80 flex items-start justify-between gap-3 group/item cursor-pointer"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 rounded-xl bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400 mt-0.5 shrink-0">
+                      <Flame className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 group-hover/item:text-purple-600 dark:group-hover/item:text-purple-400 transition-colors">
+                          {isHindi ? "करेंट अफेयर्स 2026 स्पेशल कैप्सूल" : "Current Affairs 2026 Capsule"}
+                        </h4>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500 text-white">SEP 2026</span>
+                      </div>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+                        {isHindi ? "सितंबर 2026 के 500+ अति महत्वपूर्ण प्रश्न अभ्यास के लिए उपलब्ध।" : "September 2026 500+ top MCQs ready to practice."}
+                      </p>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-slate-400 group-hover/item:translate-x-1 transition-transform shrink-0 self-center" />
+                </div>
+
+                <div
+                  onClick={() => setCurrentView("state-police-selection")}
+                  className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 hover:bg-blue-50/50 dark:hover:bg-slate-800 transition-all border border-slate-100 dark:border-slate-800/80 flex items-start justify-between gap-3 group/item cursor-pointer"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 rounded-xl bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0">
+                      <Swords className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 group-hover/item:text-blue-600 dark:group-hover/item:text-blue-400 transition-colors">
+                          {isHindi ? "यूपी एवं बिहार पुलिस भर्ती 2026" : "State Police Recruitment 2026"}
+                        </h4>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500 text-white">ACTIVE</span>
+                      </div>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+                        {isHindi ? "कांस्टेबल एवं एसआई परीक्षा हेतु विशेष प्रैक्टिस सेट उपलब्ध।" : "Special practice sets for Constable & SI exams."}
+                      </p>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-slate-400 group-hover/item:translate-x-1 transition-transform shrink-0 self-center" />
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Button */}
+            <button
+              onClick={() => setCurrentView("questions")}
+              className="w-full mt-5 py-3 px-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white dark:hover:bg-emerald-600 font-bold text-sm flex items-center justify-center gap-2 transition-all duration-200 group/btn shadow-sm"
+            >
+              <span>{isHindi ? "सभी अपडेट्स एवं प्रश्न खोजें" : "Explore All Updates & Practice"}</span>
+              <ArrowRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
+            </button>
+          </div>
+
+          {/* HALF SIDE 2: ALL INDIA MOCK TEST CARD */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-indigo-200 dark:hover:border-indigo-800/50 rounded-[32px] p-6 md:p-8 shadow-xl relative overflow-hidden transition-all duration-500 hover:shadow-2xl flex flex-col justify-between group">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 blur-3xl rounded-full mix-blend-screen pointer-events-none transition-transform duration-700 group-hover:scale-125 group-hover:bg-indigo-500/20" />
+
+            <div className="relative z-10 space-y-5">
+              {/* Header Badge & Timer */}
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 text-xs font-bold tracking-wide uppercase border border-red-200 dark:border-red-500/20">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                  </span>
+                  Live Battle
+                </div>
+
+                <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800/50 px-3 py-1 rounded-xl border border-slate-100 dark:border-slate-800 text-xs font-semibold text-slate-600 dark:text-slate-300">
+                  <Calendar className="w-3.5 h-3.5 text-indigo-500" />
+                  <span>
+                    {new Date(
+                      liveTestConfig?.resultDate || "2026-12-31T23:59:59",
+                    ).toLocaleDateString("en-GB", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                    })}
+                  </span>
+                </div>
+              </div>
+
+              {/* Title & Countdown */}
+              <div className="space-y-3">
+                <h3 className="text-xl md:text-2xl font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
                   <span>🏆 All India Mega Test 2026</span>
                 </h3>
 
-                <div className="space-y-2 text-slate-700 dark:text-slate-300 font-medium">
-                  <p className="flex items-center gap-2">
-                    <span className="text-xl">🎯</span> Know Your Real
-                    Preparation Level
-                  </p>
-                  <p className="flex items-center gap-2">
-                    <span className="text-xl">📈</span> Get Your All India Rank
-                  </p>
-                  <p className="flex items-center gap-2">
-                    <span className="text-xl">🏆</span> Compete With Thousands
-                    of Aspirants Nationwide
-                  </p>
+                <div className="inline-flex items-center gap-2 bg-amber-50 dark:bg-amber-950/40 px-3.5 py-1.5 rounded-xl border border-amber-200 dark:border-amber-800/50 text-xs font-bold text-amber-700 dark:text-amber-400">
+                  <Trophy className="w-4 h-4 text-amber-500 shrink-0" />
+                  {isCountingDown ? (
+                    <div className="flex items-center gap-1 font-mono text-sm">
+                      <span>{String(timeLeft.days).padStart(2, "0")}d</span>
+                      <span>:</span>
+                      <span>{String(timeLeft.hours).padStart(2, "0")}h</span>
+                      <span>:</span>
+                      <span>{String(timeLeft.minutes).padStart(2, "0")}m</span>
+                      <span>:</span>
+                      <span>{String(timeLeft.seconds).padStart(2, "0")}s</span>
+                      <span className="ml-1 text-[11px] font-sans text-amber-600 dark:text-amber-500 uppercase tracking-wider">
+                        {isHindi ? "शेष" : "left"}
+                      </span>
+                    </div>
+                  ) : (
+                    <span>{isHindi ? "परिणाम घोषित" : "Results Declared"}</span>
+                  )}
                 </div>
               </div>
-              <div className="flex flex-col items-center md:items-end gap-3 w-full md:w-auto">
-                <button
-                  onClick={handleAttemptBattle}
-                  disabled={hasAttemptedBattle && !isAdmin}
-                  className={`px-10 py-5 font-bold rounded-2xl transition-all w-full md:w-auto text-lg shadow-lg active:scale-95 duration-200 flex items-center justify-center gap-2 ${
-                    hasAttemptedBattle && !isAdmin
-                      ? "bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed shadow-none"
-                      : "bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-600/20 hover:shadow-indigo-600/40 hover:-translate-y-1"
-                  }`}
-                >
-                  {hasAttemptedBattle && !isAdmin
-                    ? isHindi
-                      ? "आप टेस्ट दे चुके हैं"
-                      : "Already Attempted"
-                    : "🚀 Attempt Free Test"}
-                </button>
-                <button
-                  onClick={() => {
-                    if (
-                      !isCountingDown ||
-                      isAdmin
-                    ) {
-                      setCurrentView("battle_results");
-                    } else {
-                      alert(
-                        isHindi
-                          ? `परिणाम ${new Date(liveTestConfig?.resultDate || "2026-12-31T23:59:59").toLocaleDateString("hi-IN")} को घोषित किए जाएंगे`
-                          : `Results will be declared on ${new Date(liveTestConfig?.resultDate || "2026-12-31T23:59:59").toLocaleDateString()}`
-                      );
-                    }
-                  }}
-                  disabled={isCountingDown && !isAdmin}
-                  className={`w-full md:w-auto px-10 py-3.5 font-bold rounded-2xl transition-all text-sm md:text-base border-2 flex items-center justify-center gap-2 ${
-                    !isCountingDown || isAdmin
-                      ? "border-indigo-100 dark:border-indigo-900/50 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 active:scale-95 duration-200"
-                      : "border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-slate-800 cursor-not-allowed"
-                  }`}
-                >
-                  {isCountingDown && !isAdmin && (
-                    <Lock className="w-4 h-4" />
-                  )}
-                  {isHindi ? "परिणाम देखें" : "View Results"}
-                </button>
+
+              {/* Key Features */}
+              <div className="space-y-2 text-xs md:text-sm text-slate-700 dark:text-slate-300 font-medium">
+                <p className="flex items-center gap-2">
+                  <span>🎯</span> {isHindi ? "अपनी वास्तविक तैयारी के स्तर को जांचें" : "Know Your Real Preparation Level"}
+                </p>
+                <p className="flex items-center gap-2">
+                  <span>📈</span> {isHindi ? "ऑल इंडिया रैंक (AIR) प्राप्त करें" : "Get Your All India Rank"}
+                </p>
+                <p className="flex items-center gap-2">
+                  <span>🏆</span> {isHindi ? "देशभर के हजारों परीक्षार्थियों से प्रतिस्पर्धा करें" : "Compete With Thousands Nationwide"}
+                </p>
               </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="relative z-10 flex flex-col gap-2.5 mt-5">
+              <button
+                onClick={handleAttemptBattle}
+                disabled={hasAttemptedBattle && !isAdmin}
+                className={`w-full py-3.5 px-6 font-bold rounded-2xl transition-all text-sm md:text-base shadow-md active:scale-95 duration-200 flex items-center justify-center gap-2 ${
+                  hasAttemptedBattle && !isAdmin
+                    ? "bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed shadow-none"
+                    : "bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-600/20 hover:shadow-indigo-600/40 hover:-translate-y-0.5"
+                }`}
+              >
+                {hasAttemptedBattle && !isAdmin
+                  ? isHindi
+                    ? "आप टेस्ट दे चुके हैं"
+                    : "Already Attempted"
+                  : "🚀 Attempt Free Test"}
+              </button>
+
+              <button
+                onClick={() => {
+                  if (!isCountingDown || isAdmin) {
+                    setCurrentView("battle_results");
+                  } else {
+                    alert(
+                      isHindi
+                        ? `परिणाम ${new Date(liveTestConfig?.resultDate || "2026-12-31T23:59:59").toLocaleDateString("hi-IN")} को घोषित किए जाएंगे`
+                        : `Results will be declared on ${new Date(liveTestConfig?.resultDate || "2026-12-31T23:59:59").toLocaleDateString()}`
+                    );
+                  }
+                }}
+                disabled={isCountingDown && !isAdmin}
+                className={`w-full py-2.5 px-6 font-bold rounded-2xl transition-all text-xs md:text-sm border-2 flex items-center justify-center gap-2 ${
+                  !isCountingDown || isAdmin
+                    ? "border-indigo-100 dark:border-indigo-900/50 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 active:scale-95 duration-200"
+                    : "border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-slate-800 cursor-not-allowed"
+                }`}
+              >
+                {isCountingDown && !isAdmin && <Lock className="w-3.5 h-3.5" />}
+                {isHindi ? "परिणाम देखें" : "View Results"}
+              </button>
             </div>
           </div>
         </div>
