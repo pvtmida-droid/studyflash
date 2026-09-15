@@ -52,6 +52,49 @@ const SEARCHABLE_SUGGESTIONS = [
   { nameEn: "Current Affairs", nameHi: "करेंट अफेयर्स", type: "subject", category: "CurrentAffairs", icon: "📰" },
 ];
 
+const LATEST_UPDATES_DATA = [
+  {
+    id: "update-1",
+    titleEn: "Bihar SSC Inter Level (Tier-1) – 2025",
+    titleHi: "बिहार SSC इंटर लेवल (Tier-1) – 2025",
+    date: "12 Sep 2025",
+    questionsCount: "100 Questions",
+    iconType: "file",
+  },
+  {
+    id: "update-2",
+    titleEn: "RRB NTPC & Group D Live Test – 2026",
+    titleHi: "आरआरबी NTPC एवं ग्रुप D लाइव टेस्ट – 2026",
+    date: "15 Sep 2026",
+    questionsCount: "100 Questions",
+    iconType: "zap",
+  },
+  {
+    id: "update-3",
+    titleEn: "SSC CGL Mega All-India Battle – 2026",
+    titleHi: "एसएससी CGL मेगा ऑल-इंडिया बैटल – 2026",
+    date: "10 Sep 2026",
+    questionsCount: "100 Questions",
+    iconType: "trophy",
+  },
+  {
+    id: "update-4",
+    titleEn: "State Police Recruitment Special – 2026",
+    titleHi: "राज्य पुलिस भर्ती विशेष अभ्यास – 2026",
+    date: "05 Sep 2026",
+    questionsCount: "100 Questions",
+    iconType: "swords",
+  },
+  {
+    id: "update-5",
+    titleEn: "Current Affairs Sep 2026 Special Capsule",
+    titleHi: "करेंट अफेयर्स सितंबर 2026 स्पेशल कैप्सूल",
+    date: "01 Sep 2026",
+    questionsCount: "100 Questions",
+    iconType: "flame",
+  },
+];
+
 export default function HomeView({
   isHindi,
   setCurrentView,
@@ -65,6 +108,7 @@ export default function HomeView({
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
   const [hasAttemptedBattle, setHasAttemptedBattle] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+  const [currentUpdateIndex, setCurrentUpdateIndex] = useState(0);
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -72,6 +116,13 @@ export default function HomeView({
     seconds: 0,
   });
   const [isCountingDown, setIsCountingDown] = useState(false);
+
+  useEffect(() => {
+    const updateTimer = setInterval(() => {
+      setCurrentUpdateIndex((prev) => (prev + 1) % LATEST_UPDATES_DATA.length);
+    }, 4000);
+    return () => clearInterval(updateTimer);
+  }, []);
 
   useEffect(() => {
     const battleAttempted = localStorage.getItem("studyflash_battle_attempted");
@@ -332,235 +383,137 @@ export default function HomeView({
         </div>
       </section>
 
-      {/* 2. LATEST UPDATE SECTION (EXACT COMBINED IMAGE DESIGN) */}
+      {/* 2. LATEST UPDATE SECTION (AUTO-ROTATING SINGLE ROW CAROUSEL) */}
       <section className="space-y-6">
         <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-emerald-200 dark:hover:border-emerald-800/50 rounded-[32px] p-6 md:p-8 shadow-xl relative overflow-hidden transition-all duration-500 hover:shadow-2xl space-y-6 group">
           <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/10 blur-3xl rounded-full mix-blend-screen pointer-events-none transition-transform duration-700 group-hover:scale-125 group-hover:bg-emerald-500/20" />
 
-          {/* Header: Megaphone Icon | Latest Update Title | Subtitle */}
-          <div className="relative z-10 flex items-center gap-4">
-            <div className="p-3.5 bg-emerald-50 dark:bg-emerald-950/50 rounded-2xl border border-emerald-100 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 shrink-0">
-              <Megaphone className="w-6 h-6" />
+          {/* Header: Megaphone Icon | Latest Update Title | Subtitle | Carousel Dots */}
+          <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="p-3.5 bg-emerald-50 dark:bg-emerald-950/50 rounded-2xl border border-emerald-100 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 shrink-0">
+                <Megaphone className="w-6 h-6 animate-pulse" />
+              </div>
+              <div className="h-10 w-px bg-slate-200 dark:bg-slate-700 shrink-0" />
+              <div>
+                <h2 className="text-2xl md:text-3xl font-black tracking-tight text-slate-900 dark:text-white">
+                  Latest <span className="text-emerald-600 dark:text-emerald-400">Update</span>
+                </h2>
+                <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 font-medium">
+                  Stay updated with the latest mock tests and important links.
+                </p>
+              </div>
             </div>
-            <div className="h-10 w-px bg-slate-200 dark:bg-slate-700 shrink-0" />
-            <div>
-              <h2 className="text-2xl md:text-3xl font-black tracking-tight text-slate-900 dark:text-white">
-                Latest <span className="text-emerald-600 dark:text-emerald-400">Update</span>
-              </h2>
-              <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 font-medium">
-                Stay updated with the latest mock tests and important links.
-              </p>
+
+            {/* Carousel Indicator Dots */}
+            <div className="flex items-center gap-1.5 self-end sm:self-center">
+              {LATEST_UPDATES_DATA.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setCurrentUpdateIndex(idx)}
+                  className={`h-2.5 transition-all duration-300 rounded-full ${
+                    idx === currentUpdateIndex
+                      ? "w-7 bg-emerald-600"
+                      : "w-2.5 bg-slate-200 dark:bg-slate-700 hover:bg-emerald-300"
+                  }`}
+                  title={`Go to update ${idx + 1}`}
+                />
+              ))}
             </div>
           </div>
 
-          {/* COMBINED ROWS LIST */}
-          <div className="relative z-10 space-y-4">
-            {/* ROW 1: Bihar SSC Inter Level (Tier-1) */}
-            <div className="bg-[#f0fbf7] dark:bg-slate-800/60 border border-emerald-100/80 dark:border-slate-700/80 rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all hover:shadow-md group/row">
-              {/* LEFT SIDE: Exam Icon + Title + Meta + Solid Green Attempt Test Button */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 flex-1">
-                <div className="flex items-center gap-3.5">
-                  <div className="relative shrink-0 p-3 bg-emerald-100/80 dark:bg-emerald-900/50 rounded-2xl text-emerald-700 dark:text-emerald-400">
-                    <FileText className="w-6 h-6" />
-                    <span className="absolute -bottom-1 -right-1 bg-emerald-600 text-white font-extrabold text-[8px] px-1.5 py-0.5 rounded-full border-2 border-white dark:border-slate-900 shadow-xs">
-                      NEW
-                    </span>
-                  </div>
-                  <div>
-                    <h3 className="text-sm md:text-base font-extrabold text-emerald-700 dark:text-emerald-400 group-hover/row:text-emerald-800 dark:group-hover/row:text-emerald-300 transition-colors">
-                      Bihar SSC Inter Level (Tier-1) &ndash; 2025
-                    </h3>
-                    <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">
-                      <span className="flex items-center gap-1">
-                        <Calendar className="w-3.5 h-3.5 text-emerald-600" />
-                        12 Sep 2025
-                      </span>
-                      <span>|</span>
-                      <span className="flex items-center gap-1">
-                        <FileText className="w-3.5 h-3.5 text-emerald-600" />
-                        100 Questions
-                      </span>
+          {/* SINGLE ACTIVE COMBINED ROW ITEM WITH AUTO ROTATION */}
+          <div className="relative z-10 min-h-[96px]">
+            {(() => {
+              const activeItem = LATEST_UPDATES_DATA[currentUpdateIndex];
+              return (
+                <div
+                  key={activeItem.id}
+                  className="bg-[#f0fbf7] dark:bg-slate-800/60 border border-emerald-100/80 dark:border-slate-700/80 rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all duration-500 animate-fade-in hover:shadow-md group/row"
+                >
+                  {/* LEFT SIDE: Exam Icon + Title + Meta + Solid Green Attempt Test Button */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 flex-1">
+                    <div className="flex items-center gap-3.5">
+                      <div className="relative shrink-0 p-3 bg-emerald-100/80 dark:bg-emerald-900/50 rounded-2xl text-emerald-700 dark:text-emerald-400">
+                        {activeItem.iconType === "zap" ? (
+                          <Zap className="w-6 h-6" />
+                        ) : activeItem.iconType === "trophy" ? (
+                          <Trophy className="w-6 h-6" />
+                        ) : activeItem.iconType === "swords" ? (
+                          <Swords className="w-6 h-6" />
+                        ) : activeItem.iconType === "flame" ? (
+                          <Flame className="w-6 h-6" />
+                        ) : (
+                          <FileText className="w-6 h-6" />
+                        )}
+                        <span className="absolute -bottom-1 -right-1 bg-emerald-600 text-white font-extrabold text-[8px] px-1.5 py-0.5 rounded-full border-2 border-white dark:border-slate-900 shadow-xs">
+                          NEW
+                        </span>
+                      </div>
+                      <div>
+                        <h3 className="text-sm md:text-base font-extrabold text-emerald-700 dark:text-emerald-400 group-hover/row:text-emerald-800 dark:group-hover/row:text-emerald-300 transition-colors">
+                          {isHindi ? activeItem.titleHi : activeItem.titleEn}
+                        </h3>
+                        <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">
+                          <span className="flex items-center gap-1">
+                            <Calendar className="w-3.5 h-3.5 text-emerald-600" />
+                            {activeItem.date}
+                          </span>
+                          <span>|</span>
+                          <span className="flex items-center gap-1">
+                            <FileText className="w-3.5 h-3.5 text-emerald-600" />
+                            {activeItem.questionsCount}
+                          </span>
+                        </div>
+                      </div>
                     </div>
+
+                    {/* Solid Green Attempt Test Button */}
+                    <button
+                      onClick={handleAttemptBattle}
+                      className="px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs md:text-sm flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95 shrink-0"
+                    >
+                      <span>Attempt Test</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  {/* VERTICAL DIVIDER LINE */}
+                  <div className="hidden md:block w-px bg-slate-300 dark:bg-slate-700 h-14 shrink-0 mx-2" />
+
+                  {/* RIGHT SIDE: Teacher Avatar + Rakesh Sir Test + Outline Green Open Test Button */}
+                  <div className="flex items-center justify-between gap-4 bg-white/90 dark:bg-slate-800/90 p-2.5 rounded-2xl border border-emerald-100 dark:border-slate-700 shadow-xs shrink-0">
+                    <div className="flex items-center gap-3">
+                      <img
+                        src="/teacher_avatar.png"
+                        alt="Rakesh Sir Avatar"
+                        className="w-11 h-11 rounded-full border-2 border-emerald-500 object-cover shrink-0"
+                        onError={(e: any) => {
+                          e.target.onerror = null;
+                          e.target.src = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80";
+                        }}
+                      />
+                      <div>
+                        <div className="font-extrabold text-slate-900 dark:text-white text-xs md:text-sm">
+                          Rakesh Sir Test
+                        </div>
+                        <div className="text-[10px] text-slate-400 font-medium">
+                          Fixed test link (Rakesh Sir)
+                        </div>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => setCurrentView("all-india-tests")}
+                      className="px-4 py-2 rounded-xl border-2 border-emerald-600 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white dark:hover:bg-emerald-600 font-extrabold text-xs flex items-center gap-1.5 transition-all shadow-xs shrink-0 active:scale-95"
+                    >
+                      <span>Open Test</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
                   </div>
                 </div>
-
-                {/* Solid Green Attempt Test Button */}
-                <button
-                  onClick={handleAttemptBattle}
-                  className="px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs md:text-sm flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95 shrink-0"
-                >
-                  <span>Attempt Test</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              </div>
-
-              {/* VERTICAL DIVIDER LINE */}
-              <div className="hidden md:block w-px bg-slate-300 dark:bg-slate-700 h-14 shrink-0 mx-2" />
-
-              {/* RIGHT SIDE: Teacher Avatar + Rakesh Sir Test + Outline Green Open Test Button */}
-              <div className="flex items-center justify-between gap-4 bg-white/90 dark:bg-slate-800/90 p-2.5 rounded-2xl border border-emerald-100 dark:border-slate-700 shadow-xs shrink-0">
-                <div className="flex items-center gap-3">
-                  <img
-                    src="/teacher_avatar.png"
-                    alt="Rakesh Sir Avatar"
-                    className="w-11 h-11 rounded-full border-2 border-emerald-500 object-cover shrink-0"
-                    onError={(e: any) => {
-                      e.target.onerror = null;
-                      e.target.src = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80";
-                    }}
-                  />
-                  <div>
-                    <div className="font-extrabold text-slate-900 dark:text-white text-xs md:text-sm">
-                      Rakesh Sir Test
-                    </div>
-                    <div className="text-[10px] text-slate-400 font-medium">
-                      Fixed test link (Rakesh Sir)
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => setCurrentView("all-india-tests")}
-                  className="px-4 py-2 rounded-xl border-2 border-emerald-600 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white dark:hover:bg-emerald-600 font-extrabold text-xs flex items-center gap-1.5 transition-all shadow-xs shrink-0 active:scale-95"
-                >
-                  <span>Open Test</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </div>
-
-            {/* ROW 2: RRB NTPC & Group D */}
-            <div className="bg-[#f0fbf7] dark:bg-slate-800/60 border border-emerald-100/80 dark:border-slate-700/80 rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all hover:shadow-md group/row">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 flex-1">
-                <div className="flex items-center gap-3.5">
-                  <div className="relative shrink-0 p-3 bg-emerald-100/80 dark:bg-emerald-900/50 rounded-2xl text-emerald-700 dark:text-emerald-400">
-                    <Zap className="w-6 h-6" />
-                    <span className="absolute -bottom-1 -right-1 bg-emerald-600 text-white font-extrabold text-[8px] px-1.5 py-0.5 rounded-full border-2 border-white dark:border-slate-900 shadow-xs">
-                      NEW
-                    </span>
-                  </div>
-                  <div>
-                    <h3 className="text-sm md:text-base font-extrabold text-emerald-700 dark:text-emerald-400 group-hover/row:text-emerald-800 dark:group-hover/row:text-emerald-300 transition-colors">
-                      RRB NTPC & Group D Live Test &ndash; 2026
-                    </h3>
-                    <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">
-                      <span className="flex items-center gap-1">
-                        <Calendar className="w-3.5 h-3.5 text-emerald-600" />
-                        15 Sep 2026
-                      </span>
-                      <span>|</span>
-                      <span className="flex items-center gap-1">
-                        <FileText className="w-3.5 h-3.5 text-emerald-600" />
-                        100 Questions
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  onClick={handleAttemptBattle}
-                  className="px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs md:text-sm flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95 shrink-0"
-                >
-                  <span>Attempt Test</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              </div>
-
-              <div className="hidden md:block w-px bg-slate-300 dark:bg-slate-700 h-14 shrink-0 mx-2" />
-
-              <div className="flex items-center justify-between gap-4 bg-white/90 dark:bg-slate-800/90 p-2.5 rounded-2xl border border-emerald-100 dark:border-slate-700 shadow-xs shrink-0">
-                <div className="flex items-center gap-3">
-                  <img
-                    src="/teacher_avatar.png"
-                    alt="Rakesh Sir Avatar"
-                    className="w-11 h-11 rounded-full border-2 border-emerald-500 object-cover shrink-0"
-                  />
-                  <div>
-                    <div className="font-extrabold text-slate-900 dark:text-white text-xs md:text-sm">
-                      Rakesh Sir Test
-                    </div>
-                    <div className="text-[10px] text-slate-400 font-medium">
-                      Fixed test link (Rakesh Sir)
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => setCurrentView("all-india-tests")}
-                  className="px-4 py-2 rounded-xl border-2 border-emerald-600 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white dark:hover:bg-emerald-600 font-extrabold text-xs flex items-center gap-1.5 transition-all shadow-xs shrink-0 active:scale-95"
-                >
-                  <span>Open Test</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </div>
-
-            {/* ROW 3: SSC CGL Mega Battle */}
-            <div className="bg-[#f0fbf7] dark:bg-slate-800/60 border border-emerald-100/80 dark:border-slate-700/80 rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all hover:shadow-md group/row">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 flex-1">
-                <div className="flex items-center gap-3.5">
-                  <div className="relative shrink-0 p-3 bg-emerald-100/80 dark:bg-emerald-900/50 rounded-2xl text-emerald-700 dark:text-emerald-400">
-                    <Trophy className="w-6 h-6" />
-                    <span className="absolute -bottom-1 -right-1 bg-emerald-600 text-white font-extrabold text-[8px] px-1.5 py-0.5 rounded-full border-2 border-white dark:border-slate-900 shadow-xs">
-                      NEW
-                    </span>
-                  </div>
-                  <div>
-                    <h3 className="text-sm md:text-base font-extrabold text-emerald-700 dark:text-emerald-400 group-hover/row:text-emerald-800 dark:group-hover/row:text-emerald-300 transition-colors">
-                      SSC CGL Mega All-India Battle &ndash; 2026
-                    </h3>
-                    <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">
-                      <span className="flex items-center gap-1">
-                        <Calendar className="w-3.5 h-3.5 text-emerald-600" />
-                        10 Sep 2026
-                      </span>
-                      <span>|</span>
-                      <span className="flex items-center gap-1">
-                        <FileText className="w-3.5 h-3.5 text-emerald-600" />
-                        100 Questions
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  onClick={handleAttemptBattle}
-                  className="px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs md:text-sm flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95 shrink-0"
-                >
-                  <span>Attempt Test</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              </div>
-
-              <div className="hidden md:block w-px bg-slate-300 dark:bg-slate-700 h-14 shrink-0 mx-2" />
-
-              <div className="flex items-center justify-between gap-4 bg-white/90 dark:bg-slate-800/90 p-2.5 rounded-2xl border border-emerald-100 dark:border-slate-700 shadow-xs shrink-0">
-                <div className="flex items-center gap-3">
-                  <img
-                    src="/teacher_avatar.png"
-                    alt="Rakesh Sir Avatar"
-                    className="w-11 h-11 rounded-full border-2 border-emerald-500 object-cover shrink-0"
-                  />
-                  <div>
-                    <div className="font-extrabold text-slate-900 dark:text-white text-xs md:text-sm">
-                      Rakesh Sir Test
-                    </div>
-                    <div className="text-[10px] text-slate-400 font-medium">
-                      Fixed test link (Rakesh Sir)
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => setCurrentView("all-india-tests")}
-                  className="px-4 py-2 rounded-xl border-2 border-emerald-600 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white dark:hover:bg-emerald-600 font-extrabold text-xs flex items-center gap-1.5 transition-all shadow-xs shrink-0 active:scale-95"
-                >
-                  <span>Open Test</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </div>
-
+              );
+            })()}
           </div>
 
           {/* BOTTOM FULL-WIDTH BUTTON */}
