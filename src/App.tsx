@@ -47,6 +47,7 @@ import ReasoningSelectionView from "./components/ReasoningSelectionView";
 import HindiSelectionView from "./components/HindiSelectionView";
 import EnglishSelectionView from "./components/EnglishSelectionView";
 import StatePoliceSelectionView from "./components/StatePoliceSelectionView";
+import AllIndiaMockTestsView from "./components/AllIndiaMockTestsView";
 
 import {
   auth,
@@ -102,6 +103,7 @@ export default function App() {
     "questions": "/questions",
     "quizzes": "/quizzes",
     "live-test-auto": "/live-test",
+    "all-india-tests": "/all-india-tests",
     "dashboard": "/dashboard"
   };
 
@@ -774,6 +776,17 @@ export default function App() {
             onSelectPeriod={(periodLabel) => {
               handleFilterQuestions("Current Affairs", periodLabel, true);
             }}
+          />
+        )}
+
+        {currentView === "all-india-tests" && (
+          <AllIndiaMockTestsView
+            isHindi={isHindi}
+            onBack={() => setCurrentView("home")}
+            onAttemptTest={(testId) => {
+              setCurrentView("live-test-auto");
+            }}
+            onViewResults={() => setCurrentView("battle_results")}
           />
         )}
 
