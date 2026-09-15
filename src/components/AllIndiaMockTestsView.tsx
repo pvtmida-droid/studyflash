@@ -609,13 +609,12 @@ export default function AllIndiaMockTestsView({
             <div className="bg-slate-50 dark:bg-slate-800/60 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center space-y-3 text-center">
               <div className="p-3 bg-white rounded-2xl shadow-md border-2 border-emerald-500 relative group">
                 <img
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=upi://pay?pa=${DEFAULT_UPI_ID}&pn=StudyFlash&am=${TEST_PRICE}&cu=INR`}
-                  alt="UPI QR Code"
-                  className="w-48 h-48 md:w-52 md:h-52 object-contain rounded-lg"
+                  src="/upi_qr_code.png"
+                  alt="PhonePe UPI QR Code"
+                  className="w-52 h-52 md:w-56 md:h-56 object-contain rounded-lg"
                   onError={(e: any) => {
-                    // Fallback to quickchart QR if qrserver fails
                     e.target.onerror = null;
-                    e.target.src = `https://quickchart.io/qr?text=upi://pay?pa=${DEFAULT_UPI_ID}%26pn=StudyFlash%26am=${TEST_PRICE}%26cu=INR&size=240`;
+                    e.target.src = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=upi://pay?pa=${DEFAULT_UPI_ID}&pn=StudyFlash&am=${TEST_PRICE}&cu=INR`;
                   }}
                 />
               </div>
