@@ -49,6 +49,7 @@ const MOCK_TEST_CARDS = [
     titleHi: "ऑल इंडिया मेगा टेस्ट #1",
     price: 50,
     answerKeyPdfUrl: "",
+    imageUrl: "/teacher_avatar.png",
     testDate: "15 September 2026",
     totalMarks: 100,
     userId: "Vikash kumar yadav",
@@ -66,6 +67,7 @@ const MOCK_TEST_CARDS = [
     titleHi: "ऑल इंडिया मेगा टेस्ट #2",
     price: 30,
     answerKeyPdfUrl: "",
+    imageUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
     testDate: "10 September 2026",
     totalMarks: 100,
     userId: "Munna Sir",
@@ -83,6 +85,7 @@ const MOCK_TEST_CARDS = [
     titleHi: "ऑल इंडिया मेगा टेस्ट #3",
     price: 20,
     answerKeyPdfUrl: "",
+    imageUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80",
     testDate: "05 September 2026",
     totalMarks: 100,
     userId: "Vishwash sir",
@@ -100,6 +103,7 @@ const MOCK_TEST_CARDS = [
     titleHi: "ऑल इंडिया स्पेशल टेस्ट #4",
     price: 20,
     answerKeyPdfUrl: "",
+    imageUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80",
     testDate: "01 September 2026",
     totalMarks: 100,
     userId: "Ranjan sir",
@@ -117,6 +121,7 @@ const MOCK_TEST_CARDS = [
     titleHi: "ऑल इंडिया प्रैक्टिस टेस्ट #5",
     price: 10,
     answerKeyPdfUrl: "",
+    imageUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80",
     testDate: "25 August 2026",
     totalMarks: 100,
     userId: "Guddu singh",
@@ -170,6 +175,14 @@ export default function AllIndiaMockTestsView({
       return {};
     }
   });
+  const [customImageUrls, setCustomImageUrls] = useState<Record<string, string>>(() => {
+    try {
+      const saved = localStorage.getItem("studyflash_test_image_urls_custom");
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
 
   const getTestPrice = (testCard: any) => {
     if (!testCard) return testPrice || 20;
@@ -185,6 +198,14 @@ export default function AllIndiaMockTestsView({
       return customPdfUrls[testCard.id];
     }
     return testCard.answerKeyPdfUrl || "";
+  };
+
+  const getTestImage = (testCard: any) => {
+    if (!testCard) return "/teacher_avatar.png";
+    if (customImageUrls && customImageUrls[testCard.id]) {
+      return customImageUrls[testCard.id];
+    }
+    return testCard.imageUrl || "/teacher_avatar.png";
   };
 
   // Purchased test IDs & Payment logs stored in localStorage + Firebase
@@ -240,6 +261,14 @@ export default function AllIndiaMockTestsView({
               if (data.customTestPrices && isMounted) {
                 setCustomTestPrices(data.customTestPrices);
                 localStorage.setItem("studyflash_test_prices_custom", JSON.stringify(data.customTestPrices));
+              }
+              if (data.customPdfUrls && isMounted) {
+                setCustomPdfUrls(data.customPdfUrls);
+                localStorage.setItem("studyflash_test_pdf_urls_custom", JSON.stringify(data.customPdfUrls));
+              }
+              if (data.customImageUrls && isMounted) {
+                setCustomImageUrls(data.customImageUrls);
+                localStorage.setItem("studyflash_test_image_urls_custom", JSON.stringify(data.customImageUrls));
               }
             }
           });
@@ -530,7 +559,7 @@ export default function AllIndiaMockTestsView({
                       </span>
                     ) : (
                       <span className="px-3.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 text-xs font-black uppercase tracking-wider flex items-center gap-1 border border-emerald-300">
-                        <Lock className="w-3.5 h-3.5" /> ₹{testPrice} ONLY
+                        <Lock className="w-3.5 h-3.5" /> ₹{getTestPrice(testCard)} ONLY
                       </span>
                     )}
                   </div>
@@ -542,7 +571,7 @@ export default function AllIndiaMockTestsView({
                   <div className="relative shrink-0 flex items-center justify-center">
                     <div className="relative w-28 h-28 md:w-32 md:h-32 rounded-2xl overflow-hidden border-2 border-emerald-500 shadow-md group/pic">
                       <img
-                        src="/teacher_avatar.png"
+                        src={getTestImage(testCard)}
                         alt="Teacher Avatar"
                         className="w-full h-full object-cover transition-transform duration-300 group-hover/pic:scale-105"
                         onError={(e: any) => {
@@ -664,7 +693,7 @@ export default function AllIndiaMockTestsView({
                     >
                       <div className="flex items-center gap-3">
                         <AlertCircle className="w-5 h-5" />
-                        <span>{isHindi ? "पेमेंट अस्वीकृत - पुनः प्रयास करें (₹20)" : "Payment Rejected - Retry (₹20)"}</span>
+                        <span>{isHindi ? `पेमेंट अस्वीकृत - पुनः प्रयास करें (₹${getTestPrice(testCard)})` : `Payment Rejected - Retry (₹${getTestPrice(testCard)})`}</span>
                       </div>
                       <ArrowRight className="w-6 h-6 transition-transform group-hover/mainbtn:translate-x-1" />
                     </button>
@@ -675,11 +704,11 @@ export default function AllIndiaMockTestsView({
                     >
                       <div className="flex items-center gap-3">
                         <Lock className="w-5 h-5 text-amber-300" />
-                        <span>{isHindi ? "टेस्ट अनलॉक करें (Buy Test – ₹20)" : "Buy Test – ₹20 (Unlock Now)"}</span>
+                        <span>{isHindi ? `टेस्ट अनलॉक करें (Buy Test – ₹${getTestPrice(testCard)})` : `Buy Test – ₹${getTestPrice(testCard)} (Unlock Now)`}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="text-xs bg-emerald-800 px-3 py-1 rounded-full font-bold border border-emerald-500">
-                          ₹{testPrice}
+                          ₹{getTestPrice(testCard)}
                         </span>
                         <ArrowRight className="w-6 h-6 transition-transform group-hover/mainbtn:translate-x-1" />
                       </div>
@@ -793,8 +822,8 @@ export default function AllIndiaMockTestsView({
                       onClick={() => {
                         alert(
                           isHindi
-                            ? `ऑल इंडिया टेस्ट गाइड:\n1. 'Buy Test ₹${testPrice}' बटन पर क्लिक करें\n2. UPI QR Code (PhonePe, Google Pay, Paytm) से ₹${testPrice} का पेमेंट करें\n3. UTR / Transaction ID डालकर 'Verify & Unlock' करें\n4. टेस्ट स्टार्ट करके 100 प्रश्न हल करें और रैंक देखें!`
-                            : `All India Test Guide:\n1. Click 'Buy Test ₹${testPrice}'\n2. Scan UPI QR Code with Google Pay, PhonePe, Paytm\n3. Enter UTR / Transaction ID & click Verify\n4. Start test, attempt 100 questions and get your rank!`
+                            ? `ऑल इंडिया टेस्ट गाइड:\n1. 'Buy Test ₹${getTestPrice(testCard)}' बटन पर क्लिक करें\n2. UPI QR Code (PhonePe, Google Pay, Paytm) से ₹${getTestPrice(testCard)} का पेमेंट करें\n3. UTR / Transaction ID डालकर 'Verify & Unlock' करें\n4. टेस्ट स्टार्ट करके 100 प्रश्न हल करें और रैंक देखें!`
+                            : `All India Test Guide:\n1. Click 'Buy Test ₹${getTestPrice(testCard)}'\n2. Scan UPI QR Code with Google Pay, PhonePe, Paytm\n3. Enter UTR / Transaction ID & click Verify\n4. Start test, attempt 100 questions and get your rank!`
                         );
                       }}
                       className="p-2.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/60 hover:bg-emerald-50/50 dark:hover:bg-slate-800 transition-all flex items-center justify-between text-xs md:text-sm font-bold text-slate-700 dark:text-slate-200 group/subbtn text-left"
@@ -899,7 +928,7 @@ export default function AllIndiaMockTestsView({
                 <div className="bg-gradient-to-r from-emerald-50 via-emerald-100/50 to-emerald-50 dark:from-slate-800 dark:via-slate-800/80 dark:to-slate-800 p-3.5 rounded-2xl border border-emerald-200/80 dark:border-emerald-800 flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
                     <div className="p-2 rounded-xl bg-emerald-600 text-white font-black text-base">
-                      ₹{testPrice}
+                      ₹{getTestPrice(selectedTestForPayment)}
                     </div>
                     <div>
                       <div className="text-xs font-bold text-slate-800 dark:text-slate-200">
