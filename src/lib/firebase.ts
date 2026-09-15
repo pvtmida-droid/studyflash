@@ -14,6 +14,7 @@ import {
   getDoc,
   collection,
   getDocs,
+  deleteDoc,
 } from "firebase/firestore";
 
 // Config parsed from firebase-applet-config.json
@@ -47,4 +48,5 @@ export {
   getDoc,
   collection,
   getDocs,
+  deleteDoc,
 };

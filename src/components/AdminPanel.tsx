@@ -30,6 +30,7 @@ import {
   Key,
 } from "lucide-react";
 import { Question, LiveTestConfig, MockTest } from "../types";
+import { db, doc, setDoc, deleteDoc, collection, getDocs } from "../lib/firebase";
 
 interface AdminPanelProps {
   questions: Question[];
@@ -158,59 +159,129 @@ export default function AdminPanel({
     "manage" | "bulk" | "seo" | "users" | "adsense" | "live" | "mocktests" | "payments"
   >("manage");
 
-  // Payment Approvals State
+  // Payment Approvals State (LocalStorage + Firebase Firestore)
   const [paymentLogs, setPaymentLogs] = useState<any[]>(() => {
     try {
-      return JSON.parse(localStorage.getItem("studyflash_all_india_payments") || "[]");
+      const raw = localStorage.getItem("studyflash_all_india_payments");
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed : [];
     } catch {
       return [];
     }
   });
 
-  const refreshPaymentLogs = () => {
+  const refreshPaymentLogs = async () => {
     try {
-      setPaymentLogs(JSON.parse(localStorage.getItem("studyflash_all_india_payments") || "[]"));
+      const raw = localStorage.getItem("studyflash_all_india_payments");
+      const parsed = raw ? JSON.parse(raw) : [];
+      let logs: any[] = Array.isArray(parsed) ? parsed : [];
+
+      try {
+        const snapshot = await getDocs(collection(db, "all_india_payments"));
+        if (!snapshot.empty) {
+          const firestoreLogs: any[] = [];
+          snapshot.forEach((docSnap) => {
+            const data = docSnap.data();
+            if (data && data.id) firestoreLogs.push(data);
+          });
+          const logMap = new Map<string, any>();
+          [...logs, ...firestoreLogs].forEach((item) => {
+            if (item && item.id) logMap.set(item.id, item);
+          });
+          logs = Array.from(logMap.values());
+          localStorage.setItem("studyflash_all_india_payments", JSON.stringify(logs));
+        }
+      } catch (fbErr) {}
+
+      setPaymentLogs(logs);
     } catch {}
   };
 
-  const handleApprovePayment = (id: string, testId: string) => {
+  useEffect(() => {
+    refreshPaymentLogs();
+  }, []);
+
+  const handleApprovePayment = async (id: string, testId: string) => {
     try {
-      const logs = JSON.parse(localStorage.getItem("studyflash_all_india_payments") || "[]");
-      const updated = logs.map((log: any) =>
-        log.id === id ? { ...log, status: "approved" } : log
-      );
+      const raw = localStorage.getItem("studyflash_all_india_payments");
+      const parsed = raw ? JSON.parse(raw) : [];
+      const logs = Array.isArray(parsed) ? parsed : [];
+      
+      let targetLog: any = null;
+      const updated = logs.map((log: any) => {
+        if (log.id === id) {
+          targetLog = { ...log, status: "approved" };
+          return targetLog;
+        }
+        return log;
+      });
+      
       localStorage.setItem("studyflash_all_india_payments", JSON.stringify(updated));
       setPaymentLogs(updated);
 
-      // Add to purchased tests
-      const purchased = JSON.parse(localStorage.getItem("studyflash_purchased_tests") || "[]");
+      // Add to purchased tests locally
+      const rawPurchased = localStorage.getItem("studyflash_purchased_tests");
+      const parsedPurchased = rawPurchased ? JSON.parse(rawPurchased) : [];
+      const purchased = Array.isArray(parsedPurchased) ? parsedPurchased : [];
       if (!purchased.includes(testId)) {
         purchased.push(testId);
         localStorage.setItem("studyflash_purchased_tests", JSON.stringify(purchased));
+      }
+
+      // Sync approval status to Firestore doc
+      if (targetLog) {
+        try {
+          await setDoc(doc(db, "all_india_payments", id), targetLog);
+        } catch (fbErr) {}
       }
 
       triggerToast("Payment Approved! Test unlocked for user.");
     } catch (e) {}
   };
 
-  const handleRejectPayment = (id: string) => {
+  const handleRejectPayment = async (id: string) => {
     try {
-      const logs = JSON.parse(localStorage.getItem("studyflash_all_india_payments") || "[]");
-      const updated = logs.map((log: any) =>
-        log.id === id ? { ...log, status: "rejected" } : log
-      );
+      const raw = localStorage.getItem("studyflash_all_india_payments");
+      const parsed = raw ? JSON.parse(raw) : [];
+      const logs = Array.isArray(parsed) ? parsed : [];
+      
+      let targetLog: any = null;
+      const updated = logs.map((log: any) => {
+        if (log.id === id) {
+          targetLog = { ...log, status: "rejected" };
+          return targetLog;
+        }
+        return log;
+      });
+
       localStorage.setItem("studyflash_all_india_payments", JSON.stringify(updated));
       setPaymentLogs(updated);
+
+      // Sync rejection status to Firestore doc
+      if (targetLog) {
+        try {
+          await setDoc(doc(db, "all_india_payments", id), targetLog);
+        } catch (fbErr) {}
+      }
+
       triggerToast("Payment Rejected.");
     } catch (e) {}
   };
 
-  const handleDeletePaymentLog = (id: string) => {
+  const handleDeletePaymentLog = async (id: string) => {
     try {
-      const logs = JSON.parse(localStorage.getItem("studyflash_all_india_payments") || "[]");
+      const raw = localStorage.getItem("studyflash_all_india_payments");
+      const parsed = raw ? JSON.parse(raw) : [];
+      const logs = Array.isArray(parsed) ? parsed : [];
       const updated = logs.filter((log: any) => log.id !== id);
       localStorage.setItem("studyflash_all_india_payments", JSON.stringify(updated));
       setPaymentLogs(updated);
+
+      // Delete from Firestore doc
+      try {
+        await deleteDoc(doc(db, "all_india_payments", id));
+      } catch (fbErr) {}
+
       triggerToast("Log deleted.");
     } catch (e) {}
   };

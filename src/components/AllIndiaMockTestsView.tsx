@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import upiQrCode from "../assets/upi_qr_code.png";
+import { db, doc, setDoc, collection, getDocs } from "../lib/firebase";
 import {
   ArrowLeft,
   Calendar,
@@ -134,11 +135,12 @@ export default function AllIndiaMockTestsView({
   const [isVerifying, setIsVerifying] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Purchased test IDs & Payment logs stored in localStorage
+  // Purchased test IDs & Payment logs stored in localStorage + Firebase
   const [purchasedTests, setPurchasedTests] = useState<string[]>(() => {
     try {
       const saved = localStorage.getItem("studyflash_purchased_tests");
-      return saved ? JSON.parse(saved) : [];
+      const parsed = saved ? JSON.parse(saved) : [];
+      return Array.isArray(parsed) ? parsed : [];
     } catch {
       return [];
     }
@@ -146,25 +148,76 @@ export default function AllIndiaMockTestsView({
 
   const [paymentLogs, setPaymentLogs] = useState<any[]>(() => {
     try {
-      return JSON.parse(localStorage.getItem("studyflash_all_india_payments") || "[]");
+      const saved = localStorage.getItem("studyflash_all_india_payments");
+      const parsed = saved ? JSON.parse(saved) : [];
+      return Array.isArray(parsed) ? parsed : [];
     } catch {
       return [];
     }
   });
 
-  // Sync payments from localStorage periodically
+  // Sync payments from localStorage & Firebase Firestore periodically
   useEffect(() => {
-    const syncPayments = () => {
+    let isMounted = true;
+
+    const syncPayments = async () => {
       try {
-        const logs = JSON.parse(localStorage.getItem("studyflash_all_india_payments") || "[]");
-        const purchased = JSON.parse(localStorage.getItem("studyflash_purchased_tests") || "[]");
-        setPaymentLogs(logs);
-        setPurchasedTests(purchased);
-      } catch {}
+        const rawLogs = localStorage.getItem("studyflash_all_india_payments");
+        const parsedLogs = rawLogs ? JSON.parse(rawLogs) : [];
+        let logs: any[] = Array.isArray(parsedLogs) ? parsedLogs : [];
+
+        const rawPurchased = localStorage.getItem("studyflash_purchased_tests");
+        const parsedPurchased = rawPurchased ? JSON.parse(rawPurchased) : [];
+        let purchased: string[] = Array.isArray(parsedPurchased) ? parsedPurchased : [];
+
+        // Try syncing from Firebase Firestore
+        try {
+          const snapshot = await getDocs(collection(db, "all_india_payments"));
+          if (!snapshot.empty) {
+            const firestoreLogs: any[] = [];
+            snapshot.forEach((docSnap) => {
+              const data = docSnap.data();
+              if (data && data.id) firestoreLogs.push(data);
+            });
+
+            // Merge local and firestore logs by ID
+            const logMap = new Map<string, any>();
+            [...logs, ...firestoreLogs].forEach((item) => {
+              if (item && item.id) logMap.set(item.id, item);
+            });
+            logs = Array.from(logMap.values());
+
+            // Sync approved items to purchased
+            logs.forEach((item) => {
+              if (item.status === "approved" && item.testId && !purchased.includes(item.testId)) {
+                purchased.push(item.testId);
+              }
+            });
+
+            try {
+              localStorage.setItem("studyflash_all_india_payments", JSON.stringify(logs));
+              localStorage.setItem("studyflash_purchased_tests", JSON.stringify(purchased));
+            } catch {}
+          }
+        } catch (fbErr) {
+          // Firebase offline or network issue - fallback to local
+        }
+
+        if (isMounted) {
+          setPaymentLogs(logs);
+          setPurchasedTests(purchased);
+        }
+      } catch (err) {
+        console.error("Payment sync error:", err);
+      }
     };
+
     syncPayments();
-    const interval = setInterval(syncPayments, 3000);
-    return () => clearInterval(interval);
+    const interval = setInterval(syncPayments, 4000);
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
   }, []);
 
   const showToast = (msg: string) => {
@@ -178,7 +231,7 @@ export default function AllIndiaMockTestsView({
     setTimeout(() => setCopiedUpi(false), 2000);
   };
 
-  const handleUnlockTest = (testId: string) => {
+  const handleUnlockTest = async (testId: string) => {
     const enteredName = studentName.trim();
     const enteredUtr = utrNumber.trim();
     const enteredTxn = transactionId.trim();
@@ -197,29 +250,48 @@ export default function AllIndiaMockTestsView({
       return;
     }
 
+    // Capture title before async operation
+    const currentTestTitle = selectedTestForPayment
+      ? (isHindi ? selectedTestForPayment.titleHi : selectedTestForPayment.titleEn)
+      : "All India Test";
+
     setIsVerifying(true);
+
+    const paymentId = "pay_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
+    const newLog = {
+      id: paymentId,
+      studentName: enteredName,
+      testId,
+      testTitle: currentTestTitle,
+      utrNumber: enteredUtr || "N/A",
+      transactionId: enteredTxn || "N/A",
+      amount: TEST_PRICE,
+      status: "pending", // PENDING ADMIN APPROVAL!
+      date: new Date().toLocaleString(),
+    };
+
+    // 1. Save to LocalStorage safely
+    let updatedLogs: any[] = [newLog];
+    try {
+      const rawLogs = localStorage.getItem("studyflash_all_india_payments");
+      const parsed = rawLogs ? JSON.parse(rawLogs) : [];
+      const existingLogs = Array.isArray(parsed) ? parsed : [];
+      updatedLogs = [newLog, ...existingLogs];
+      localStorage.setItem("studyflash_all_india_payments", JSON.stringify(updatedLogs));
+      setPaymentLogs(updatedLogs);
+    } catch (err) {
+      console.error("LocalStorage save error:", err);
+    }
+
+    // 2. Save to Firebase Firestore safely
+    try {
+      await setDoc(doc(db, "all_india_payments", paymentId), newLog);
+    } catch (fbErr) {
+      console.warn("Firestore payment save warning:", fbErr);
+    }
+
     setTimeout(() => {
       setIsVerifying(false);
-
-      const newLog = {
-        id: "pay_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
-        studentName: enteredName,
-        testId,
-        testTitle: selectedTestForPayment ? selectedTestForPayment.titleEn : "All India Test",
-        utrNumber: enteredUtr || "N/A",
-        transactionId: enteredTxn || "N/A",
-        amount: TEST_PRICE,
-        status: "pending", // PENDING ADMIN APPROVAL!
-        date: new Date().toLocaleString(),
-      };
-
-      try {
-        const existingLogs = JSON.parse(localStorage.getItem("studyflash_all_india_payments") || "[]");
-        const updatedLogs = [newLog, ...existingLogs];
-        localStorage.setItem("studyflash_all_india_payments", JSON.stringify(updatedLogs));
-        setPaymentLogs(updatedLogs);
-      } catch {}
-
       setSelectedTestForPayment(null);
       setStudentName("");
       setUtrNumber("");
@@ -229,14 +301,17 @@ export default function AllIndiaMockTestsView({
           ? `⏳ भुगतान विवरण सबमिट हो गया! एडमिन (Admin) द्वारा UTR सत्यापित करने के बाद टेस्ट अनलॉक होगा।`
           : `⏳ Payment details submitted! Test will be unlocked after Admin verifies your UTR.`
       );
-    }, 1200);
+    }, 800);
   };
 
   const getCardPaymentStatus = (testId: string) => {
-    if (purchasedTests.includes(testId)) return "approved";
-    const testLogs = paymentLogs.filter((log: any) => log.testId === testId);
+    const safePurchased = Array.isArray(purchasedTests) ? purchasedTests : [];
+    const safeLogs = Array.isArray(paymentLogs) ? paymentLogs : [];
+
+    if (safePurchased.includes(testId)) return "approved";
+    const testLogs = safeLogs.filter((log: any) => log && log.testId === testId);
     if (testLogs.length === 0) return "none";
-    return testLogs[0].status || "pending"; // "pending" | "approved" | "rejected" | "none"
+    return testLogs[0]?.status || "pending"; // "pending" | "approved" | "rejected" | "none"
   };
 
   const filteredTests = MOCK_TEST_CARDS.filter(
@@ -852,6 +927,7 @@ export default function AllIndiaMockTestsView({
                     )}
 
                     <button
+                      type="button"
                       onClick={() => handleUnlockTest(selectedTestForPayment.id)}
                       disabled={isVerifying}
                       className="w-full py-4 px-5 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-sm md:text-base flex items-center justify-center gap-2 shadow-lg transition-all active:scale-98 disabled:opacity-50 mt-3"
