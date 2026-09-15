@@ -126,6 +126,7 @@ export default function AllIndiaMockTestsView({
 }: AllIndiaMockTestsViewProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTestForPayment, setSelectedTestForPayment] = useState<any | null>(null);
+  const [studentName, setStudentName] = useState("");
   const [utrNumber, setUtrNumber] = useState("");
   const [transactionId, setTransactionId] = useState("");
   const [activePaymentTab, setActivePaymentTab] = useState<"utr" | "txn">("utr");
@@ -155,8 +156,14 @@ export default function AllIndiaMockTestsView({
   };
 
   const handleUnlockTest = (testId: string) => {
+    const enteredName = studentName.trim();
     const enteredUtr = utrNumber.trim();
     const enteredTxn = transactionId.trim();
+
+    if (!enteredName) {
+      alert(isHindi ? "कृपया अपना नाम दर्ज करें।" : "Please enter your full name.");
+      return;
+    }
 
     if (!enteredUtr && !enteredTxn) {
       alert(
@@ -178,6 +185,7 @@ export default function AllIndiaMockTestsView({
       try {
         const logs = JSON.parse(localStorage.getItem("studyflash_all_india_payments") || "[]");
         logs.push({
+          studentName: enteredName,
           testId,
           utrNumber: enteredUtr || "N/A",
           transactionId: enteredTxn || "N/A",
@@ -188,12 +196,13 @@ export default function AllIndiaMockTestsView({
       } catch {}
 
       setSelectedTestForPayment(null);
+      setStudentName("");
       setUtrNumber("");
       setTransactionId("");
       showToast(
         isHindi
-          ? "🎉 भुगतान सफलता से सत्यापित! टेस्ट अनलॉक हो गया है।"
-          : "🎉 Payment Verified! Test Unlocked successfully."
+          ? `🎉 भुगतान सत्यापित! ${enteredName} के लिए टेस्ट अनलॉक हो गया है।`
+          : `🎉 Payment Verified! Test Unlocked for ${enteredName}.`
       );
     }, 1200);
   };
@@ -678,10 +687,24 @@ export default function AllIndiaMockTestsView({
               </div>
             </div>
 
-            {/* TRANSACTION / UTR DUAL OPTION INPUTS */}
-            <div className="space-y-2.5 pt-1 border-t border-slate-100 dark:border-slate-800">
-              <label className="text-xs font-extrabold text-slate-800 dark:text-slate-200 flex items-center justify-between">
-                <span>{isHindi ? "पेमेंट वेरिफिकेशन विवरण दर्ज करें:" : "Enter Payment Verification Details:"}</span>
+            {/* STUDENT NAME & VERIFICATION INPUTS */}
+            <div className="space-y-3 pt-1 border-t border-slate-100 dark:border-slate-800">
+              {/* STUDENT NAME FIELD */}
+              <div>
+                <label className="text-xs font-extrabold text-slate-800 dark:text-slate-200 block mb-1">
+                  {isHindi ? "आपका नाम (Student Name):" : "Your Full Name:"}
+                </label>
+                <input
+                  type="text"
+                  placeholder={isHindi ? "उदा. राहुल कुमार" : "e.g. Rahul Kumar"}
+                  value={studentName}
+                  onChange={(e) => setStudentName(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-semibold focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+
+              <label className="text-xs font-extrabold text-slate-800 dark:text-slate-200 flex items-center justify-between pt-1">
+                <span>{isHindi ? "पेमेंट विवरण दर्ज करें (UTR / Transaction ID):" : "Enter Payment Details (UTR / Transaction ID):"}</span>
               </label>
 
               {/* TAB SELECTOR BUTTONS */}
