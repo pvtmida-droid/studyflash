@@ -302,6 +302,14 @@ export default function AdminPanel({
       return {};
     }
   });
+  const [adminCustomPdfUrls, setAdminCustomPdfUrls] = useState<Record<string, string>>(() => {
+    try {
+      const saved = localStorage.getItem("studyflash_test_pdf_urls_custom");
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
 
   const handleSavePaymentSettings = async () => {
     try {
@@ -310,17 +318,19 @@ export default function AdminPanel({
       localStorage.setItem("studyflash_upi_id", trimmedUpi);
       localStorage.setItem("studyflash_test_price", String(numPrice));
       localStorage.setItem("studyflash_test_prices_custom", JSON.stringify(adminCustomPrices));
+      localStorage.setItem("studyflash_test_pdf_urls_custom", JSON.stringify(adminCustomPdfUrls));
 
       try {
         await setDoc(doc(db, "settings", "payment_settings"), {
           upiId: trimmedUpi,
           testPrice: numPrice,
           customTestPrices: adminCustomPrices,
+          customPdfUrls: adminCustomPdfUrls,
           updatedAt: new Date().toISOString(),
         });
       } catch (fbErr) {}
 
-      triggerToast("Payment Settings (UPI ID & Per-Test Prices) saved live!");
+      triggerToast("Payment Settings (UPI ID, Prices & Answer Key PDFs) saved live!");
     } catch (e) {
       alert("Failed to save settings.");
     }
@@ -2016,6 +2026,39 @@ Sitemap: https://studyflash.co/sitemap.xml`);
                           className="w-full px-2 py-1 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-extrabold focus:outline-none focus:border-emerald-500"
                         />
                       </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* PER-TEST GOOGLE DRIVE ANSWER KEY PDF LINKS GRID */}
+              <div className="pt-3 border-t border-slate-200 dark:border-slate-700 space-y-2">
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">
+                  {isHindi ? "प्रत्येक टेस्ट की Google Drive Answer Key PDF लिंक सेट करें:" : "Set Google Drive Answer Key PDF Link per Test:"}
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {[
+                    { id: "mega-test-1", title: "Mega Test #1" },
+                    { id: "mega-test-2", title: "Mega Test #2" },
+                    { id: "mega-test-3", title: "Mega Test #3" },
+                    { id: "mega-test-4", title: "Special Test #4" },
+                    { id: "mega-test-5", title: "Practice Test #5" },
+                  ].map((testItem) => (
+                    <div key={testItem.id} className="bg-white dark:bg-slate-900 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-xs space-y-1">
+                      <div className="text-[10px] font-extrabold text-slate-600 dark:text-slate-300 flex items-center gap-1">
+                        <FileText className="w-3 h-3 text-purple-500" />
+                        <span>{testItem.title} PDF Link</span>
+                      </div>
+                      <input
+                        type="url"
+                        placeholder="https://drive.google.com/file/d/.../view"
+                        value={adminCustomPdfUrls[testItem.id] || ""}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setAdminCustomPdfUrls(prev => ({ ...prev, [testItem.id]: val }));
+                        }}
+                        className="w-full px-2.5 py-1 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-mono focus:outline-none focus:border-purple-500"
+                      />
                     </div>
                   ))}
                 </div>

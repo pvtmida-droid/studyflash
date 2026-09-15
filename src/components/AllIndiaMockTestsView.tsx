@@ -48,6 +48,7 @@ const MOCK_TEST_CARDS = [
     titleEn: "All India Mega Test #1",
     titleHi: "ऑल इंडिया मेगा टेस्ट #1",
     price: 50,
+    answerKeyPdfUrl: "",
     testDate: "15 September 2026",
     totalMarks: 100,
     userId: "Vikash kumar yadav",
@@ -64,6 +65,7 @@ const MOCK_TEST_CARDS = [
     titleEn: "All India Mega Test #2",
     titleHi: "ऑल इंडिया मेगा टेस्ट #2",
     price: 30,
+    answerKeyPdfUrl: "",
     testDate: "10 September 2026",
     totalMarks: 100,
     userId: "Munna Sir",
@@ -80,6 +82,7 @@ const MOCK_TEST_CARDS = [
     titleEn: "All India Mega Test #3",
     titleHi: "ऑल इंडिया मेगा टेस्ट #3",
     price: 20,
+    answerKeyPdfUrl: "",
     testDate: "05 September 2026",
     totalMarks: 100,
     userId: "Vishwash sir",
@@ -96,6 +99,7 @@ const MOCK_TEST_CARDS = [
     titleEn: "All India Special Test #4",
     titleHi: "ऑल इंडिया स्पेशल टेस्ट #4",
     price: 20,
+    answerKeyPdfUrl: "",
     testDate: "01 September 2026",
     totalMarks: 100,
     userId: "Ranjan sir",
@@ -112,6 +116,7 @@ const MOCK_TEST_CARDS = [
     titleEn: "All India Practice Test #5",
     titleHi: "ऑल इंडिया प्रैक्टिस टेस्ट #5",
     price: 10,
+    answerKeyPdfUrl: "",
     testDate: "25 August 2026",
     totalMarks: 100,
     userId: "Guddu singh",
@@ -157,6 +162,14 @@ export default function AllIndiaMockTestsView({
       return {};
     }
   });
+  const [customPdfUrls, setCustomPdfUrls] = useState<Record<string, string>>(() => {
+    try {
+      const saved = localStorage.getItem("studyflash_test_pdf_urls_custom");
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
 
   const getTestPrice = (testCard: any) => {
     if (!testCard) return testPrice || 20;
@@ -164,6 +177,14 @@ export default function AllIndiaMockTestsView({
       return Number(customTestPrices[testCard.id]);
     }
     return testCard.price !== undefined ? Number(testCard.price) : testPrice;
+  };
+
+  const getTestPdfUrl = (testCard: any) => {
+    if (!testCard) return "";
+    if (customPdfUrls && customPdfUrls[testCard.id]) {
+      return customPdfUrls[testCard.id];
+    }
+    return testCard.answerKeyPdfUrl || "";
   };
 
   // Purchased test IDs & Payment logs stored in localStorage + Firebase
@@ -730,12 +751,17 @@ export default function AllIndiaMockTestsView({
                       type="button"
                       onClick={() => {
                         if (cardStatus === "approved") {
-                          onViewResults();
+                          const pdfUrl = getTestPdfUrl(testCard);
+                          if (pdfUrl) {
+                            window.open(pdfUrl, "_blank");
+                          } else {
+                            onViewResults();
+                          }
                         } else {
                           alert(
                             isHindi
-                              ? "🔒 उत्तर कुंजी (Answer Key) देखने के लिए पहले पेमेंट सत्यापित होना अनिवार्य है।"
-                              : "🔒 Payment verification required before accessing answer key."
+                              ? "🔒 उत्तर कुंजी (Answer Key PDF) देखने के लिए पहले एडमिन द्वारा पेमेंट सत्यापित होना अनिवार्य है।"
+                              : "🔒 Payment verification required before accessing answer key PDF."
                           );
                         }
                       }}
