@@ -18,6 +18,15 @@ import {
   Sparkles,
   Search,
   CheckCircle2,
+  Lock,
+  QrCode,
+  Copy,
+  Check,
+  X,
+  ShieldCheck,
+  CreditCard,
+  Smartphone,
+  AlertCircle,
 } from "lucide-react";
 
 interface AllIndiaMockTestsViewProps {
@@ -26,6 +35,9 @@ interface AllIndiaMockTestsViewProps {
   onAttemptTest: (testId?: string) => void;
   onViewResults: () => void;
 }
+
+const DEFAULT_UPI_ID = "8825227701@ybl";
+const TEST_PRICE = 20;
 
 const MOCK_TEST_CARDS = [
   {
@@ -112,6 +124,49 @@ export default function AllIndiaMockTestsView({
   onViewResults,
 }: AllIndiaMockTestsViewProps) {
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedTestForPayment, setSelectedTestForPayment] = useState<any | null>(null);
+  const [utrNumber, setUtrNumber] = useState("");
+  const [copiedUpi, setCopiedUpi] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Purchased test IDs stored in localStorage
+  const [purchasedTests, setPurchasedTests] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem("studyflash_purchased_tests");
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 4000);
+  };
+
+  const handleCopyUpi = () => {
+    navigator.clipboard.writeText(DEFAULT_UPI_ID);
+    setCopiedUpi(true);
+    setTimeout(() => setCopiedUpi(false), 2000);
+  };
+
+  const handleUnlockTest = (testId: string) => {
+    setIsVerifying(true);
+    setTimeout(() => {
+      setIsVerifying(false);
+      const updated = Array.from(new Set([...purchasedTests, testId]));
+      setPurchasedTests(updated);
+      localStorage.setItem("studyflash_purchased_tests", JSON.stringify(updated));
+      setSelectedTestForPayment(null);
+      setUtrNumber("");
+      showToast(
+        isHindi
+          ? "🎉 भुगतान सफल! टेस्ट अनलॉक हो गया है। अब आप टेस्ट दे सकते हैं।"
+          : "🎉 Payment Verified! Test Unlocked successfully. You can now start the test!"
+      );
+    }, 1200);
+  };
 
   const filteredTests = MOCK_TEST_CARDS.filter(
     (t) =>
@@ -121,7 +176,15 @@ export default function AllIndiaMockTestsView({
   );
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8 animate-fade-in pb-20 pt-4 px-4">
+    <div className="max-w-6xl mx-auto space-y-8 animate-fade-in pb-20 pt-4 px-4 relative">
+      {/* TOAST NOTIFICATION */}
+      {toastMessage && (
+        <div className="fixed top-6 right-6 z-50 bg-emerald-700 text-white font-extrabold px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 animate-bounce border-2 border-emerald-400">
+          <CheckCircle2 className="w-6 h-6 text-emerald-200" />
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
       {/* HEADER BAR */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-lg">
         <div className="flex items-center gap-4">
@@ -144,8 +207,8 @@ export default function AllIndiaMockTestsView({
             </h1>
             <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 font-medium mt-1">
               {isHindi
-                ? "100 प्रश्नों का लाइव टेस्ट दें (प्रत्येक विषय के 20 प्रश्न) और अपनी ऑल इंडिया रैंक देखें।"
-                : "Attempt 100 questions live tests (20 per subject) & get your All India Rank."}
+                ? "100 प्रश्नों का प्रीमियम लाइव टेस्ट (प्रत्येक विषय के 20 प्रश्न) - मात्र ₹20 में अनलॉक करें।"
+                : "Attempt 100 questions premium live test (20 per subject) - Unlock for ₹20 only."}
             </p>
           </div>
         </div>
@@ -186,17 +249,17 @@ export default function AllIndiaMockTestsView({
         </div>
 
         <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center gap-3">
-          <div className="p-3 rounded-xl bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400">
-            <Sparkles className="w-5 h-5" />
+          <div className="p-3 rounded-xl bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400">
+            <Lock className="w-5 h-5" />
           </div>
           <div>
             <div className="text-xs text-slate-400 font-bold">{isHindi ? "टेस्ट शुल्क" : "Test Fee"}</div>
-            <div className="text-lg font-extrabold text-emerald-600 dark:text-emerald-400">100% FREE</div>
+            <div className="text-lg font-extrabold text-emerald-700 dark:text-emerald-400">₹20 / Test</div>
           </div>
         </div>
 
         <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center gap-3">
-          <div className="p-3 rounded-xl bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400">
+          <div className="p-3 rounded-xl bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400">
             <User className="w-5 h-5" />
           </div>
           <div>
@@ -206,267 +269,432 @@ export default function AllIndiaMockTestsView({
         </div>
       </div>
 
-      {/* 4-5 DUPLICATE TEST CARDS GRID */}
+      {/* 5 TEST CARDS GRID */}
       <div className="space-y-6">
-        {filteredTests.map((testCard) => (
-          <div
-            key={testCard.id}
-            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-300 dark:hover:border-emerald-700 rounded-[28px] p-5 md:p-7 shadow-lg relative overflow-hidden transition-all duration-300 hover:shadow-2xl group"
-          >
-            <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 blur-3xl rounded-full mix-blend-screen pointer-events-none group-hover:bg-emerald-500/10 transition-colors" />
+        {filteredTests.map((testCard) => {
+          const isPurchased = purchasedTests.includes(testCard.id);
 
-            <div className="relative z-10 space-y-5">
-              {/* CARD TITLE STRIP */}
-              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800/80 pb-3">
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl">🏆</span>
-                  <div>
-                    <h3 className="text-lg md:text-xl font-extrabold text-slate-900 dark:text-white">
-                      {isHindi ? testCard.titleHi : testCard.titleEn}
-                    </h3>
-                    <div className="text-xs text-slate-400 font-medium">
-                      {isHindi ? "फुल लेंथ मॉक टेस्ट • 100 अंक" : "Full Length Mock Test • 100 Marks"}
-                    </div>
-                  </div>
-                </div>
+          return (
+            <div
+              key={testCard.id}
+              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-300 dark:hover:border-emerald-700 rounded-[28px] p-5 md:p-7 shadow-lg relative overflow-hidden transition-all duration-300 hover:shadow-2xl group"
+            >
+              <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 blur-3xl rounded-full mix-blend-screen pointer-events-none group-hover:bg-emerald-500/10 transition-colors" />
 
-                <div className="flex items-center gap-2">
-                  <span className="px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 text-xs font-bold uppercase tracking-wider">
-                    {testCard.badge}
-                  </span>
-                </div>
-              </div>
-
-              {/* TOP ROW: Profile Pic + 5 Subject Badges */}
-              <div className="flex flex-col md:flex-row items-stretch gap-4">
-                {/* Profile Picture with Camera Icon */}
-                <div className="relative shrink-0 flex items-center justify-center">
-                  <div className="relative w-28 h-28 md:w-32 md:h-32 rounded-2xl overflow-hidden border-2 border-emerald-500 shadow-md group/pic">
-                    <img
-                      src="/teacher_avatar.png"
-                      alt="Teacher Avatar"
-                      className="w-full h-full object-cover transition-transform duration-300 group-hover/pic:scale-105"
-                      onError={(e: any) => {
-                        e.target.onerror = null;
-                        e.target.src =
-                          "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80";
-                      }}
-                    />
-                    <div className="absolute bottom-1 right-1 bg-emerald-600 text-white rounded-full p-1.5 border-2 border-white dark:border-slate-900 shadow-md flex items-center justify-center">
-                      <Camera className="w-3.5 h-3.5" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* 5 Subjects Cards Grid */}
-                <div className="flex-1 grid grid-cols-5 gap-2 items-center justify-between">
-                  {/* Hindi */}
-                  <div className="flex flex-col items-center justify-between p-2.5 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 text-center h-full space-y-2 hover:border-emerald-200 transition-colors">
-                    <div className="w-9 h-9 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 font-extrabold text-base flex items-center justify-center shadow-xs">
-                      अ
-                    </div>
-                    <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">
-                      Hindi
-                    </span>
-                    <div className="w-full py-1 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-800/60 text-emerald-700 dark:text-emerald-400 font-extrabold text-sm rounded-xl">
-                      {testCard.hindi}
-                    </div>
-                  </div>
-
-                  {/* English */}
-                  <div className="flex flex-col items-center justify-between p-2.5 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 text-center h-full space-y-2 hover:border-blue-200 transition-colors">
-                    <div className="w-9 h-9 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300 font-bold text-[10px] flex items-center justify-center shadow-xs leading-tight">
-                      A B C
-                    </div>
-                    <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">
-                      English
-                    </span>
-                    <div className="w-full py-1 bg-blue-50 dark:bg-blue-950/60 border border-blue-200/80 dark:border-blue-800/60 text-blue-700 dark:text-blue-400 font-extrabold text-sm rounded-xl">
-                      {testCard.english}
-                    </div>
-                  </div>
-
-                  {/* GK/GS */}
-                  <div className="flex flex-col items-center justify-between p-2.5 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 text-center h-full space-y-2 hover:border-amber-200 transition-colors">
-                    <div className="w-9 h-9 rounded-full bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300 font-bold text-sm flex items-center justify-center shadow-xs">
-                      <Globe className="w-4 h-4" />
-                    </div>
-                    <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">
-                      GK/GS
-                    </span>
-                    <div className="w-full py-1 bg-amber-50 dark:bg-amber-950/60 border border-amber-200/80 dark:border-amber-800/60 text-amber-700 dark:text-amber-400 font-extrabold text-sm rounded-xl">
-                      {testCard.gkgs}
-                    </div>
-                  </div>
-
-                  {/* Math */}
-                  <div className="flex flex-col items-center justify-between p-2.5 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 text-center h-full space-y-2 hover:border-purple-200 transition-colors">
-                    <div className="w-9 h-9 rounded-full bg-purple-100 dark:bg-purple-900/50 text-purple-800 dark:text-purple-300 font-bold text-sm flex items-center justify-center shadow-xs">
-                      <Calculator className="w-4 h-4" />
-                    </div>
-                    <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">
-                      Math
-                    </span>
-                    <div className="w-full py-1 bg-purple-50 dark:bg-purple-950/60 border border-purple-200/80 dark:border-purple-800/60 text-purple-700 dark:text-purple-400 font-extrabold text-sm rounded-xl">
-                      {testCard.math}
-                    </div>
-                  </div>
-
-                  {/* Reasoning */}
-                  <div className="flex flex-col items-center justify-between p-2.5 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 text-center h-full space-y-2 hover:border-emerald-200 transition-colors">
-                    <div className="w-9 h-9 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 font-bold text-sm flex items-center justify-center shadow-xs">
-                      <Brain className="w-4 h-4" />
-                    </div>
-                    <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">
-                      Reasoning
-                    </span>
-                    <div className="w-full py-1 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-800/60 text-emerald-700 dark:text-emerald-400 font-extrabold text-sm rounded-xl">
-                      {testCard.reasoning}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* ACTION BUTTONS PANEL */}
-              <div className="space-y-3 pt-1">
-                {/* Big Dark Green Attempt Free Test Button */}
-                <button
-                  onClick={() => onAttemptTest(testCard.id)}
-                  className="w-full py-4 px-6 font-extrabold rounded-2xl transition-all text-base md:text-lg shadow-lg flex items-center justify-between bg-emerald-700 hover:bg-emerald-800 active:scale-98 text-white shadow-emerald-700/20 hover:shadow-emerald-700/40 group/mainbtn"
-                >
+              <div className="relative z-10 space-y-5">
+                {/* CARD TITLE STRIP */}
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800/80 pb-3">
                   <div className="flex items-center gap-3">
-                    <Rocket className="w-5 h-5 transition-transform group-hover/mainbtn:translate-x-0.5 group-hover/mainbtn:-translate-y-0.5" />
-                    <span>{isHindi ? "फ्री टेस्ट दें (Attempt Free Test)" : "Attempt Free Test"}</span>
+                    <span className="text-2xl">🏆</span>
+                    <div>
+                      <h3 className="text-lg md:text-xl font-extrabold text-slate-900 dark:text-white">
+                        {isHindi ? testCard.titleHi : testCard.titleEn}
+                      </h3>
+                      <div className="text-xs text-slate-400 font-medium">
+                        {isHindi ? "फुल लेंथ मॉक टेस्ट • 100 अंक" : "Full Length Mock Test • 100 Marks"}
+                      </div>
+                    </div>
                   </div>
-                  <ArrowRight className="w-6 h-6 transition-transform group-hover/mainbtn:translate-x-1" />
-                </button>
 
-                {/* 2x2 Grid of Secondary Action Buttons */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  {/* View Results */}
-                  <button
-                    onClick={onViewResults}
-                    className="p-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/60 hover:bg-blue-50/50 dark:hover:bg-slate-800 transition-all flex items-center justify-between text-xs md:text-sm font-bold text-slate-700 dark:text-slate-200 group/subbtn"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <div className="p-2 rounded-xl bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400">
-                        <Eye className="w-4 h-4" />
+                  <div className="flex items-center gap-2">
+                    {isPurchased ? (
+                      <span className="px-3.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 text-xs font-black uppercase tracking-wider flex items-center gap-1 border border-emerald-300">
+                        <CheckCircle2 className="w-3.5 h-3.5" /> UNLOCKED
+                      </span>
+                    ) : (
+                      <span className="px-3.5 py-1 rounded-full bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300 text-xs font-black uppercase tracking-wider flex items-center gap-1 border border-amber-300">
+                        <Lock className="w-3.5 h-3.5" /> ₹{TEST_PRICE} ONLY
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* TOP ROW: Profile Pic + 5 Subject Badges */}
+                <div className="flex flex-col md:flex-row items-stretch gap-4">
+                  {/* Profile Picture with Camera Icon */}
+                  <div className="relative shrink-0 flex items-center justify-center">
+                    <div className="relative w-28 h-28 md:w-32 md:h-32 rounded-2xl overflow-hidden border-2 border-emerald-500 shadow-md group/pic">
+                      <img
+                        src="/teacher_avatar.png"
+                        alt="Teacher Avatar"
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover/pic:scale-105"
+                        onError={(e: any) => {
+                          e.target.onerror = null;
+                          e.target.src =
+                            "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80";
+                        }}
+                      />
+                      <div className="absolute bottom-1 right-1 bg-emerald-600 text-white rounded-full p-1.5 border-2 border-white dark:border-slate-900 shadow-md flex items-center justify-center">
+                        <Camera className="w-3.5 h-3.5" />
                       </div>
-                      <span>{isHindi ? "परिणाम देखें" : "View Results"}</span>
                     </div>
-                    <ChevronRight className="w-4 h-4 text-blue-500 group-hover/subbtn:translate-x-0.5 transition-transform" />
-                  </button>
+                  </div>
 
-                  {/* Buy 20 /- */}
-                  <button
-                    onClick={() => {
-                      alert(
-                        isHindi
-                          ? "यह टेस्ट सभी छात्रों के लिए 100% FREE है!"
-                          : "This test is 100% FREE for all aspirants!"
-                      );
-                    }}
-                    className="p-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/60 hover:bg-emerald-50/50 dark:hover:bg-slate-800 transition-all flex items-center justify-between text-xs md:text-sm font-bold text-slate-700 dark:text-slate-200 group/subbtn"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <div className="p-2 rounded-xl bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400">
-                        <Key className="w-4 h-4" />
+                  {/* 5 Subjects Cards Grid */}
+                  <div className="flex-1 grid grid-cols-5 gap-2 items-center justify-between">
+                    {/* Hindi */}
+                    <div className="flex flex-col items-center justify-between p-2.5 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 text-center h-full space-y-2 hover:border-emerald-200 transition-colors">
+                      <div className="w-9 h-9 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 font-extrabold text-base flex items-center justify-center shadow-xs">
+                        अ
                       </div>
-                      <span>Buy 20 /-</span>
+                      <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">
+                        Hindi
+                      </span>
+                      <div className="w-full py-1 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-800/60 text-emerald-700 dark:text-emerald-400 font-extrabold text-sm rounded-xl">
+                        {testCard.hindi}
+                      </div>
                     </div>
-                    <ChevronRight className="w-4 h-4 text-emerald-500 group-hover/subbtn:translate-x-0.5 transition-transform" />
-                  </button>
 
-                  {/* Answer Key */}
-                  <button
-                    onClick={onViewResults}
-                    className="p-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/60 hover:bg-purple-50/50 dark:hover:bg-slate-800 transition-all flex items-center justify-between text-xs md:text-sm font-bold text-slate-700 dark:text-slate-200 group/subbtn"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <div className="p-2 rounded-xl bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400">
-                        <FileText className="w-4 h-4" />
+                    {/* English */}
+                    <div className="flex flex-col items-center justify-between p-2.5 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 text-center h-full space-y-2 hover:border-blue-200 transition-colors">
+                      <div className="w-9 h-9 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300 font-bold text-[10px] flex items-center justify-center shadow-xs leading-tight">
+                        A B C
                       </div>
-                      <span>{isHindi ? "उत्तर कुंजी" : "Answer Key"}</span>
+                      <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">
+                        English
+                      </span>
+                      <div className="w-full py-1 bg-blue-50 dark:bg-blue-950/60 border border-blue-200/80 dark:border-blue-800/60 text-blue-700 dark:text-blue-400 font-extrabold text-sm rounded-xl">
+                        {testCard.english}
+                      </div>
                     </div>
-                    <ChevronRight className="w-4 h-4 text-purple-500 group-hover/subbtn:translate-x-0.5 transition-transform" />
-                  </button>
 
-                  {/* How to Attempt This Test */}
-                  <button
-                    onClick={() => {
-                      alert(
-                        isHindi
-                          ? "गाइड:\n1. Attempt Free Test पर क्लिक करें\n2. 100 प्रश्नों के उत्तर दें (प्रत्येक विषय के 20 प्रश्न)\n3. टेस्ट सबमिट करके अपना ऑल इंडिया रैंक देखें!"
-                          : "Guide:\n1. Click Attempt Free Test\n2. Solve 100 questions (20 per subject)\n3. Submit test to get your All India Rank!"
-                      );
-                    }}
-                    className="p-2.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/60 hover:bg-emerald-50/50 dark:hover:bg-slate-800 transition-all flex items-center justify-between text-xs md:text-sm font-bold text-slate-700 dark:text-slate-200 group/subbtn text-left"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <div className="p-2 rounded-xl bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 shrink-0">
-                        <BarChart3 className="w-4 h-4" />
+                    {/* GK/GS */}
+                    <div className="flex flex-col items-center justify-between p-2.5 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 text-center h-full space-y-2 hover:border-amber-200 transition-colors">
+                      <div className="w-9 h-9 rounded-full bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300 font-bold text-sm flex items-center justify-center shadow-xs">
+                        <Globe className="w-4 h-4" />
                       </div>
-                      <div className="leading-tight">
-                        <div className="text-xs font-bold">How to Attempt This Test</div>
-                        <div className="text-[10px] text-slate-400 font-normal">
-                          (Step by Step Guide)
+                      <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">
+                        GK/GS
+                      </span>
+                      <div className="w-full py-1 bg-amber-50 dark:bg-amber-950/60 border border-amber-200/80 dark:border-amber-800/60 text-amber-700 dark:text-amber-400 font-extrabold text-sm rounded-xl">
+                        {testCard.gkgs}
+                      </div>
+                    </div>
+
+                    {/* Math */}
+                    <div className="flex flex-col items-center justify-between p-2.5 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 text-center h-full space-y-2 hover:border-purple-200 transition-colors">
+                      <div className="w-9 h-9 rounded-full bg-purple-100 dark:bg-purple-900/50 text-purple-800 dark:text-purple-300 font-bold text-sm flex items-center justify-center shadow-xs">
+                        <Calculator className="w-4 h-4" />
+                      </div>
+                      <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">
+                        Math
+                      </span>
+                      <div className="w-full py-1 bg-purple-50 dark:bg-purple-950/60 border border-purple-200/80 dark:border-purple-800/60 text-purple-700 dark:text-purple-400 font-extrabold text-sm rounded-xl">
+                        {testCard.math}
+                      </div>
+                    </div>
+
+                    {/* Reasoning */}
+                    <div className="flex flex-col items-center justify-between p-2.5 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 text-center h-full space-y-2 hover:border-emerald-200 transition-colors">
+                      <div className="w-9 h-9 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 font-bold text-sm flex items-center justify-center shadow-xs">
+                        <Brain className="w-4 h-4" />
+                      </div>
+                      <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">
+                        Reasoning
+                      </span>
+                      <div className="w-full py-1 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-800/60 text-emerald-700 dark:text-emerald-400 font-extrabold text-sm rounded-xl">
+                        {testCard.reasoning}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* ACTION BUTTONS PANEL */}
+                <div className="space-y-3 pt-1">
+                  {/* MAIN BIG ACTION BUTTON */}
+                  {isPurchased ? (
+                    <button
+                      onClick={() => onAttemptTest(testCard.id)}
+                      className="w-full py-4 px-6 font-extrabold rounded-2xl transition-all text-base md:text-lg shadow-lg flex items-center justify-between bg-emerald-700 hover:bg-emerald-800 active:scale-98 text-white shadow-emerald-700/20 hover:shadow-emerald-700/40 group/mainbtn"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Rocket className="w-5 h-5 transition-transform group-hover/mainbtn:translate-x-0.5 group-hover/mainbtn:-translate-y-0.5" />
+                        <span>{isHindi ? "टेस्ट शुरू करें (Attempt Test)" : "Start Test (Unlocked)"}</span>
+                      </div>
+                      <ArrowRight className="w-6 h-6 transition-transform group-hover/mainbtn:translate-x-1" />
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => setSelectedTestForPayment(testCard)}
+                      className="w-full py-4 px-6 font-extrabold rounded-2xl transition-all text-base md:text-lg shadow-lg flex items-center justify-between bg-emerald-700 hover:bg-emerald-800 active:scale-98 text-white shadow-emerald-700/20 hover:shadow-emerald-700/40 group/mainbtn"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Lock className="w-5 h-5 text-amber-300" />
+                        <span>{isHindi ? "टेस्ट अनलॉक करें (Buy Test – ₹20)" : "Buy Test – ₹20 (Unlock Now)"}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs bg-emerald-800 px-3 py-1 rounded-full font-bold border border-emerald-500">
+                          ₹{TEST_PRICE}
+                        </span>
+                        <ArrowRight className="w-6 h-6 transition-transform group-hover/mainbtn:translate-x-1" />
+                      </div>
+                    </button>
+                  )}
+
+                  {/* 2x2 Grid of Secondary Action Buttons */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    {/* View Results */}
+                    <button
+                      onClick={onViewResults}
+                      className="p-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/60 hover:bg-blue-50/50 dark:hover:bg-slate-800 transition-all flex items-center justify-between text-xs md:text-sm font-bold text-slate-700 dark:text-slate-200 group/subbtn"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <div className="p-2 rounded-xl bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400">
+                          <Eye className="w-4 h-4" />
+                        </div>
+                        <span>{isHindi ? "परिणाम देखें" : "View Results"}</span>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-blue-500 group-hover/subbtn:translate-x-0.5 transition-transform" />
+                    </button>
+
+                    {/* Buy 20 /- Button */}
+                    <button
+                      onClick={() => {
+                        if (isPurchased) {
+                          onAttemptTest(testCard.id);
+                        } else {
+                          setSelectedTestForPayment(testCard);
+                        }
+                      }}
+                      className="p-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/60 hover:bg-emerald-50/50 dark:hover:bg-slate-800 transition-all flex items-center justify-between text-xs md:text-sm font-bold text-slate-700 dark:text-slate-200 group/subbtn"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <div className="p-2 rounded-xl bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400">
+                          <Key className="w-4 h-4" />
+                        </div>
+                        <span>{isPurchased ? "Unlocked ✓" : `Buy ${TEST_PRICE} /-`}</span>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-emerald-500 group-hover/subbtn:translate-x-0.5 transition-transform" />
+                    </button>
+
+                    {/* Answer Key */}
+                    <button
+                      onClick={onViewResults}
+                      className="p-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/60 hover:bg-purple-50/50 dark:hover:bg-slate-800 transition-all flex items-center justify-between text-xs md:text-sm font-bold text-slate-700 dark:text-slate-200 group/subbtn"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <div className="p-2 rounded-xl bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400">
+                          <FileText className="w-4 h-4" />
+                        </div>
+                        <span>{isHindi ? "उत्तर कुंजी" : "Answer Key"}</span>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-purple-500 group-hover/subbtn:translate-x-0.5 transition-transform" />
+                    </button>
+
+                    {/* How to Attempt This Test */}
+                    <button
+                      onClick={() => {
+                        alert(
+                          isHindi
+                            ? "ऑल इंडिया टेस्ट गाइड:\n1. 'Buy Test ₹20' बटन पर क्लिक करें\n2. UPI QR Code (PhonePe, Google Pay, Paytm) से ₹20 का पेमेंट करें\n3. UTR / Transaction ID डालकर 'Verify & Unlock' करें\n4. टेस्ट स्टार्ट करके 100 प्रश्न हल करें और रैंक देखें!"
+                            : "All India Test Guide:\n1. Click 'Buy Test ₹20'\n2. Scan UPI QR Code with Google Pay, PhonePe, Paytm\n3. Enter UTR / Transaction ID & click Verify\n4. Start test, attempt 100 questions and get your rank!"
+                        );
+                      }}
+                      className="p-2.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/60 hover:bg-emerald-50/50 dark:hover:bg-slate-800 transition-all flex items-center justify-between text-xs md:text-sm font-bold text-slate-700 dark:text-slate-200 group/subbtn text-left"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <div className="p-2 rounded-xl bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 shrink-0">
+                          <BarChart3 className="w-4 h-4" />
+                        </div>
+                        <div className="leading-tight">
+                          <div className="text-xs font-bold">How to Attempt This Test</div>
+                          <div className="text-[10px] text-slate-400 font-normal">
+                            (Step by Step Payment Guide)
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-emerald-500 group-hover/subbtn:translate-x-0.5 transition-transform shrink-0" />
-                  </button>
-                </div>
-              </div>
-
-              {/* BOTTOM FOOTER STRIP */}
-              <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-4 text-xs md:text-sm font-semibold text-slate-700 dark:text-slate-300">
-                {/* Test Date */}
-                <div className="flex items-center gap-2.5">
-                  <div className="p-2 rounded-xl bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400">
-                    <Calendar className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <div className="text-[10px] text-slate-400 font-normal">Test Date</div>
-                    <div className="font-extrabold text-slate-800 dark:text-slate-200">
-                      {testCard.testDate}
-                    </div>
+                      <ChevronRight className="w-4 h-4 text-emerald-500 group-hover/subbtn:translate-x-0.5 transition-transform shrink-0" />
+                    </button>
                   </div>
                 </div>
 
-                <div className="hidden sm:block w-px h-8 bg-slate-200 dark:bg-slate-700" />
-
-                {/* Total Marks */}
-                <div className="flex items-center gap-2.5">
-                  <div className="px-3 py-1 bg-emerald-800 text-white rounded-xl font-black text-base">
-                    {testCard.totalMarks}
+                {/* BOTTOM FOOTER STRIP */}
+                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-4 text-xs md:text-sm font-semibold text-slate-700 dark:text-slate-300">
+                  {/* Test Date */}
+                  <div className="flex items-center gap-2.5">
+                    <div className="p-2 rounded-xl bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400">
+                      <Calendar className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-[10px] text-slate-400 font-normal">Test Date</div>
+                      <div className="font-extrabold text-slate-800 dark:text-slate-200">
+                        {testCard.testDate}
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <div className="text-[10px] text-slate-400 font-normal">Total Marks</div>
-                    <div className="font-extrabold text-slate-800 dark:text-slate-200">
+
+                  <div className="hidden sm:block w-px h-8 bg-slate-200 dark:bg-slate-700" />
+
+                  {/* Total Marks */}
+                  <div className="flex items-center gap-2.5">
+                    <div className="px-3 py-1 bg-emerald-800 text-white rounded-xl font-black text-base">
                       {testCard.totalMarks}
                     </div>
+                    <div>
+                      <div className="text-[10px] text-slate-400 font-normal">Total Marks</div>
+                      <div className="font-extrabold text-slate-800 dark:text-slate-200">
+                        {testCard.totalMarks}
+                      </div>
+                    </div>
                   </div>
-                </div>
 
-                <div className="hidden sm:block w-px h-8 bg-slate-200 dark:bg-slate-700" />
+                  <div className="hidden sm:block w-px h-8 bg-slate-200 dark:bg-slate-700" />
 
-                {/* User ID */}
-                <div className="flex items-center gap-2.5">
-                  <div className="p-2 rounded-xl bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400">
-                    <User className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <div className="text-[10px] text-slate-400 font-normal">User ID</div>
-                    <div className="font-extrabold text-slate-800 dark:text-slate-200">
-                      {testCard.userId}
+                  {/* User ID */}
+                  <div className="flex items-center gap-2.5">
+                    <div className="p-2 rounded-xl bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400">
+                      <User className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-[10px] text-slate-400 font-normal">User ID</div>
+                      <div className="font-extrabold text-slate-800 dark:text-slate-200">
+                        {testCard.userId}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
+
+      {/* UPI QR CODE PAYMENT MODAL */}
+      {selectedTestForPayment && (
+        <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-md w-full p-6 md:p-7 shadow-2xl relative space-y-5 overflow-hidden">
+            {/* CLOSE BUTTON */}
+            <button
+              onClick={() => setSelectedTestForPayment(null)}
+              className="absolute top-5 right-5 p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-white transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {/* MODAL HEADER */}
+            <div className="text-center space-y-1">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 text-xs font-extrabold uppercase">
+                <ShieldCheck className="w-4 h-4" />
+                <span>Instant Payment</span>
+              </div>
+              <h2 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white">
+                {isHindi ? "UPI QR कोड द्वारा भुगतान" : "Pay via UPI QR Code"}
+              </h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                {isHindi ? selectedTestForPayment.titleHi : selectedTestForPayment.titleEn}
+              </p>
+            </div>
+
+            {/* PRICE TAG */}
+            <div className="bg-gradient-to-r from-emerald-50 via-emerald-100/50 to-emerald-50 dark:from-slate-800 dark:via-slate-800/80 dark:to-slate-800 p-3.5 rounded-2xl border border-emerald-200/80 dark:border-emerald-800 flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-emerald-600 text-white font-black text-base">
+                  ₹{TEST_PRICE}
+                </div>
+                <div>
+                  <div className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                    {isHindi ? "ऑल इंडिया मॉक टेस्ट फी" : "All India Test Access Fee"}
+                  </div>
+                  <div className="text-[10px] text-slate-400 font-medium">
+                    100 Questions • Instant Rank
+                  </div>
+                </div>
+              </div>
+              <span className="text-xs font-extrabold text-emerald-700 dark:text-emerald-400 bg-white dark:bg-slate-900 px-3 py-1 rounded-full border border-emerald-200">
+                100% Secure
+              </span>
+            </div>
+
+            {/* QR CODE CONTAINER */}
+            <div className="bg-slate-50 dark:bg-slate-800/60 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center space-y-3 text-center">
+              <div className="p-3 bg-white rounded-2xl shadow-md border-2 border-emerald-500 relative group">
+                <img
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=upi://pay?pa=${DEFAULT_UPI_ID}&pn=StudyFlash&am=${TEST_PRICE}&cu=INR`}
+                  alt="UPI QR Code"
+                  className="w-48 h-48 md:w-52 md:h-52 object-contain rounded-lg"
+                  onError={(e: any) => {
+                    // Fallback to quickchart QR if qrserver fails
+                    e.target.onerror = null;
+                    e.target.src = `https://quickchart.io/qr?text=upi://pay?pa=${DEFAULT_UPI_ID}%26pn=StudyFlash%26am=${TEST_PRICE}%26cu=INR&size=240`;
+                  }}
+                />
+              </div>
+
+              {/* SUPPORTED APPS ICONS BADGES */}
+              <div className="flex items-center justify-center gap-2 text-[11px] font-bold text-slate-500 dark:text-slate-400">
+                <span className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200">Google Pay</span>
+                <span className="px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 border border-purple-200">PhonePe</span>
+                <span className="px-2 py-0.5 rounded-md bg-sky-50 text-sky-700 border border-sky-200">Paytm</span>
+                <span className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">BHIM</span>
+              </div>
+            </div>
+
+            {/* COPY UPI ID STRIP */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-600 dark:text-slate-300 flex items-center justify-between">
+                <span>{isHindi ? "UPI ID द्वारा पे करें:" : "Or Pay via UPI ID:"}</span>
+                {copiedUpi && (
+                  <span className="text-[10px] text-emerald-600 font-extrabold animate-pulse">
+                    Copied to clipboard!
+                  </span>
+                )}
+              </label>
+              <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 p-2.5 rounded-2xl border border-slate-200 dark:border-slate-700">
+                <code className="text-sm font-extrabold text-emerald-700 dark:text-emerald-400 flex-1 px-2 select-all">
+                  {DEFAULT_UPI_ID}
+                </code>
+                <button
+                  onClick={handleCopyUpi}
+                  className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-1 transition-all"
+                >
+                  {copiedUpi ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                  <span>{copiedUpi ? "Copied" : "Copy"}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* TRANSACTION / UTR INPUT */}
+            <div className="space-y-2 pt-1 border-t border-slate-100 dark:border-slate-800">
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">
+                {isHindi
+                  ? "पेमेंट के बाद UTR / Transaction ID (12 अंक) दर्ज करें:"
+                  : "Enter UTR / Transaction ID (12 Digits) after Payment:"}
+              </label>
+              <div className="space-y-2">
+                <input
+                  type="text"
+                  placeholder="e.g. 425189012345 or Ref No."
+                  value={utrNumber}
+                  onChange={(e) => setUtrNumber(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-semibold focus:outline-none focus:border-emerald-500"
+                />
+
+                <button
+                  onClick={() => handleUnlockTest(selectedTestForPayment.id)}
+                  disabled={isVerifying}
+                  className="w-full py-3.5 px-5 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-sm md:text-base flex items-center justify-center gap-2 shadow-lg transition-all active:scale-98 disabled:opacity-50"
+                >
+                  {isVerifying ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>{isHindi ? "सत्यापित हो रहा है..." : "Verifying Payment..."}</span>
+                    </div>
+                  ) : (
+                    <>
+                      <CheckCircle2 className="w-5 h-5" />
+                      <span>
+                        {isHindi
+                          ? "भुगतान सत्यापित करें & टेस्ट अनलॉक करें"
+                          : "Verify Payment & Unlock Test"}
+                      </span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
