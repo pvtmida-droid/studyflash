@@ -332,33 +332,33 @@ export default function HomeView({
         </div>
       </section>
 
-      {/* 2. LATEST UPDATES & LIVE BATTLE (SPLIT SECTION) */}
+      {/* 2. LATEST UPDATE SECTION (EXACT COMBINED IMAGE DESIGN) */}
       <section className="space-y-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 items-stretch">
-          {/* HALF SIDE 1: LATEST UPDATE (EXACT ATTACHED DESIGN) */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-emerald-200 dark:hover:border-emerald-800/50 rounded-[32px] p-6 md:p-8 shadow-xl relative overflow-hidden transition-all duration-500 hover:shadow-2xl flex flex-col justify-between group">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 blur-3xl rounded-full mix-blend-screen pointer-events-none transition-transform duration-700 group-hover:scale-125 group-hover:bg-emerald-500/20" />
+        <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-emerald-200 dark:hover:border-emerald-800/50 rounded-[32px] p-6 md:p-8 shadow-xl relative overflow-hidden transition-all duration-500 hover:shadow-2xl space-y-6 group">
+          <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/10 blur-3xl rounded-full mix-blend-screen pointer-events-none transition-transform duration-700 group-hover:scale-125 group-hover:bg-emerald-500/20" />
 
-            <div className="relative z-10 space-y-5">
-              {/* Header: Megaphone Icon | Latest Update | Subtitle */}
-              <div className="flex items-center gap-4">
-                <div className="p-3.5 bg-emerald-50 dark:bg-emerald-950/50 rounded-2xl border border-emerald-100 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 shrink-0">
-                  <Megaphone className="w-6 h-6" />
-                </div>
-                <div className="h-10 w-px bg-slate-200 dark:bg-slate-700 shrink-0" />
-                <div>
-                  <h2 className="text-2xl md:text-3xl font-black tracking-tight text-slate-900 dark:text-white">
-                    Latest <span className="text-emerald-600 dark:text-emerald-400">Update</span>
-                  </h2>
-                  <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 font-medium">
-                    Stay updated with the latest mock tests and important links.
-                  </p>
-                </div>
-              </div>
+          {/* Header: Megaphone Icon | Latest Update Title | Subtitle */}
+          <div className="relative z-10 flex items-center gap-4">
+            <div className="p-3.5 bg-emerald-50 dark:bg-emerald-950/50 rounded-2xl border border-emerald-100 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 shrink-0">
+              <Megaphone className="w-6 h-6" />
+            </div>
+            <div className="h-10 w-px bg-slate-200 dark:bg-slate-700 shrink-0" />
+            <div>
+              <h2 className="text-2xl md:text-3xl font-black tracking-tight text-slate-900 dark:text-white">
+                Latest <span className="text-emerald-600 dark:text-emerald-400">Update</span>
+              </h2>
+              <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 font-medium">
+                Stay updated with the latest mock tests and important links.
+              </p>
+            </div>
+          </div>
 
-              {/* Card Row 1 (Exact matching Bihar SSC photo) */}
-              <div className="bg-[#f0fbf7] dark:bg-slate-800/60 border border-emerald-100/80 dark:border-slate-700/80 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all hover:shadow-md group/row">
-                {/* Left Side: Icon + Title + Meta */}
+          {/* COMBINED ROWS LIST */}
+          <div className="relative z-10 space-y-4">
+            {/* ROW 1: Bihar SSC Inter Level (Tier-1) */}
+            <div className="bg-[#f0fbf7] dark:bg-slate-800/60 border border-emerald-100/80 dark:border-slate-700/80 rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all hover:shadow-md group/row">
+              {/* LEFT SIDE: Exam Icon + Title + Meta + Solid Green Attempt Test Button */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 flex-1">
                 <div className="flex items-center gap-3.5">
                   <div className="relative shrink-0 p-3 bg-emerald-100/80 dark:bg-emerald-900/50 rounded-2xl text-emerald-700 dark:text-emerald-400">
                     <FileText className="w-6 h-6" />
@@ -384,37 +384,54 @@ export default function HomeView({
                   </div>
                 </div>
 
-                {/* Right Side: Rakesh Sir Profile + Open Test Button */}
-                <div className="flex items-center gap-3 bg-white/90 dark:bg-slate-800/90 p-2.5 rounded-2xl border border-emerald-100 dark:border-slate-700 shadow-xs shrink-0 self-end sm:self-center">
+                {/* Solid Green Attempt Test Button */}
+                <button
+                  onClick={handleAttemptBattle}
+                  className="px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs md:text-sm flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95 shrink-0"
+                >
+                  <span>Attempt Test</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* VERTICAL DIVIDER LINE */}
+              <div className="hidden md:block w-px bg-slate-300 dark:bg-slate-700 h-14 shrink-0 mx-2" />
+
+              {/* RIGHT SIDE: Teacher Avatar + Rakesh Sir Test + Outline Green Open Test Button */}
+              <div className="flex items-center justify-between gap-4 bg-white/90 dark:bg-slate-800/90 p-2.5 rounded-2xl border border-emerald-100 dark:border-slate-700 shadow-xs shrink-0">
+                <div className="flex items-center gap-3">
                   <img
                     src="/teacher_avatar.png"
                     alt="Rakesh Sir Avatar"
-                    className="w-10 h-10 rounded-full border-2 border-emerald-500 object-cover shrink-0"
+                    className="w-11 h-11 rounded-full border-2 border-emerald-500 object-cover shrink-0"
                     onError={(e: any) => {
                       e.target.onerror = null;
                       e.target.src = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80";
                     }}
                   />
-                  <div className="hidden sm:block">
-                    <div className="font-extrabold text-slate-900 dark:text-white text-xs">
+                  <div>
+                    <div className="font-extrabold text-slate-900 dark:text-white text-xs md:text-sm">
                       Rakesh Sir Test
                     </div>
                     <div className="text-[10px] text-slate-400 font-medium">
                       Fixed test link (Rakesh Sir)
                     </div>
                   </div>
-                  <button
-                    onClick={() => setCurrentView("all-india-tests")}
-                    className="px-4 py-2 rounded-xl border-2 border-emerald-600 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white dark:hover:bg-emerald-600 font-extrabold text-xs flex items-center gap-1.5 transition-all shadow-xs shrink-0 active:scale-95"
-                  >
-                    <span>Open Test</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
                 </div>
-              </div>
 
-              {/* Card Row 2 (RRB NTPC) */}
-              <div className="bg-[#f0fbf7] dark:bg-slate-800/60 border border-emerald-100/80 dark:border-slate-700/80 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all hover:shadow-md group/row">
+                <button
+                  onClick={() => setCurrentView("all-india-tests")}
+                  className="px-4 py-2 rounded-xl border-2 border-emerald-600 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white dark:hover:bg-emerald-600 font-extrabold text-xs flex items-center gap-1.5 transition-all shadow-xs shrink-0 active:scale-95"
+                >
+                  <span>Open Test</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+
+            {/* ROW 2: RRB NTPC & Group D */}
+            <div className="bg-[#f0fbf7] dark:bg-slate-800/60 border border-emerald-100/80 dark:border-slate-700/80 rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all hover:shadow-md group/row">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 flex-1">
                 <div className="flex items-center gap-3.5">
                   <div className="relative shrink-0 p-3 bg-emerald-100/80 dark:bg-emerald-900/50 rounded-2xl text-emerald-700 dark:text-emerald-400">
                     <Zap className="w-6 h-6" />
@@ -440,113 +457,120 @@ export default function HomeView({
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 bg-white/90 dark:bg-slate-800/90 p-2.5 rounded-2xl border border-emerald-100 dark:border-slate-700 shadow-xs shrink-0 self-end sm:self-center">
+                <button
+                  onClick={handleAttemptBattle}
+                  className="px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs md:text-sm flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95 shrink-0"
+                >
+                  <span>Attempt Test</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="hidden md:block w-px bg-slate-300 dark:bg-slate-700 h-14 shrink-0 mx-2" />
+
+              <div className="flex items-center justify-between gap-4 bg-white/90 dark:bg-slate-800/90 p-2.5 rounded-2xl border border-emerald-100 dark:border-slate-700 shadow-xs shrink-0">
+                <div className="flex items-center gap-3">
                   <img
                     src="/teacher_avatar.png"
                     alt="Rakesh Sir Avatar"
-                    className="w-10 h-10 rounded-full border-2 border-emerald-500 object-cover shrink-0"
+                    className="w-11 h-11 rounded-full border-2 border-emerald-500 object-cover shrink-0"
                   />
-                  <div className="hidden sm:block">
-                    <div className="font-extrabold text-slate-900 dark:text-white text-xs">
+                  <div>
+                    <div className="font-extrabold text-slate-900 dark:text-white text-xs md:text-sm">
                       Rakesh Sir Test
                     </div>
                     <div className="text-[10px] text-slate-400 font-medium">
                       Fixed test link (Rakesh Sir)
                     </div>
                   </div>
-                  <button
-                    onClick={() => setCurrentView("all-india-tests")}
-                    className="px-4 py-2 rounded-xl border-2 border-emerald-600 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white dark:hover:bg-emerald-600 font-extrabold text-xs flex items-center gap-1.5 transition-all shadow-xs shrink-0 active:scale-95"
-                  >
-                    <span>Open Test</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
                 </div>
+
+                <button
+                  onClick={() => setCurrentView("all-india-tests")}
+                  className="px-4 py-2 rounded-xl border-2 border-emerald-600 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white dark:hover:bg-emerald-600 font-extrabold text-xs flex items-center gap-1.5 transition-all shadow-xs shrink-0 active:scale-95"
+                >
+                  <span>Open Test</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
               </div>
             </div>
 
-            {/* Bottom Button */}
-            <button
-              onClick={() => setCurrentView("all-india-tests")}
-              className="w-full mt-5 py-3.5 px-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white dark:hover:bg-emerald-600 font-extrabold text-sm flex items-center justify-center gap-2 transition-all duration-200 group/btn shadow-sm"
-            >
-              <span>{isHindi ? "सभी 5 ऑल इंडिया मॉक टेस्ट देखें" : "View All All-India Mock Tests"}</span>
-              <ArrowRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
-            </button>
+            {/* ROW 3: SSC CGL Mega Battle */}
+            <div className="bg-[#f0fbf7] dark:bg-slate-800/60 border border-emerald-100/80 dark:border-slate-700/80 rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all hover:shadow-md group/row">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 flex-1">
+                <div className="flex items-center gap-3.5">
+                  <div className="relative shrink-0 p-3 bg-emerald-100/80 dark:bg-emerald-900/50 rounded-2xl text-emerald-700 dark:text-emerald-400">
+                    <Trophy className="w-6 h-6" />
+                    <span className="absolute -bottom-1 -right-1 bg-emerald-600 text-white font-extrabold text-[8px] px-1.5 py-0.5 rounded-full border-2 border-white dark:border-slate-900 shadow-xs">
+                      NEW
+                    </span>
+                  </div>
+                  <div>
+                    <h3 className="text-sm md:text-base font-extrabold text-emerald-700 dark:text-emerald-400 group-hover/row:text-emerald-800 dark:group-hover/row:text-emerald-300 transition-colors">
+                      SSC CGL Mega All-India Battle &ndash; 2026
+                    </h3>
+                    <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">
+                      <span className="flex items-center gap-1">
+                        <Calendar className="w-3.5 h-3.5 text-emerald-600" />
+                        10 Sep 2026
+                      </span>
+                      <span>|</span>
+                      <span className="flex items-center gap-1">
+                        <FileText className="w-3.5 h-3.5 text-emerald-600" />
+                        100 Questions
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleAttemptBattle}
+                  className="px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs md:text-sm flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95 shrink-0"
+                >
+                  <span>Attempt Test</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="hidden md:block w-px bg-slate-300 dark:bg-slate-700 h-14 shrink-0 mx-2" />
+
+              <div className="flex items-center justify-between gap-4 bg-white/90 dark:bg-slate-800/90 p-2.5 rounded-2xl border border-emerald-100 dark:border-slate-700 shadow-xs shrink-0">
+                <div className="flex items-center gap-3">
+                  <img
+                    src="/teacher_avatar.png"
+                    alt="Rakesh Sir Avatar"
+                    className="w-11 h-11 rounded-full border-2 border-emerald-500 object-cover shrink-0"
+                  />
+                  <div>
+                    <div className="font-extrabold text-slate-900 dark:text-white text-xs md:text-sm">
+                      Rakesh Sir Test
+                    </div>
+                    <div className="text-[10px] text-slate-400 font-medium">
+                      Fixed test link (Rakesh Sir)
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setCurrentView("all-india-tests")}
+                  className="px-4 py-2 rounded-xl border-2 border-emerald-600 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white dark:hover:bg-emerald-600 font-extrabold text-xs flex items-center gap-1.5 transition-all shadow-xs shrink-0 active:scale-95"
+                >
+                  <span>Open Test</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+
           </div>
 
-          {/* HALF SIDE 2: ALL INDIA MOCK TESTS PORTAL CARD */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-emerald-200 dark:hover:border-emerald-800/50 rounded-[32px] p-6 md:p-8 shadow-xl relative overflow-hidden transition-all duration-500 hover:shadow-2xl flex flex-col justify-between group">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 blur-3xl rounded-full mix-blend-screen pointer-events-none transition-transform duration-700 group-hover:scale-125 group-hover:bg-emerald-500/20" />
-
-            <div className="relative z-10 space-y-5">
-              {/* Header Badge & Date */}
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 text-xs font-bold tracking-wide uppercase border border-red-200 dark:border-red-500/20">
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
-                  </span>
-                  5 Live Tests Active
-                </div>
-
-                <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800/50 px-3 py-1 rounded-xl border border-slate-100 dark:border-slate-800 text-xs font-semibold text-slate-600 dark:text-slate-300">
-                  <Calendar className="w-3.5 h-3.5 text-emerald-500" />
-                  <span>15 Sep 2026</span>
-                </div>
-              </div>
-
-              {/* Title & Description */}
-              <div className="space-y-3">
-                <h3 className="text-xl md:text-2xl font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-                  <span>🏆 All India Live & Mega Mock Tests</span>
-                </h3>
-
-                <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 font-medium leading-relaxed">
-                  {isHindi
-                    ? "सभी ऑल इंडिया लाइव मॉक टेस्ट सीरीज एक ही स्थान पर उपलब्ध हैं। 100 प्रश्नों (हिंदी, अंग्रेजी, गणित, रीज़निंग, GK/GS) के साथ अभ्यास करें।"
-                    : "Access all full-length All India Mega Tests in one place. Practice with 100 questions & get your All India Rank."}
-                </p>
-              </div>
-
-              {/* Subject Badges Preview */}
-              <div className="flex items-center gap-1.5 flex-wrap pt-1">
-                <span className="px-2.5 py-1 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 text-xs font-bold">
-                  अ Hindi (20)
-                </span>
-                <span className="px-2.5 py-1 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-400 text-xs font-bold">
-                  ABC English (20)
-                </span>
-                <span className="px-2.5 py-1 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 text-xs font-bold">
-                  🌐 GK/GS (20)
-                </span>
-                <span className="px-2.5 py-1 rounded-xl bg-purple-50 dark:bg-purple-950/60 border border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-400 text-xs font-bold">
-                  🧮 Math (20)
-                </span>
-                <span className="px-2.5 py-1 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 text-xs font-bold">
-                  🧠 Reasoning (20)
-                </span>
-              </div>
-            </div>
-
-            {/* Prominent Action Button to Open All India Tests Page */}
-            <div className="relative z-10 pt-5">
-              <button
-                onClick={() => setCurrentView("all-india-tests")}
-                className="w-full py-4 px-6 font-extrabold rounded-2xl transition-all text-sm md:text-base shadow-lg flex items-center justify-between bg-emerald-700 hover:bg-emerald-800 active:scale-95 text-white shadow-emerald-700/20 hover:shadow-emerald-700/40 group/portalbtn"
-              >
-                <div className="flex items-center gap-2.5">
-                  <Rocket className="w-5 h-5 transition-transform group-hover/portalbtn:translate-x-0.5 group-hover/portalbtn:-translate-y-0.5" />
-                  <span>
-                    {isHindi
-                      ? "सभी 5 ऑल इंडिया मॉक टेस्ट देखें"
-                      : "Explore All 5 All-India Mock Tests"}
-                  </span>
-                </div>
-                <ArrowRight className="w-5 h-5 transition-transform group-hover/portalbtn:translate-x-1" />
-              </button>
-            </div>
-          </div>
+          {/* BOTTOM FULL-WIDTH BUTTON */}
+          <button
+            onClick={() => setCurrentView("all-india-tests")}
+            className="w-full mt-4 py-4 px-6 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white dark:hover:bg-emerald-600 font-black text-sm md:text-base flex items-center justify-center gap-2 transition-all duration-200 group/btn shadow-sm"
+          >
+            <span>{isHindi ? "सभी 5 ऑल इंडिया मॉक टेस्ट देखें" : "View All All-India Mock Tests"}</span>
+            <ArrowRight className="w-5 h-5 transition-transform group-hover/btn:translate-x-1" />
+          </button>
         </div>
       </section>
 
