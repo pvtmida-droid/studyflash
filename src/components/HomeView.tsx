@@ -429,39 +429,39 @@ export default function HomeView({
               return (
                 <div
                   key={activeItem.id}
-                  className="bg-[#ebf4e7] dark:bg-slate-800/80 border border-emerald-200/60 dark:border-slate-700/80 rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all duration-500 animate-fade-in hover:shadow-md group/row"
+                  className="bg-[#ebf4e7] dark:bg-slate-800/80 border border-emerald-200/60 dark:border-slate-700/80 rounded-2xl p-3.5 md:p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all duration-500 animate-fade-in hover:shadow-md group/row"
                 >
-                  {/* LEFT SIDE: Exam Icon + Title + Meta + Solid Green Attempt Test Button */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 flex-1">
-                    <div className="flex items-center gap-3.5">
-                      <div className="relative shrink-0 p-3 bg-emerald-100/90 dark:bg-emerald-900/50 rounded-2xl text-emerald-800 dark:text-emerald-400">
+                  {/* LEFT SIDE (50% WIDTH): Exam Icon + Title + Meta + Solid Green Attempt Test Button */}
+                  <div className="flex-1 w-full md:w-1/2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 pr-0 md:pr-2">
+                    <div className="flex items-center gap-3">
+                      <div className="relative shrink-0 p-2.5 md:p-3 bg-emerald-100/90 dark:bg-emerald-900/50 rounded-2xl text-emerald-800 dark:text-emerald-400">
                         {activeItem.iconType === "zap" ? (
-                          <Zap className="w-6 h-6" />
+                          <Zap className="w-5 h-5 md:w-6 md:h-6" />
                         ) : activeItem.iconType === "trophy" ? (
-                          <Trophy className="w-6 h-6" />
+                          <Trophy className="w-5 h-5 md:w-6 md:h-6" />
                         ) : activeItem.iconType === "swords" ? (
-                          <Swords className="w-6 h-6" />
+                          <Swords className="w-5 h-5 md:w-6 md:h-6" />
                         ) : activeItem.iconType === "flame" ? (
-                          <Flame className="w-6 h-6" />
+                          <Flame className="w-5 h-5 md:w-6 md:h-6" />
                         ) : (
-                          <FileText className="w-6 h-6" />
+                          <FileText className="w-5 h-5 md:w-6 md:h-6" />
                         )}
                         <span className="absolute -bottom-1 -right-1 bg-emerald-700 text-white font-extrabold text-[8px] px-1.5 py-0.5 rounded-full border-2 border-white dark:border-slate-900 shadow-xs">
                           NEW
                         </span>
                       </div>
-                      <div>
-                        <h3 className="text-sm md:text-base font-black text-slate-900 dark:text-white group-hover/row:text-emerald-800 dark:group-hover/row:text-emerald-300 transition-colors">
+                      <div className="min-w-0">
+                        <h3 className="text-xs sm:text-sm md:text-base font-black text-slate-900 dark:text-white group-hover/row:text-emerald-800 dark:group-hover/row:text-emerald-300 transition-colors truncate">
                           {isHindi ? activeItem.titleHi : activeItem.titleEn}
                         </h3>
-                        <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 font-semibold mt-1">
-                          <span className="flex items-center gap-1">
-                            <Calendar className="w-3.5 h-3.5 text-emerald-600" />
+                        <div className="flex items-center gap-2 md:gap-3 text-[11px] md:text-xs text-slate-500 dark:text-slate-400 font-semibold mt-0.5">
+                          <span className="flex items-center gap-1 shrink-0">
+                            <Calendar className="w-3 h-3 md:w-3.5 md:h-3.5 text-emerald-600" />
                             {activeItem.date}
                           </span>
                           <span>|</span>
-                          <span className="flex items-center gap-1">
-                            <FileText className="w-3.5 h-3.5 text-emerald-600" />
+                          <span className="flex items-center gap-1 shrink-0">
+                            <FileText className="w-3 h-3 md:w-3.5 md:h-3.5 text-emerald-600" />
                             {activeItem.questionsCount}
                           </span>
                         </div>
@@ -471,33 +471,33 @@ export default function HomeView({
                     {/* Solid Green Attempt Test Button */}
                     <button
                       onClick={handleAttemptBattle}
-                      className="px-6 py-2.5 rounded-full bg-[#047857] hover:bg-emerald-800 text-white font-extrabold text-xs md:text-sm flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95 shrink-0"
+                      className="px-5 py-2 md:py-2.5 rounded-full bg-[#047857] hover:bg-emerald-800 text-white font-extrabold text-xs md:text-sm flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95 shrink-0 self-end sm:self-center"
                     >
                       <span>Attempt Test</span>
-                      <ArrowRight className="w-4 h-4" />
+                      <ArrowRight className="w-3.5 h-3.5 md:w-4 md:h-4" />
                     </button>
                   </div>
 
-                  {/* VERTICAL DIVIDER LINE */}
-                  <div className="hidden md:block w-px bg-slate-300/80 dark:bg-slate-700 h-14 shrink-0 mx-2" />
+                  {/* VERTICAL DIVIDER LINE IN EXACT CENTER */}
+                  <div className="hidden md:block w-px bg-slate-300/80 dark:bg-slate-700 h-12 shrink-0 mx-1" />
 
-                  {/* RIGHT SIDE: Teacher Avatar + Rakesh Sir Test + Outline Green Open Test Button */}
-                  <div className="flex items-center justify-between gap-4 bg-white/95 dark:bg-slate-900/95 p-2.5 px-4 rounded-full border border-emerald-200/60 dark:border-slate-700 shadow-xs shrink-0">
-                    <div className="flex items-center gap-3">
+                  {/* RIGHT SIDE (50% WIDTH): Teacher Avatar + Rakesh Sir Test + Outline Green Open Test Button */}
+                  <div className="flex-1 w-full md:w-1/2 flex items-center justify-between gap-3 bg-white/95 dark:bg-slate-900/95 p-2.5 px-4 rounded-full border border-emerald-200/60 dark:border-slate-700 shadow-xs">
+                    <div className="flex items-center gap-3 min-w-0">
                       <img
                         src="/teacher_avatar.png"
                         alt="Rakesh Sir Avatar"
-                        className="w-11 h-11 rounded-full border-2 border-emerald-500 object-cover shrink-0"
+                        className="w-10 h-10 md:w-11 md:h-11 rounded-full border-2 border-emerald-500 object-cover shrink-0"
                         onError={(e: any) => {
                           e.target.onerror = null;
                           e.target.src = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80";
                         }}
                       />
-                      <div>
-                        <div className="font-extrabold text-slate-900 dark:text-white text-xs md:text-sm">
+                      <div className="min-w-0">
+                        <div className="font-extrabold text-slate-900 dark:text-white text-xs md:text-sm truncate">
                           Rakesh Sir Test
                         </div>
-                        <div className="text-[10px] text-slate-400 font-medium">
+                        <div className="text-[10px] text-slate-400 font-medium truncate">
                           Fixed test link (Rakesh Sir)
                         </div>
                       </div>
