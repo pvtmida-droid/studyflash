@@ -116,7 +116,8 @@ export default function App() {
   }, []);
 
   const getInitialView = () => {
-    const path = window.location.pathname;
+    const rawPath = window.location.pathname;
+    const path = rawPath.length > 1 ? rawPath.replace(/\/$/, "") : rawPath;
     return pathToView[path] || "home";
   };
 
@@ -135,7 +136,8 @@ export default function App() {
 
   useEffect(() => {
     const handlePopState = () => {
-      const path = window.location.pathname;
+      const rawPath = window.location.pathname;
+      const path = rawPath.length > 1 ? rawPath.replace(/\/$/, "") : rawPath;
       const view = pathToView[path] || "home";
       setRawView(view);
     };

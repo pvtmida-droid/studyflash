@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import upiQrCode from "../assets/upi_qr_code.png";
 import {
   ArrowLeft,

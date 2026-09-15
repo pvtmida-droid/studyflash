@@ -58,6 +58,7 @@ export default function Header({
 
   const navItems = [
     { id: "home", labelEn: "Home", labelHi: "मुख्य पृष्ठ" },
+    { id: "all-india-tests", labelEn: "All India Tests", labelHi: "ऑल इंडिया टेस्ट" },
     { id: "questions", labelEn: "MCQ Practice", labelHi: "प्रैक्टिस प्रश्न" },
     { id: "quizzes", labelEn: "Mock Tests", labelHi: "मॉक टेस्ट" },
     { id: "dashboard", labelEn: "Dashboard", labelHi: "डैशबोर्ड" },
