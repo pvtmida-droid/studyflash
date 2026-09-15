@@ -39,8 +39,8 @@ interface AllIndiaMockTestsViewProps {
   onViewResults: () => void;
 }
 
-const DEFAULT_UPI_ID = "8825227701@ybl";
-const TEST_PRICE = 20;
+const DEFAULT_UPI_ID = "blasterking@ybl";
+const TEST_PRICE = 50;
 
 const MOCK_TEST_CARDS = [
   {
