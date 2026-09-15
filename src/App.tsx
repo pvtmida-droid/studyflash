@@ -357,6 +357,60 @@ export default function App() {
     }
   };
 
+  const [selectedAllIndiaTestId, setSelectedAllIndiaTestId] = useState<string>("mega-test-1");
+
+  // Generate distinct mock test objects for each of the 5 All India tests
+  const allIndiaMegaTests = useMemo(() => {
+    const cards = [
+      { id: "mega-test-1", titleEn: "All India Mega Test #1", titleHi: "ऑल इंडिया मेगा टेस्ट #1" },
+      { id: "mega-test-2", titleEn: "All India Mega Test #2", titleHi: "ऑल इंडिया मेगा टेस्ट #2" },
+      { id: "mega-test-3", titleEn: "All India Mega Test #3", titleHi: "ऑल इंडिया मेगा टेस्ट #3" },
+      { id: "mega-test-4", titleEn: "All India Special Test #4", titleHi: "ऑल इंडिया स्पेशल टेस्ट #4" },
+      { id: "mega-test-5", titleEn: "All India Practice Test #5", titleHi: "ऑल इंडिया प्रैक्टिस टेस्ट #5" },
+    ];
+
+    return cards.map((card, idx) => {
+      // 1. If admin added/saved a custom test with this ID in mockTests, use that
+      const customTest = mockTests.find((t) => t.id === card.id);
+      if (customTest && customTest.questions && customTest.questions.length > 0) {
+        return customTest;
+      }
+
+      // 2. For mega-test-1, use liveTestConfig.test
+      if (card.id === "mega-test-1") {
+        return {
+          ...liveTestConfig.test,
+          id: "mega-test-1",
+          titleEn: card.titleEn,
+          titleHi: card.titleHi,
+        };
+      }
+
+      // 3. For mega-test-2 to mega-test-5, pick a distinct set of questions from question bank
+      let pool = questions.length > 0 ? questions : (liveTestConfig.test.questions || []);
+
+      const offset = (idx * 20) % (pool.length || 1);
+      const rotatedPool = pool.length > 0
+        ? [...pool.slice(offset), ...pool.slice(0, offset)]
+        : [];
+
+      const testQs = rotatedPool.slice(0, Math.min(100, rotatedPool.length));
+
+      return {
+        id: card.id,
+        titleEn: card.titleEn,
+        titleHi: card.titleHi,
+        subject: "All India Mock Test Series",
+        exam: "Mega Battle",
+        duration: 120,
+        totalQuestions: testQs.length,
+        totalMarks: testQs.length * 2,
+        questions: testQs,
+        isPreviousYear: false,
+      };
+    });
+  }, [mockTests, liveTestConfig, questions]);
+
   const [userStats, setUserStats] = useState<UserStats>(INITIAL_USER_STATS);
 
   // Auth session states
@@ -703,15 +757,15 @@ export default function App() {
 
         {currentView === "live-test-auto" && (
           <QuizView
-            mockTests={[liveTestConfig.test, ...mockTests]}
+            mockTests={[...allIndiaMegaTests, liveTestConfig.test, ...mockTests]}
             isHindi={isHindi}
             userStats={userStats}
             onUpdateStats={handleUpdateStats}
             selectedFontSize={selectedFontSize}
-            autoStartTestId={liveTestConfig.test.id}
+            autoStartTestId={selectedAllIndiaTestId || "mega-test-1"}
             liveTestConfig={liveTestConfig}
             isAdmin={isAdmin}
-            onBack={() => setCurrentView("home")}
+            onBack={() => setCurrentView("all-india-tests")}
           />
         )}
 
@@ -786,6 +840,7 @@ export default function App() {
             isHindi={isHindi}
             onBack={() => setCurrentView("home")}
             onAttemptTest={(testId) => {
+              if (testId) setSelectedAllIndiaTestId(testId);
               setCurrentView("live-test-auto");
             }}
             onViewResults={() => setCurrentView("battle_results")}
