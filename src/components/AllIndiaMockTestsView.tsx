@@ -600,8 +600,8 @@ export default function AllIndiaMockTestsView({
 
       {/* UPI QR CODE PAYMENT MODAL */}
       {selectedTestForPayment && (
-        <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-fade-in">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-md w-full p-4 sm:p-6 shadow-2xl relative space-y-4 max-h-[88vh] overflow-y-auto my-auto">
+        <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-3 md:p-6 overflow-y-auto animate-fade-in">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-md md:max-w-3xl w-full p-5 md:p-8 shadow-2xl relative max-h-[92vh] overflow-y-auto my-auto">
             {/* CLOSE BUTTON */}
             <button
               onClick={() => setSelectedTestForPayment(null)}
@@ -610,180 +610,202 @@ export default function AllIndiaMockTestsView({
               <X className="w-5 h-5" />
             </button>
 
-            {/* MODAL HEADER */}
-            <div className="text-center space-y-1 pt-1">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 text-xs font-extrabold uppercase">
-                <ShieldCheck className="w-4 h-4" />
-                <span>Instant Payment</span>
-              </div>
-              <h2 className="text-lg sm:text-2xl font-black text-slate-900 dark:text-white">
-                {isHindi ? "UPI QR कोड द्वारा भुगतान" : "Pay via UPI QR Code"}
-              </h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                {isHindi ? selectedTestForPayment.titleHi : selectedTestForPayment.titleEn}
-              </p>
-            </div>
-
-            {/* PRICE TAG */}
-            <div className="bg-gradient-to-r from-emerald-50 via-emerald-100/50 to-emerald-50 dark:from-slate-800 dark:via-slate-800/80 dark:to-slate-800 p-3 rounded-2xl border border-emerald-200/80 dark:border-emerald-800 flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-xl bg-emerald-600 text-white font-black text-base">
-                  ₹{TEST_PRICE}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+              {/* LEFT COLUMN: Price Tag + PhonePe QR Code + UPI ID Copy */}
+              <div className="space-y-4">
+                {/* MODAL HEADER FOR MOBILE */}
+                <div className="text-center md:text-left space-y-1 block md:hidden">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 text-xs font-extrabold uppercase">
+                    <ShieldCheck className="w-4 h-4" />
+                    <span>Instant Payment</span>
+                  </div>
+                  <h2 className="text-xl font-black text-slate-900 dark:text-white">
+                    {isHindi ? "UPI QR कोड द्वारा भुगतान" : "Pay via UPI QR Code"}
+                  </h2>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                    {isHindi ? selectedTestForPayment.titleHi : selectedTestForPayment.titleEn}
+                  </p>
                 </div>
-                <div>
-                  <div className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                    {isHindi ? "ऑल इंडिया मॉक टेस्ट फी" : "All India Test Access Fee"}
-                  </div>
-                  <div className="text-[10px] text-slate-400 font-medium">
-                    100 Questions • Instant Rank
-                  </div>
-                </div>
-              </div>
-              <span className="text-xs font-extrabold text-emerald-700 dark:text-emerald-400 bg-white dark:bg-slate-900 px-3 py-1 rounded-full border border-emerald-200">
-                100% Secure
-              </span>
-            </div>
 
-            {/* QR CODE CONTAINER */}
-            <div className="bg-slate-50 dark:bg-slate-800/60 p-3 sm:p-4 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center space-y-2.5 text-center">
-              <div className="p-2 bg-slate-950 rounded-2xl shadow-xl border-2 border-emerald-500 relative group flex items-center justify-center">
-                <img
-                  src={upiQrCode}
-                  alt="PhonePe UPI QR Code"
-                  className="w-48 h-48 sm:w-56 sm:h-56 object-contain rounded-xl"
-                />
-              </div>
-
-              {/* SUPPORTED APPS ICONS BADGES */}
-              <div className="flex items-center justify-center gap-2 text-[11px] font-bold text-slate-500 dark:text-slate-400">
-                <span className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200">Google Pay</span>
-                <span className="px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 border border-purple-200">PhonePe</span>
-                <span className="px-2 py-0.5 rounded-md bg-sky-50 text-sky-700 border border-sky-200">Paytm</span>
-                <span className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">BHIM</span>
-              </div>
-            </div>
-
-            {/* COPY UPI ID STRIP */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-600 dark:text-slate-300 flex items-center justify-between">
-                <span>{isHindi ? "UPI ID द्वारा पे करें:" : "Or Pay via UPI ID:"}</span>
-                {copiedUpi && (
-                  <span className="text-[10px] text-emerald-600 font-extrabold animate-pulse">
-                    Copied to clipboard!
-                  </span>
-                )}
-              </label>
-              <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 p-2.5 rounded-2xl border border-slate-200 dark:border-slate-700">
-                <code className="text-sm font-extrabold text-emerald-700 dark:text-emerald-400 flex-1 px-2 select-all">
-                  {DEFAULT_UPI_ID}
-                </code>
-                <button
-                  onClick={handleCopyUpi}
-                  className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-1 transition-all"
-                >
-                  {copiedUpi ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{copiedUpi ? "Copied" : "Copy"}</span>
-                </button>
-              </div>
-            </div>
-
-            {/* STUDENT NAME & VERIFICATION INPUTS */}
-            <div className="space-y-3 pt-1 border-t border-slate-100 dark:border-slate-800">
-              {/* STUDENT NAME FIELD */}
-              <div>
-                <label className="text-xs font-extrabold text-slate-800 dark:text-slate-200 block mb-1">
-                  {isHindi ? "आपका नाम (Student Name):" : "Your Full Name:"}
-                </label>
-                <input
-                  type="text"
-                  placeholder={isHindi ? "उदा. राहुल कुमार" : "e.g. Rahul Kumar"}
-                  value={studentName}
-                  onChange={(e) => setStudentName(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-semibold focus:outline-none focus:border-emerald-500"
-                />
-              </div>
-
-              <label className="text-xs font-extrabold text-slate-800 dark:text-slate-200 flex items-center justify-between pt-1">
-                <span>{isHindi ? "पेमेंट विवरण दर्ज करें (UTR / Transaction ID):" : "Enter Payment Details (UTR / Transaction ID):"}</span>
-              </label>
-
-              {/* TAB SELECTOR BUTTONS */}
-              <div className="flex rounded-xl bg-slate-100 dark:bg-slate-800 p-1 border border-slate-200 dark:border-slate-700">
-                <button
-                  type="button"
-                  onClick={() => setActivePaymentTab("utr")}
-                  className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${
-                    activePaymentTab === "utr"
-                      ? "bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-xs"
-                      : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
-                  }`}
-                >
-                  {isHindi ? "1. UTR नंबर (12 अंक)" : "1. UTR Number (12 Digits)"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActivePaymentTab("txn")}
-                  className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${
-                    activePaymentTab === "txn"
-                      ? "bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-xs"
-                      : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
-                  }`}
-                >
-                  {isHindi ? "2. Transaction ID / Ref No" : "2. Transaction ID / Ref No"}
-                </button>
-              </div>
-
-              {/* ACTIVE TAB INPUT */}
-              <div className="space-y-2">
-                {activePaymentTab === "utr" ? (
-                  <div>
-                    <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block mb-1">
-                      {isHindi ? "12-अंकों का UTR नंबर:" : "Enter 12-Digit UTR Number:"}
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="e.g. 425189012345"
-                      value={utrNumber}
-                      onChange={(e) => setUtrNumber(e.target.value)}
-                      className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-semibold focus:outline-none focus:border-emerald-500"
-                    />
-                  </div>
-                ) : (
-                  <div>
-                    <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block mb-1">
-                      {isHindi ? "ट्रांजैक्शन आईडी / रेफरेंस नंबर:" : "Enter Transaction ID / Ref No:"}
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="e.g. T26091512345678 or Paytm Ref ID"
-                      value={transactionId}
-                      onChange={(e) => setTransactionId(e.target.value)}
-                      className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-semibold focus:outline-none focus:border-emerald-500"
-                    />
-                  </div>
-                )}
-
-                <button
-                  onClick={() => handleUnlockTest(selectedTestForPayment.id)}
-                  disabled={isVerifying}
-                  className="w-full py-3.5 px-5 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-sm md:text-base flex items-center justify-center gap-2 shadow-lg transition-all active:scale-98 disabled:opacity-50 mt-1"
-                >
-                  {isVerifying ? (
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span>{isHindi ? "सत्यापित हो रहा है..." : "Verifying Payment..."}</span>
+                {/* PRICE TAG */}
+                <div className="bg-gradient-to-r from-emerald-50 via-emerald-100/50 to-emerald-50 dark:from-slate-800 dark:via-slate-800/80 dark:to-slate-800 p-3.5 rounded-2xl border border-emerald-200/80 dark:border-emerald-800 flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="p-2 rounded-xl bg-emerald-600 text-white font-black text-base">
+                      ₹{TEST_PRICE}
                     </div>
-                  ) : (
-                    <>
-                      <CheckCircle2 className="w-5 h-5" />
-                      <span>
-                        {isHindi
-                          ? "भुगतान सत्यापित करें & टेस्ट अनलॉक करें"
-                          : "Verify Payment & Unlock Test"}
+                    <div>
+                      <div className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                        {isHindi ? "ऑल इंडिया मॉक टेस्ट फी" : "All India Test Access Fee"}
+                      </div>
+                      <div className="text-[10px] text-slate-400 font-medium">
+                        100 Questions • Instant Rank
+                      </div>
+                    </div>
+                  </div>
+                  <span className="text-xs font-extrabold text-emerald-700 dark:text-emerald-400 bg-white dark:bg-slate-900 px-3 py-1 rounded-full border border-emerald-200">
+                    100% Secure
+                  </span>
+                </div>
+
+                {/* QR CODE CONTAINER */}
+                <div className="bg-slate-50 dark:bg-slate-800/60 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center space-y-3 text-center">
+                  <div className="p-2 bg-slate-950 rounded-2xl shadow-xl border-2 border-emerald-500 relative group flex items-center justify-center">
+                    <img
+                      src={upiQrCode}
+                      alt="PhonePe UPI QR Code"
+                      className="w-48 h-48 sm:w-56 sm:h-56 md:w-52 md:h-52 object-contain rounded-xl"
+                    />
+                  </div>
+
+                  {/* SUPPORTED APPS ICONS BADGES */}
+                  <div className="flex items-center justify-center gap-2 text-[11px] font-bold text-slate-500 dark:text-slate-400">
+                    <span className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200">Google Pay</span>
+                    <span className="px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 border border-purple-200">PhonePe</span>
+                    <span className="px-2 py-0.5 rounded-md bg-sky-50 text-sky-700 border border-sky-200">Paytm</span>
+                    <span className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">BHIM</span>
+                  </div>
+                </div>
+
+                {/* COPY UPI ID STRIP */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-slate-600 dark:text-slate-300 flex items-center justify-between">
+                    <span>{isHindi ? "UPI ID द्वारा पे करें:" : "Or Pay via UPI ID:"}</span>
+                    {copiedUpi && (
+                      <span className="text-[10px] text-emerald-600 font-extrabold animate-pulse">
+                        Copied to clipboard!
                       </span>
-                    </>
-                  )}
-                </button>
+                    )}
+                  </label>
+                  <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 p-2.5 rounded-2xl border border-slate-200 dark:border-slate-700">
+                    <code className="text-sm font-extrabold text-emerald-700 dark:text-emerald-400 flex-1 px-2 select-all">
+                      {DEFAULT_UPI_ID}
+                    </code>
+                    <button
+                      onClick={handleCopyUpi}
+                      className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-1 transition-all"
+                    >
+                      {copiedUpi ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                      <span>{copiedUpi ? "Copied" : "Copy"}</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* RIGHT COLUMN: Header (Desktop) + Name Input + UTR/Txn Tabs & Unlock Button */}
+              <div className="space-y-4">
+                {/* MODAL HEADER FOR DESKTOP */}
+                <div className="text-left space-y-1 hidden md:block">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 text-xs font-extrabold uppercase">
+                    <ShieldCheck className="w-4 h-4" />
+                    <span>Instant Payment</span>
+                  </div>
+                  <h2 className="text-2xl font-black text-slate-900 dark:text-white">
+                    {isHindi ? "UPI QR कोड द्वारा भुगतान" : "Pay via UPI QR Code"}
+                  </h2>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                    {isHindi ? selectedTestForPayment.titleHi : selectedTestForPayment.titleEn}
+                  </p>
+                </div>
+
+                {/* STUDENT NAME & VERIFICATION INPUTS */}
+                <div className="space-y-3 pt-2 md:pt-0 border-t md:border-t-0 border-slate-100 dark:border-slate-800">
+                  {/* STUDENT NAME FIELD */}
+                  <div>
+                    <label className="text-xs font-extrabold text-slate-800 dark:text-slate-200 block mb-1">
+                      {isHindi ? "आपका नाम (Student Name):" : "Your Full Name:"}
+                    </label>
+                    <input
+                      type="text"
+                      placeholder={isHindi ? "उदा. राहुल कुमार" : "e.g. Rahul Kumar"}
+                      value={studentName}
+                      onChange={(e) => setStudentName(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-semibold focus:outline-none focus:border-emerald-500"
+                    />
+                  </div>
+
+                  <label className="text-xs font-extrabold text-slate-800 dark:text-slate-200 flex items-center justify-between pt-1">
+                    <span>{isHindi ? "पेमेंट विवरण दर्ज करें (UTR / Transaction ID):" : "Enter Payment Details (UTR / Transaction ID):"}</span>
+                  </label>
+
+                  {/* TAB SELECTOR BUTTONS */}
+                  <div className="flex rounded-xl bg-slate-100 dark:bg-slate-800 p-1 border border-slate-200 dark:border-slate-700">
+                    <button
+                      type="button"
+                      onClick={() => setActivePaymentTab("utr")}
+                      className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
+                        activePaymentTab === "utr"
+                          ? "bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-xs"
+                          : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
+                      }`}
+                    >
+                      {isHindi ? "1. UTR नंबर (12 अंक)" : "1. UTR Number (12 Digits)"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActivePaymentTab("txn")}
+                      className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
+                        activePaymentTab === "txn"
+                          ? "bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-xs"
+                          : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
+                      }`}
+                    >
+                      {isHindi ? "2. Transaction ID / Ref No" : "2. Transaction ID / Ref No"}
+                    </button>
+                  </div>
+
+                  {/* ACTIVE TAB INPUT */}
+                  <div className="space-y-3 pt-1">
+                    {activePaymentTab === "utr" ? (
+                      <div>
+                        <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block mb-1">
+                          {isHindi ? "12-अंकों का UTR नंबर:" : "Enter 12-Digit UTR Number:"}
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="e.g. 425189012345"
+                          value={utrNumber}
+                          onChange={(e) => setUtrNumber(e.target.value)}
+                          className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-semibold focus:outline-none focus:border-emerald-500"
+                        />
+                      </div>
+                    ) : (
+                      <div>
+                        <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block mb-1">
+                          {isHindi ? "ट्रांजैक्शन आईडी / रेफरेंस नंबर:" : "Enter Transaction ID / Ref No:"}
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="e.g. T26091512345678 or Paytm Ref ID"
+                          value={transactionId}
+                          onChange={(e) => setTransactionId(e.target.value)}
+                          className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-semibold focus:outline-none focus:border-emerald-500"
+                        />
+                      </div>
+                    )}
+
+                    <button
+                      onClick={() => handleUnlockTest(selectedTestForPayment.id)}
+                      disabled={isVerifying}
+                      className="w-full py-4 px-5 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-sm md:text-base flex items-center justify-center gap-2 shadow-lg transition-all active:scale-98 disabled:opacity-50 mt-3"
+                    >
+                      {isVerifying ? (
+                        <div className="flex items-center gap-2">
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          <span>{isHindi ? "सत्यापित हो रहा है..." : "Verifying Payment..."}</span>
+                        </div>
+                      ) : (
+                        <>
+                          <CheckCircle2 className="w-5 h-5" />
+                          <span>
+                            {isHindi
+                              ? "भुगतान सत्यापित करें & टेस्ट अनलॉक करें"
+                              : "Verify Payment & Unlock Test"}
+                          </span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
