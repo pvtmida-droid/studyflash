@@ -600,23 +600,23 @@ export default function AllIndiaMockTestsView({
 
       {/* UPI QR CODE PAYMENT MODAL */}
       {selectedTestForPayment && (
-        <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-md w-full p-6 md:p-7 shadow-2xl relative space-y-5 overflow-hidden">
+        <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-fade-in">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-md w-full p-4 sm:p-6 shadow-2xl relative space-y-4 max-h-[88vh] overflow-y-auto my-auto">
             {/* CLOSE BUTTON */}
             <button
               onClick={() => setSelectedTestForPayment(null)}
-              className="absolute top-5 right-5 p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-white transition-colors"
+              className="absolute top-4 right-4 p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-white transition-colors z-20"
             >
               <X className="w-5 h-5" />
             </button>
 
             {/* MODAL HEADER */}
-            <div className="text-center space-y-1">
+            <div className="text-center space-y-1 pt-1">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 text-xs font-extrabold uppercase">
                 <ShieldCheck className="w-4 h-4" />
                 <span>Instant Payment</span>
               </div>
-              <h2 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white">
+              <h2 className="text-lg sm:text-2xl font-black text-slate-900 dark:text-white">
                 {isHindi ? "UPI QR कोड द्वारा भुगतान" : "Pay via UPI QR Code"}
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
@@ -625,7 +625,7 @@ export default function AllIndiaMockTestsView({
             </div>
 
             {/* PRICE TAG */}
-            <div className="bg-gradient-to-r from-emerald-50 via-emerald-100/50 to-emerald-50 dark:from-slate-800 dark:via-slate-800/80 dark:to-slate-800 p-3.5 rounded-2xl border border-emerald-200/80 dark:border-emerald-800 flex items-center justify-between">
+            <div className="bg-gradient-to-r from-emerald-50 via-emerald-100/50 to-emerald-50 dark:from-slate-800 dark:via-slate-800/80 dark:to-slate-800 p-3 rounded-2xl border border-emerald-200/80 dark:border-emerald-800 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <div className="p-2 rounded-xl bg-emerald-600 text-white font-black text-base">
                   ₹{TEST_PRICE}
@@ -645,12 +645,12 @@ export default function AllIndiaMockTestsView({
             </div>
 
             {/* QR CODE CONTAINER */}
-            <div className="bg-slate-50 dark:bg-slate-800/60 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center space-y-3 text-center">
-              <div className="p-2.5 bg-slate-950 rounded-2xl shadow-xl border-2 border-emerald-500 relative group flex items-center justify-center">
+            <div className="bg-slate-50 dark:bg-slate-800/60 p-3 sm:p-4 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center space-y-2.5 text-center">
+              <div className="p-2 bg-slate-950 rounded-2xl shadow-xl border-2 border-emerald-500 relative group flex items-center justify-center">
                 <img
                   src={upiQrCode}
                   alt="PhonePe UPI QR Code"
-                  className="w-56 h-56 md:w-64 md:h-64 object-contain rounded-xl"
+                  className="w-48 h-48 sm:w-56 sm:h-56 object-contain rounded-xl"
                 />
               </div>
 
