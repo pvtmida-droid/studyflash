@@ -49,7 +49,7 @@ const MOCK_TEST_CARDS = [
     titleHi: "ऑल इंडिया मेगा टेस्ट #1",
     price: 50,
     answerKeyPdfUrl: "",
-    imageUrl: "/teacher_avatar.png",
+    imageUrl: "https://ibb.co/1GXqn4fy",
     testDate: "15 September 2026",
     totalMarks: 100,
     userId: "Vikash kumar yadav",
