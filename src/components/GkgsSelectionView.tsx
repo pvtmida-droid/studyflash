@@ -75,7 +75,7 @@ export default function GkgsSelectionView({
     },
     {
       id: "culture",
-      subjectCode: "Static GK",
+      subjectCode: "Art & Culture",
       topicFilter: "Culture",
       titleHi: "संस्कृति",
       titleEn: "Art & Culture",

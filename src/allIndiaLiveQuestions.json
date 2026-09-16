@@ -2998,5 +2998,150 @@
     ],
     "likes": 100,
     "dislikes": 0
+  },
+  {
+    "id": "live2026-art-001",
+    "subject": "Art & Culture",
+    "topic": "Culture",
+    "questionEn": "Kathakali is a classical dance form of which Indian state?",
+    "questionHi": "कथकली किस भारतीय राज्य का प्रसिद्ध शास्त्रीय नृत्य है?",
+    "optionsEn": [
+      "Kerala",
+      "Tamil Nadu",
+      "Karnataka",
+      "Andhra Pradesh"
+    ],
+    "optionsHi": [
+      "केरल",
+      "तमिलनाडु",
+      "कर्नाटक",
+      "आंध्र प्रदेश"
+    ],
+    "correctAnswer": "A",
+    "explanationEn": "Kathakali originated in Kerala and is renowned for its elaborate makeup and costumes.",
+    "explanationHi": "कथकली की उत्पत्ति केरल में हुई थी और यह अपने विस्तृत श्रृंगार और वेशभूषा के लिए प्रसिद्ध है।",
+    "examTags": [
+      "Art & Culture",
+      "Culture",
+      "Static GK"
+    ],
+    "likes": 100,
+    "dislikes": 0
+  },
+  {
+    "id": "live2026-art-002",
+    "subject": "Art & Culture",
+    "topic": "Culture",
+    "questionEn": "The famous Sun Temple is located in which state?",
+    "questionHi": "प्रसिद्ध सूर्य मंदिर (कोणार्क) किस राज्य में स्थित है?",
+    "optionsEn": [
+      "Odisha",
+      "West Bengal",
+      "Gujarat",
+      "Madhya Pradesh"
+    ],
+    "optionsHi": [
+      "ओडिशा",
+      "पश्चिम बंगाल",
+      "गुजरात",
+      "मध्य प्रदेश"
+    ],
+    "correctAnswer": "A",
+    "explanationEn": "The Konark Sun Temple in Odisha was built by King Narasimhadeva I of the Eastern Ganga Dynasty in the 13th century.",
+    "explanationHi": "ओडिशा का कोणार्क सूर्य मंदिर 13वीं शताब्दी में पूर्वी गंगा राजवंश के राजा नरसिंहदेव प्रथम द्वारा बनवाया गया था।",
+    "examTags": [
+      "Art & Culture",
+      "Culture",
+      "Static GK"
+    ],
+    "likes": 100,
+    "dislikes": 0
+  },
+  {
+    "id": "live2026-art-003",
+    "subject": "Art & Culture",
+    "topic": "Culture",
+    "questionEn": "Madhubani folk painting style belongs to which state of India?",
+    "questionHi": "मधुबनी लोक चित्रकला शैली भारत के किस राज्य से संबंधित है?",
+    "optionsEn": [
+      "Bihar",
+      "Uttar Pradesh",
+      "Rajasthan",
+      "Madhya Pradesh"
+    ],
+    "optionsHi": [
+      "बिहार",
+      "उत्तर प्रदेश",
+      "राजस्थान",
+      "मध्य प्रदेश"
+    ],
+    "correctAnswer": "A",
+    "explanationEn": "Madhubani painting (Mithila art) originated in the Mithila region of Bihar.",
+    "explanationHi": "मधुबनी चित्रकला (मिथिला कला) बिहार के मिथिला क्षेत्र से शुरू हुई थी।",
+    "examTags": [
+      "Art & Culture",
+      "Culture",
+      "Static GK"
+    ],
+    "likes": 100,
+    "dislikes": 0
+  },
+  {
+    "id": "live2026-art-004",
+    "subject": "Art & Culture",
+    "topic": "Culture",
+    "questionEn": "Bihu is the most popular traditional folk festival of which state?",
+    "questionHi": "बिहू किस राज्य का सबसे लोकप्रिय पारंपरिक लोक उत्सव है?",
+    "optionsEn": [
+      "Assam",
+      "Manipur",
+      "Nagaland",
+      "Sikkim"
+    ],
+    "optionsHi": [
+      "असम",
+      "मणिपुर",
+      "नागालैंड",
+      "सिक्किम"
+    ],
+    "correctAnswer": "A",
+    "explanationEn": "Bihu is celebrated in Assam, marking the agricultural season.",
+    "explanationHi": "बिहू असम में कृषि मौसम की शुरुआत का जश्न मनाने के लिए मनाया जाने वाला मुख्य त्यौहार है।",
+    "examTags": [
+      "Art & Culture",
+      "Culture",
+      "Static GK"
+    ],
+    "likes": 100,
+    "dislikes": 0
+  },
+  {
+    "id": "live2026-art-005",
+    "subject": "Art & Culture",
+    "topic": "Culture",
+    "questionEn": "Which dynasty constructed the world-famous Khajuraho Group of Monuments in Madhya Pradesh?",
+    "questionHi": "मध्य प्रदेश में विश्व प्रसिद्ध खजुराहो के मंदिरों का निर्माण किस राजवंश ने करवाया था?",
+    "optionsEn": [
+      "Chandela Dynasty",
+      "Maurya Dynasty",
+      "Gupta Dynasty",
+      "Chola Dynasty"
+    ],
+    "optionsHi": [
+      "चंदेल राजवंश",
+      "मौर्य राजवंश",
+      "गुप्त राजवंश",
+      "चोल राजवंश"
+    ],
+    "correctAnswer": "A",
+    "explanationEn": "Khajuraho temples were built between 950 and 1050 AD by the Chandela dynasty.",
+    "explanationHi": "खजुराहो के मंदिर 950 से 1050 ईस्वी के बीच चंदेल राजवंश द्वारा बनवाए गए थे।",
+    "examTags": [
+      "Art & Culture",
+      "Culture",
+      "Static GK"
+    ],
+    "likes": 100,
+    "dislikes": 0
   }
 ]

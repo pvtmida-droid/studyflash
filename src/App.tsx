@@ -151,7 +151,7 @@ export default function App() {
   const [selectedFontSize, setSelectedFontSize] = useState(15);
 
   // Db lists states
-  const [questions, setQuestions] = useState<Question[]>([]);
+  const [questions, setQuestions] = useState<Question[]>(allIndiaLiveQuestions as Question[]);
   const [mockTests, setMockTests] = useState<MockTest[]>([]);
 
   // Load mock tests and questions from server
@@ -192,7 +192,8 @@ export default function App() {
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data)) {
-            const uniqueQs: Question[] = Array.from(new Map(data.map((q: any) => [q.id, q])).values());
+            const combined = [...(allIndiaLiveQuestions as Question[]), ...data];
+            const uniqueQs: Question[] = Array.from(new Map(combined.map((q: any) => [q.id, q])).values());
             setQuestions(uniqueQs);
 
             // Sync live questions from Supabase database

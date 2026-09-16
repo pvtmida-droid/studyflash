@@ -123,6 +123,7 @@ const ADMIN_CARD_CATEGORIES = [
     defaultSubject: "General",
     subfolders: [
       { id: "GKGS", nameEn: "General Studies (GK/GS)", nameHi: "सामान्य अध्ययन (GK/GS)", subject: "GKGS", topic: "General Knowledge", examTags: ["GKGS"] },
+      { id: "Art & Culture", nameEn: "Art & Culture", nameHi: "कला एवं संस्कृति", subject: "Art & Culture", topic: "Culture", examTags: ["Art & Culture", "Culture"] },
       { id: "Science", nameEn: "General Science (Physics/Chemistry/Bio)", nameHi: "सामान्य विज्ञान", subject: "Science", topic: "Science GK", examTags: ["Science"] },
       { id: "Maths", nameEn: "Mathematics (Quantitative Aptitude)", nameHi: "गणित", subject: "Maths", topic: "Arithmetic", examTags: ["Maths"] },
       { id: "Reasoning", nameEn: "Reasoning & Mental Ability", nameHi: "तार्किक क्षमता", subject: "Reasoning", topic: "Verbal Reasoning", examTags: ["Reasoning"] },

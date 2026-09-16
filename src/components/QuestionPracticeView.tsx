@@ -110,11 +110,28 @@ export default function QuestionPracticeView({
         if (lower === "gkgs" || lower === "general knowledge" || lower === "gk/gs" || lower === "general knowledge (gk/gs)") return "gkgs";
         if (lower === "computer" || lower === "computer gk" || lower === "computer knowledge") return "computer";
         if (lower === "current affairs" || lower === "currentaffairs" || lower === "current_affairs" || lower === "ca" || lower.includes("current") || lower.includes("affairs")) return "current affairs";
+        if (lower === "art & culture" || lower === "art and culture" || lower === "culture") return "art_and_culture";
         return lower;
       };
 
-      const matchesSubject =
-        selectedSubject === "All" || normSubject(q.subject) === normSubject(selectedSubject);
+      const isArtCultureFilter = selectedSubject === "Art & Culture" || selectedSubject === "Culture" || searchQuery.toLowerCase().includes("culture");
+
+      const matchesSubject = (() => {
+        if (selectedSubject === "All") return true;
+        if (isArtCultureFilter) {
+          // Dedicated exact match for Art & Culture card
+          const subLower = (q.subject || "").toLowerCase();
+          const topLower = (q.topic || "").toLowerCase();
+          const tagMatch = Array.isArray(q.examTags) && q.examTags.some(t => t.toLowerCase().includes("culture") || t.toLowerCase().includes("art"));
+          return (
+            subLower.includes("art") || subLower.includes("culture") ||
+            topLower.includes("art") || topLower.includes("culture") ||
+            topLower.includes("कला") || topLower.includes("संस्कृति") ||
+            tagMatch
+          );
+        }
+        return normSubject(q.subject) === normSubject(selectedSubject);
+      })();
       const rawQuery = searchQuery.toLowerCase().trim();
       
       // If searching for a central exam (doesn't have PYQ), don't match PYQ topics/tags
@@ -139,6 +156,9 @@ export default function QuestionPracticeView({
         if (term.includes("_")) {
           variants.push(term.replace(/_/g, " "));
           variants.push(term.replace(/_/g, ""));
+        }
+        if (term === "culture" || term === "art" || term === "sanskriti" || term === "kala") {
+          variants.push("culture", "art", "art & culture", "art and culture", "kala", "sanskriti", "dance", "music", "festival", "fair", "temple", "monument", "painting", "sculpture", "heritage", "unesco", "कला", "संस्कृति", "चित्रकला", "नृत्य", "संगीत", "मेला", "त्यौहार", "मंदिर", "स्थापत्य");
         }
         if (term === "ms_office" || term === "msoffice" || term === "office") {
           variants.push("word", "excel", "powerpoint", "access", "ms word", "ms excel", "ms office", "dca", "adca");
