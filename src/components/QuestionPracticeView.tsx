@@ -106,91 +106,49 @@ export default function QuestionPracticeView({
     let matches = questions.filter((q) => {
       const normSubject = (s: string) => {
         const lower = (s || "").toLowerCase().trim();
-        if (lower === "mathematics" || lower === "maths") return "maths";
-        if (lower === "gkgs" || lower === "general knowledge" || lower === "gk/gs" || lower === "general knowledge (gk/gs)") return "gkgs";
+        if (lower === "mathematics" || lower === "maths" || lower === "math") return "maths";
+        if (lower === "science" || lower === "general science" || lower === "physics" || lower === "chemistry" || lower === "biology") return "science";
+        if (
+          lower === "gkgs" ||
+          lower === "general knowledge" ||
+          lower === "gk/gs" ||
+          lower === "general knowledge (gk/gs)" ||
+          lower === "general studies" ||
+          lower === "static gk" ||
+          lower === "history" ||
+          lower === "geography" ||
+          lower === "polity" ||
+          lower === "economics" ||
+          lower === "art & culture"
+        ) return "gkgs";
         if (lower === "computer" || lower === "computer gk" || lower === "computer knowledge") return "computer";
         if (lower === "current affairs" || lower === "currentaffairs" || lower === "current_affairs" || lower === "ca" || lower.includes("current") || lower.includes("affairs")) return "current affairs";
-        if (lower === "art & culture" || lower === "art and culture" || lower === "culture") return "art_and_culture";
+        if (lower === "reasoning" || lower === "mental ability") return "reasoning";
+        if (lower === "hindi" || lower === "general hindi") return "hindi";
+        if (lower === "english" || lower === "general english") return "english";
         return lower;
       };
 
       const matchesSubject = (() => {
-        if (selectedSubject === "All") return true;
-        const selLower = selectedSubject.toLowerCase();
-        const rawQueryLower = searchQuery.toLowerCase();
-        const subLower = (q.subject || "").toLowerCase();
-        const topLower = (q.topic || "").toLowerCase();
+        if (!selectedSubject || selectedSubject === "All") return true;
+
+        const selNorm = normSubject(selectedSubject);
+        const qSubNorm = normSubject(q.subject);
+
+        // 1. Direct or normalized subject match (e.g. Science == Science, Maths == Maths, GKGS == GKGS)
+        if (selNorm === qSubNorm) return true;
+
+        // 2. Flexible match if question's subject, topic or tags explicitly name the selected subject/topic
+        const selLower = selectedSubject.toLowerCase().trim();
+        const qSubLower = (q.subject || "").toLowerCase().trim();
+        const qTopLower = (q.topic || "").toLowerCase().trim();
         const tagsLower = Array.isArray(q.examTags) ? q.examTags.map(t => t.toLowerCase()) : [];
 
-        const hasTerm = (str: string, term: string) => str.includes(term);
-
-        // 1. Art & Culture
-        if (selLower.includes("art") || selLower.includes("culture") || rawQueryLower.includes("culture")) {
-          return (
-            hasTerm(subLower, "art") || hasTerm(subLower, "culture") ||
-            hasTerm(topLower, "art") || hasTerm(topLower, "culture") ||
-            hasTerm(topLower, "कला") || hasTerm(topLower, "संस्कृति") ||
-            tagsLower.some(t => t.includes("art") || t.includes("culture"))
-          );
+        if (qSubLower.includes(selLower) || qTopLower.includes(selLower) || tagsLower.some(t => t.includes(selLower))) {
+          return true;
         }
 
-        // 2. India & Neighboring
-        if (selLower.includes("neighbor") || rawQueryLower.includes("neighbor") || rawQueryLower.includes("padosi")) {
-          return (
-            hasTerm(subLower, "neighbor") || hasTerm(topLower, "neighbor") ||
-            hasTerm(subLower, "पड़ोसी") || hasTerm(topLower, "पड़ोसी") ||
-            tagsLower.some(t => t.includes("neighbor") || t.includes("padosi"))
-          );
-        }
-
-        // 3. Indian Constitution
-        if (selLower.includes("constitution") || rawQueryLower.includes("constitution")) {
-          return (
-            hasTerm(subLower, "constitution") || hasTerm(topLower, "constitution") ||
-            hasTerm(subLower, "संविधान") || hasTerm(topLower, "संविधान") ||
-            tagsLower.some(t => t.includes("constitution") || t.includes("samvidhan"))
-          );
-        }
-
-        // 4. Sports & Athletics
-        if (selLower.includes("sport") || selLower.includes("athletic") || rawQueryLower.includes("sport")) {
-          return (
-            hasTerm(subLower, "sport") || hasTerm(topLower, "sport") ||
-            hasTerm(subLower, "खेल") || hasTerm(topLower, "खेल") ||
-            tagsLower.some(t => t.includes("sport") || t.includes("khel"))
-          );
-        }
-
-        // 5. Awards & Honors
-        if (selLower.includes("award") || selLower.includes("honor") || rawQueryLower.includes("honor") || rawQueryLower.includes("award")) {
-          return (
-            hasTerm(subLower, "award") || hasTerm(topLower, "award") ||
-            hasTerm(subLower, "honor") || hasTerm(topLower, "honor") ||
-            hasTerm(subLower, "पुरस्कार") || hasTerm(topLower, "पुरस्कार") ||
-            hasTerm(subLower, "सम्मान") || hasTerm(topLower, "सम्मान") ||
-            tagsLower.some(t => t.includes("award") || t.includes("honor"))
-          );
-        }
-
-        // 6. Important Days
-        if (selLower.includes("important day") || selLower.includes("days") || rawQueryLower.includes("days")) {
-          return (
-            hasTerm(subLower, "day") || hasTerm(topLower, "day") ||
-            hasTerm(subLower, "दिवस") || hasTerm(topLower, "दिवस") ||
-            tagsLower.some(t => t.includes("day") || t.includes("divas"))
-          );
-        }
-
-        // 7. Scientific Research
-        if (selLower.includes("research") || rawQueryLower.includes("research")) {
-          return (
-            hasTerm(subLower, "research") || hasTerm(topLower, "research") ||
-            hasTerm(subLower, "अनुसंधान") || hasTerm(topLower, "अनुसंधान") ||
-            tagsLower.some(t => t.includes("research") || t.includes("anunsandhan"))
-          );
-        }
-
-        return normSubject(q.subject) === normSubject(selectedSubject) || normSubject(q.topic) === normSubject(selectedSubject);
+        return false;
       })();
       const rawQuery = searchQuery.toLowerCase().trim();
       
@@ -208,49 +166,22 @@ export default function QuestionPracticeView({
         return false;
       }
 
-      const queryTerms = rawQuery.split(/\s+/).filter(t => t.length > 0);
       const isCurrentAffairsFilter = normSubject(selectedSubject) === "current affairs";
-      
-      const matchesSearch = queryTerms.length === 0 || isCurrentAffairsFilter || queryTerms.every(term => {
-        const variants: string[] = [term];
-        if (term.includes("_")) {
-          variants.push(term.replace(/_/g, " "));
-          variants.push(term.replace(/_/g, ""));
-        }
-        if (term === "culture" || term === "art" || term === "sanskriti" || term === "kala") {
-          variants.push("culture", "art", "art & culture", "art and culture", "kala", "sanskriti", "dance", "music", "festival", "fair", "temple", "monument", "painting", "sculpture", "heritage", "unesco", "कला", "संस्कृति", "चित्रकला", "नृत्य", "संगीत", "मेला", "त्यौहार", "मंदिर", "स्थापत्य");
-        }
-        if (term === "ms_office" || term === "msoffice" || term === "office") {
-          variants.push("word", "excel", "powerpoint", "access", "ms word", "ms excel", "ms office", "dca", "adca");
-        }
-        if (term === "fundamentals_os" || term === "fundamentals") {
-          variants.push("fundamental", "os", "operating", "system", "windows", "hardware", "software");
-        }
-        if (term === "internet_networking" || term === "internet" || term === "networking") {
-          variants.push("network", "dbms", "html", "email", "sql", "multimedia", "ccc", "o level");
-        }
-        if (term === "6" || term === "month" || term === "6month") {
-          variants.push("6 month", "6month", "monthly", "monthly ca", "6 months");
-        }
-        if (term === "1" || term === "year" || term === "1year") {
-          variants.push("1 year", "1year", "yearly", "yearly ca", "annual");
-        }
-        if (term === "today" || term === "daily") {
-          variants.push("today", "daily", "daily ca", "today ca");
-        }
+      const stopWords = new Set(["and", "&", "the", "in", "of", "or", "a", "an", "is", "for", "to", "with"]);
+      const queryTerms = rawQuery
+        .split(/[\s/\-,&]+/)
+        .map(t => t.trim())
+        .filter(t => t.length > 1 && !stopWords.has(t));
 
-        const checkInText = (text: string) => {
-          if (!text) return false;
-          const lowerText = text.toLowerCase();
-          return variants.some(v => lowerText.includes(v));
-        };
+      const matchesSearch = queryTerms.length === 0 || isCurrentAffairsFilter || queryTerms.some(term => {
+        const checkInText = (text: string) => (text || "").toLowerCase().includes(term);
 
         return (
-          checkInText(q.id) ||
+          checkInText(q.topic) ||
+          checkInText(q.subject) ||
           checkInText(q.questionEn) ||
           checkInText(q.questionHi) ||
-          checkInText(q.subject) ||
-          checkInText(q.topic) ||
+          checkInText(q.id) ||
           (q.examTags && q.examTags.some(tag => checkInText(tag)))
         );
       });
