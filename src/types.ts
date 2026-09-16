@@ -29,6 +29,7 @@ export interface MockTest {
   questions: Question[];
   isPreviousYear: boolean;
   year?: string;
+  userId?: string;
 }
 
 export interface LiveTestConfig {

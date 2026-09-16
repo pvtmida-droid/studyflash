@@ -884,7 +884,7 @@ export default function AllIndiaMockTestsView({
                     <div>
                       <div className="text-[10px] text-slate-400 font-normal">User ID</div>
                       <div className="font-extrabold text-slate-800 dark:text-slate-200">
-                        {testCard.userId}
+                        {(testCard as any).userId || "N/A"}
                       </div>
                     </div>
                   </div>
