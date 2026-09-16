@@ -11,7 +11,17 @@ export interface QuestionImportModalProps {
 
 const COMMON_SUBJECTS = [
   { id: "GKGS", nameEn: "General Knowledge (GK/GS)", nameHi: "सामान्य ज्ञान (GK/GS)" },
+  { id: "India & Neighboring", nameEn: "GS/GK > India & Neighboring (भारत एवं पड़ोसी देश)", nameHi: "सामान्य अध्ययन > भारत एवं पड़ोसी देश" },
+  { id: "History", nameEn: "GS/GK > History (इतिहास)", nameHi: "सामान्य अध्ययन > इतिहास" },
+  { id: "Geography", nameEn: "GS/GK > Geography (भूगोल)", nameHi: "सामान्य अध्ययन > भूगोल" },
+  { id: "Constitution", nameEn: "GS/GK > Indian Constitution (भारतीय संविधान)", nameHi: "सामान्य अध्ययन > भारतीय संविधान" },
+  { id: "Polity", nameEn: "GS/GK > Polity & Politics (राजनीति)", nameHi: "सामान्य अध्ययन > राजनीति" },
+  { id: "Economics", nameEn: "GS/GK > Economics (अर्थव्यवस्था)", nameHi: "सामान्य अध्ययन > अर्थव्यवस्था" },
   { id: "Art & Culture", nameEn: "GS/GK > Art & Culture (कला एवं संस्कृति)", nameHi: "सामान्य अध्ययन > कला एवं संस्कृति" },
+  { id: "Sports", nameEn: "GS/GK > Sports & Athletics (खेल)", nameHi: "सामान्य अध्ययन > खेल" },
+  { id: "Awards", nameEn: "GS/GK > Awards & Honors (पुरस्कार एवं सम्मान)", nameHi: "सामान्य अध्ययन > पुरस्कार एवं सम्मान" },
+  { id: "Important Days", nameEn: "GS/GK > Important Days (महत्वपूर्ण दिवस)", nameHi: "सामान्य अध्ययन > महत्वपूर्ण दिवस" },
+  { id: "Scientific Research", nameEn: "GS/GK > Scientific Research (वैज्ञानिक अनुसंधान)", nameHi: "सामान्य अध्ययन > वैज्ञानिक अनुसंधान" },
   { id: "Current Affairs", nameEn: "Current Affairs", nameHi: "करेंट अफेयर्स" },
   { id: "Science", nameEn: "General Science", nameHi: "सामान्य विज्ञान" },
   { id: "Maths", nameEn: "Mathematics", nameHi: "गणित" },

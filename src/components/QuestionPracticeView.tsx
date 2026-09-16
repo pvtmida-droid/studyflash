@@ -114,23 +114,83 @@ export default function QuestionPracticeView({
         return lower;
       };
 
-      const isArtCultureFilter = selectedSubject === "Art & Culture" || selectedSubject === "Culture" || searchQuery.toLowerCase().includes("culture");
-
       const matchesSubject = (() => {
         if (selectedSubject === "All") return true;
-        if (isArtCultureFilter) {
-          // Dedicated exact match for Art & Culture card
-          const subLower = (q.subject || "").toLowerCase();
-          const topLower = (q.topic || "").toLowerCase();
-          const tagMatch = Array.isArray(q.examTags) && q.examTags.some(t => t.toLowerCase().includes("culture") || t.toLowerCase().includes("art"));
+        const selLower = selectedSubject.toLowerCase();
+        const rawQueryLower = searchQuery.toLowerCase();
+        const subLower = (q.subject || "").toLowerCase();
+        const topLower = (q.topic || "").toLowerCase();
+        const tagsLower = Array.isArray(q.examTags) ? q.examTags.map(t => t.toLowerCase()) : [];
+
+        const hasTerm = (str: string, term: string) => str.includes(term);
+
+        // 1. Art & Culture
+        if (selLower.includes("art") || selLower.includes("culture") || rawQueryLower.includes("culture")) {
           return (
-            subLower.includes("art") || subLower.includes("culture") ||
-            topLower.includes("art") || topLower.includes("culture") ||
-            topLower.includes("कला") || topLower.includes("संस्कृति") ||
-            tagMatch
+            hasTerm(subLower, "art") || hasTerm(subLower, "culture") ||
+            hasTerm(topLower, "art") || hasTerm(topLower, "culture") ||
+            hasTerm(topLower, "कला") || hasTerm(topLower, "संस्कृति") ||
+            tagsLower.some(t => t.includes("art") || t.includes("culture"))
           );
         }
-        return normSubject(q.subject) === normSubject(selectedSubject);
+
+        // 2. India & Neighboring
+        if (selLower.includes("neighbor") || rawQueryLower.includes("neighbor") || rawQueryLower.includes("padosi")) {
+          return (
+            hasTerm(subLower, "neighbor") || hasTerm(topLower, "neighbor") ||
+            hasTerm(subLower, "पड़ोसी") || hasTerm(topLower, "पड़ोसी") ||
+            tagsLower.some(t => t.includes("neighbor") || t.includes("padosi"))
+          );
+        }
+
+        // 3. Indian Constitution
+        if (selLower.includes("constitution") || rawQueryLower.includes("constitution")) {
+          return (
+            hasTerm(subLower, "constitution") || hasTerm(topLower, "constitution") ||
+            hasTerm(subLower, "संविधान") || hasTerm(topLower, "संविधान") ||
+            tagsLower.some(t => t.includes("constitution") || t.includes("samvidhan"))
+          );
+        }
+
+        // 4. Sports & Athletics
+        if (selLower.includes("sport") || selLower.includes("athletic") || rawQueryLower.includes("sport")) {
+          return (
+            hasTerm(subLower, "sport") || hasTerm(topLower, "sport") ||
+            hasTerm(subLower, "खेल") || hasTerm(topLower, "खेल") ||
+            tagsLower.some(t => t.includes("sport") || t.includes("khel"))
+          );
+        }
+
+        // 5. Awards & Honors
+        if (selLower.includes("award") || selLower.includes("honor") || rawQueryLower.includes("honor") || rawQueryLower.includes("award")) {
+          return (
+            hasTerm(subLower, "award") || hasTerm(topLower, "award") ||
+            hasTerm(subLower, "honor") || hasTerm(topLower, "honor") ||
+            hasTerm(subLower, "पुरस्कार") || hasTerm(topLower, "पुरस्कार") ||
+            hasTerm(subLower, "सम्मान") || hasTerm(topLower, "सम्मान") ||
+            tagsLower.some(t => t.includes("award") || t.includes("honor"))
+          );
+        }
+
+        // 6. Important Days
+        if (selLower.includes("important day") || selLower.includes("days") || rawQueryLower.includes("days")) {
+          return (
+            hasTerm(subLower, "day") || hasTerm(topLower, "day") ||
+            hasTerm(subLower, "दिवस") || hasTerm(topLower, "दिवस") ||
+            tagsLower.some(t => t.includes("day") || t.includes("divas"))
+          );
+        }
+
+        // 7. Scientific Research
+        if (selLower.includes("research") || rawQueryLower.includes("research")) {
+          return (
+            hasTerm(subLower, "research") || hasTerm(topLower, "research") ||
+            hasTerm(subLower, "अनुसंधान") || hasTerm(topLower, "अनुसंधान") ||
+            tagsLower.some(t => t.includes("research") || t.includes("anunsandhan"))
+          );
+        }
+
+        return normSubject(q.subject) === normSubject(selectedSubject) || normSubject(q.topic) === normSubject(selectedSubject);
       })();
       const rawQuery = searchQuery.toLowerCase().trim();
       
