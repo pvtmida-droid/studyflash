@@ -5065,6 +5065,7 @@ Sitemap: https://studyflash.co/sitemap.xml`);
         onClose={() => setIsCsvModalOpen(false)}
         isHindi={isHindi}
         onQuestionsImported={async (importedQs) => {
+          let saveSuccess = false;
           try {
             const token = localStorage.getItem("studyflash_admin_token");
             const res = await fetch("/api/questions/bulk", {
@@ -5076,7 +5077,9 @@ Sitemap: https://studyflash.co/sitemap.xml`);
               body: JSON.stringify({ questions: importedQs }),
             });
 
-            if (!res.ok) {
+            if (res.ok) {
+              saveSuccess = true;
+            } else {
               console.error("Failed to save imported questions to DB");
             }
           } catch (err) {
@@ -5087,15 +5090,24 @@ Sitemap: https://studyflash.co/sitemap.xml`);
           const uniqueMap = new Map(combined.map(q => [q.id, q]));
           const updatedPool = Array.from(uniqueMap.values());
           onSetBulkQuestions(updatedPool);
-          // show success message
+
           if (typeof window !== "undefined") {
             const toastElement = document.createElement("div");
-            toastElement.className = "fixed bottom-6 right-6 z-50 bg-emerald-600 text-white px-5 py-3 rounded-xl shadow-xl flex items-center gap-2 animate-bounce text-xs font-semibold";
-            toastElement.textContent = `Successfully imported ${importedQs.length} questions!`;
+            if (saveSuccess) {
+              toastElement.className = "fixed bottom-6 right-6 z-50 bg-emerald-600 text-white px-5 py-3 rounded-xl shadow-xl flex items-center gap-2 animate-bounce text-xs font-semibold";
+              toastElement.textContent = isHindi 
+                ? `सफलतापूर्वक ${importedQs.length} प्रश्न डेटाबेस में सहेजे गए!`
+                : `Successfully imported ${importedQs.length} questions!`;
+            } else {
+              toastElement.className = "fixed bottom-6 right-6 z-50 bg-amber-600 text-white px-5 py-3 rounded-xl shadow-xl flex items-center gap-2 text-xs font-semibold";
+              toastElement.textContent = isHindi 
+                ? `${importedQs.length} प्रश्न लोकली जोड़े गए (DB सिंक्रोनाइज़ेशन जांचें)।`
+                : `Added ${importedQs.length} questions locally (Check DB backend connection).`;
+            }
             document.body.appendChild(toastElement);
             setTimeout(() => {
               toastElement.remove();
-            }, 3000);
+            }, 4000);
           }
         }}
       />

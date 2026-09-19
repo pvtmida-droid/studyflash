@@ -1,5 +1,6 @@
 import React, { useState, ChangeEvent, DragEvent, useEffect } from "react";
 import { Upload, X, Check, AlertCircle, Download, Trash2, Edit } from "lucide-react";
+import * as XLSX from "xlsx";
 import { Question } from "../types";
 
 export interface QuestionImportModalProps {
@@ -124,155 +125,183 @@ export default function QuestionImportModal({ isOpen, onClose, onQuestionsImport
     return result;
   };
 
-  const handleCsvFile = (file: File) => {
-    setCsvFileName(file.name);
-    setCsvError(null);
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const text = e.target?.result as string;
-        const parsedData = parseCSV(text);
-        if (parsedData.length <= 1) {
-          throw new Error(isHindi ? "फाइल खाली है या इसमें कोई डेटा नहीं है।" : "File is empty or contains no rows.");
-        }
+  const processParsedCsvText = (text: string) => {
+    const parsedData = parseCSV(text);
+    if (parsedData.length <= 1) {
+      throw new Error(isHindi ? "फाइल खाली है या इसमें कोई डेटा नहीं है।" : "File is empty or contains no rows.");
+    }
 
-        const headers = parsedData[0].map(h => h.trim().replace(/^"|"$/g, ""));
-        const rows = parsedData.slice(1);
+    const headers = parsedData[0].map(h => h.trim().replace(/^"|"$/g, ""));
+    const rows = parsedData.slice(1);
 
-        const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
+    const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
-        const aliases: Record<string, string[]> = {
-          id: ["id"],
-          questionEn: ["questionen", "question", "questiontext", "questionenglish", "quesen", "qen"],
-          questionHi: ["questionhi", "questionhindi", "queshi", "qhi"],
-          optionAEn: ["optionaen", "optiona", "option1", "a", "optionaenglish", "optaen", "opta"],
-          optionBEn: ["optionben", "optionb", "option2", "b", "optionbenglish", "optben", "optb"],
-          optionCEn: ["optioncen", "optionc", "option3", "c", "optioncenglish", "optcen", "optc"],
-          optionDEn: ["optionden", "optiond", "option4", "d", "optiondenglish", "optden", "optd"],
-          optionAHi: ["optionahi", "optiona_hi", "optionahindi", "optahi"],
-          optionBHi: ["optionbhi", "optionb_hi", "optionbhindi", "optbhi"],
-          optionCHi: ["optionchi", "optionc_hi", "optionchindi", "optchi"],
-          optionDHi: ["optiondhi", "optiond_hi", "optiondhindi", "optdhi"],
-          correctAnswer: ["correctanswer", "correct", "answer", "correctoption", "ans", "correctans"],
-          explanationEn: ["explanationen", "explanation", "exp", "explanationtext", "explanationenglish", "expen"],
-          explanationHi: ["explanationhi", "exphi", "explanationhindi"],
-          subject: ["subject", "subjectname"],
-          topic: ["topic", "topicname", "chapter"],
-          examTags: ["examtags", "examtag", "tags", "tag", "exam"]
+    const aliases: Record<string, string[]> = {
+      id: ["id"],
+      questionEn: ["questionen", "question", "questiontext", "questionenglish", "quesen", "qen"],
+      questionHi: ["questionhi", "questionhindi", "queshi", "qhi"],
+      optionAEn: ["optionaen", "optiona", "option1", "a", "optionaenglish", "optaen", "opta"],
+      optionBEn: ["optionben", "optionb", "option2", "b", "optionbenglish", "optben", "optb"],
+      optionCEn: ["optioncen", "optionc", "option3", "c", "optioncenglish", "optcen", "optc"],
+      optionDEn: ["optionden", "optiond", "option4", "d", "optiondenglish", "optden", "optd"],
+      optionAHi: ["optionahi", "optiona_hi", "optionahindi", "optahi"],
+      optionBHi: ["optionbhi", "optionb_hi", "optionbhindi", "optbhi"],
+      optionCHi: ["optionchi", "optionc_hi", "optionchindi", "optchi"],
+      optionDHi: ["optiondhi", "optiond_hi", "optiondhindi", "optdhi"],
+      correctAnswer: ["correctanswer", "correct", "answer", "correctoption", "ans", "correctans"],
+      explanationEn: ["explanationen", "explanation", "exp", "explanationtext", "explanationenglish", "expen"],
+      explanationHi: ["explanationhi", "exphi", "explanationhindi"],
+      subject: ["subject", "subjectname"],
+      topic: ["topic", "topicname", "chapter"],
+      examTags: ["examtags", "examtag", "tags", "tag", "exam"]
+    };
+
+    const headerIndices: Record<string, number> = {};
+    Object.keys(aliases).forEach(field => {
+      const possible = aliases[field];
+      const matchedIdx = headers.findIndex(h => possible.includes(normalize(h)));
+      if (matchedIdx !== -1) {
+        headerIndices[field] = matchedIdx;
+      }
+    });
+
+    // Verify only critical headers (question text and at least four options + correct answer)
+    const missingCritical: string[] = [];
+    if (headerIndices["questionEn"] === undefined && headerIndices["questionHi"] === undefined) {
+      missingCritical.push("questionEn/questionHi");
+    }
+    if (headerIndices["correctAnswer"] === undefined) missingCritical.push("correctAnswer");
+
+    const hasEnHeaders = 
+      headerIndices["optionAEn"] !== undefined &&
+      headerIndices["optionBEn"] !== undefined &&
+      headerIndices["optionCEn"] !== undefined &&
+      headerIndices["optionDEn"] !== undefined;
+
+    const hasHiHeaders = 
+      headerIndices["optionAHi"] !== undefined &&
+      headerIndices["optionBHi"] !== undefined &&
+      headerIndices["optionCHi"] !== undefined &&
+      headerIndices["optionDHi"] !== undefined;
+
+    if (!hasEnHeaders && !hasHiHeaders) {
+      missingCritical.push("optionA/B/C/D (English or Hindi)");
+    }
+
+    if (missingCritical.length > 0) {
+      throw new Error(isHindi 
+        ? `गलत CSV/Excel प्रारूप। ये हेडर गायब हैं: ${missingCritical.join(", ")}। कृपया सही हेडर वाले कॉलम का उपयोग करें।`
+        : `Invalid CSV/Excel columns. Missing required headers: ${missingCritical.join(", ")}. Please ensure headers match the template.`
+      );
+    }
+
+    const questions: Question[] = rows
+      .filter(row => row.some(cell => cell.trim() !== "")) // skip completely empty rows
+      .map((row, idx) => {
+        const getVal = (field: string, fallback = "") => {
+          const colIdx = headerIndices[field];
+          return colIdx !== undefined ? (row[colIdx] || fallback).trim().replace(/^"|"$/g, "") : fallback;
         };
 
-        const headerIndices: Record<string, number> = {};
-        Object.keys(aliases).forEach(field => {
-          const possible = aliases[field];
-          const matchedIdx = headers.findIndex(h => possible.includes(normalize(h)));
-          if (matchedIdx !== -1) {
-            headerIndices[field] = matchedIdx;
-          }
-        });
+        const qEn = getVal("questionEn");
+        const qHi = getVal("questionHi");
 
-        // Verify only critical headers (question text and at least four options + correct answer)
-        const missingCritical: string[] = [];
-        if (headerIndices["questionEn"] === undefined && headerIndices["questionHi"] === undefined) {
-          missingCritical.push("questionEn/questionHi");
-        }
-        if (headerIndices["correctAnswer"] === undefined) missingCritical.push("correctAnswer");
-
-        const hasEnHeaders = 
-          headerIndices["optionAEn"] !== undefined &&
-          headerIndices["optionBEn"] !== undefined &&
-          headerIndices["optionCEn"] !== undefined &&
-          headerIndices["optionDEn"] !== undefined;
-
-        const hasHiHeaders = 
-          headerIndices["optionAHi"] !== undefined &&
-          headerIndices["optionBHi"] !== undefined &&
-          headerIndices["optionCHi"] !== undefined &&
-          headerIndices["optionDHi"] !== undefined;
-
-        if (!hasEnHeaders && !hasHiHeaders) {
-          missingCritical.push("optionA/B/C/D (English or Hindi)");
-        }
-
-        if (missingCritical.length > 0) {
-          throw new Error(isHindi 
-            ? `गलत CSV प्रारूप। ये हेडर गायब हैं: ${missingCritical.join(", ")}। कृपया सही हेडर वाले कॉलम का उपयोग करें।`
-            : `Invalid CSV columns. Missing required headers: ${missingCritical.join(", ")}. Please ensure headers match the template.`
+        if (!qEn && !qHi) {
+          throw new Error(isHindi
+            ? `पंक्ति ${idx + 2}: प्रश्न का टेक्स्ट (English या Hindi) आवश्यक है।`
+            : `Row ${idx + 2}: Question text (English or Hindi) is required.`
           );
         }
 
-        const questions: Question[] = rows
-          .filter(row => row.some(cell => cell.trim() !== "")) // skip completely empty rows
-          .map((row, idx) => {
-            const getVal = (field: string, fallback = "") => {
-              const colIdx = headerIndices[field];
-              return colIdx !== undefined ? (row[colIdx] || fallback).trim().replace(/^"|"$/g, "") : fallback;
-            };
+        const optAEn = getVal("optionAEn");
+        const optBEn = getVal("optionBEn");
+        const optCEn = getVal("optionCEn");
+        const optDEn = getVal("optionDEn");
 
-            const qEn = getVal("questionEn");
-            const qHi = getVal("questionHi");
+        const optAHi = getVal("optionAHi");
+        const optBHi = getVal("optionBHi");
+        const optCHi = getVal("optionCHi");
+        const optDHi = getVal("optionDHi");
 
-            if (!qEn && !qHi) {
-              throw new Error(isHindi
-                ? `पंक्ति ${idx + 2}: प्रश्न का टेक्स्ट (English या Hindi) आवश्यक है।`
-                : `Row ${idx + 2}: Question text (English or Hindi) is required.`
-              );
-            }
+        const hasAllEn = optAEn && optBEn && optCEn && optDEn;
+        const hasAllHi = optAHi && optBHi && optCHi && optDHi;
 
-            const optAEn = getVal("optionAEn");
-            const optBEn = getVal("optionBEn");
-            const optCEn = getVal("optionCEn");
-            const optDEn = getVal("optionDEn");
+        if (!hasAllEn && !hasAllHi) {
+          throw new Error(isHindi
+            ? `पंक्ति ${idx + 2}: चारों विकल्प (English या Hindi में) आवश्यक हैं।`
+            : `Row ${idx + 2}: All four options (in English or Hindi) are required.`
+          );
+        }
 
-            const optAHi = getVal("optionAHi");
-            const optBHi = getVal("optionBHi");
-            const optCHi = getVal("optionCHi");
-            const optDHi = getVal("optionDHi");
+        let ans = (getVal("correctAnswer").toUpperCase() || "A").trim();
+        if (!["A", "B", "C", "D"].includes(ans)) {
+          ans = "A"; // Auto-fallback
+        }
 
-            const hasAllEn = optAEn && optBEn && optCEn && optDEn;
-            const hasAllHi = optAHi && optBHi && optCHi && optDHi;
+        const subFromCsv = getVal("subject");
+        const topFromCsv = getVal("topic");
+        const tagFromCsv = getVal("examTags");
 
-            if (!hasAllEn && !hasAllHi) {
-              throw new Error(isHindi
-                ? `पंक्ति ${idx + 2}: चारों विकल्प (English या Hindi में) आवश्यक हैं।`
-                : `Row ${idx + 2}: All four options (in English or Hindi) are required.`
-              );
-            }
+        return {
+          id: getVal("id") || `csv-import-q-${Date.now()}-${idx}-${Math.floor(Math.random() * 1000)}`,
+          questionEn: qEn,
+          questionHi: qHi,
+          optionsEn: [optAEn, optBEn, optCEn, optDEn] as [string, string, string, string],
+          optionsHi: [optAHi, optBHi, optCHi, optDHi] as [string, string, string, string],
+          correctAnswer: ans as "A" | "B" | "C" | "D",
+          explanationEn: getVal("explanationEn"),
+          explanationHi: getVal("explanationHi"),
+          subject: subFromCsv || globalSubject,
+          topic: topFromCsv || globalTopic,
+          examTags: tagFromCsv 
+            ? tagFromCsv.split(",").map(t => t.trim()).filter(Boolean) 
+            : (globalExamTags ? globalExamTags.split(",").map(t => t.trim()).filter(Boolean) : ["Practice"]),
+          likes: 0,
+          dislikes: 0
+        };
+      });
 
-            let ans = (getVal("correctAnswer").toUpperCase() || "A").trim();
-            if (!["A", "B", "C", "D"].includes(ans)) {
-              ans = "A"; // Auto-fallback
-            }
+    setPreviewQuestions(questions);
+  };
 
-            const subFromCsv = getVal("subject");
-            const topFromCsv = getVal("topic");
-            const tagFromCsv = getVal("examTags");
+  const handleCsvFile = (file: File) => {
+    setCsvFileName(file.name);
+    setCsvError(null);
+    const lowerName = file.name.toLowerCase();
+    const isExcel = lowerName.endsWith(".xlsx") || lowerName.endsWith(".xls");
 
-            return {
-              id: getVal("id") || `csv-import-q-${Date.now()}-${idx}-${Math.floor(Math.random() * 1000)}`,
-              questionEn: qEn,
-              questionHi: qHi,
-              optionsEn: [optAEn, optBEn, optCEn, optDEn] as [string, string, string, string],
-              optionsHi: [optAHi, optBHi, optCHi, optDHi] as [string, string, string, string],
-              correctAnswer: ans as "A" | "B" | "C" | "D",
-              explanationEn: getVal("explanationEn"),
-              explanationHi: getVal("explanationHi"),
-              subject: subFromCsv || globalSubject,
-              topic: topFromCsv || globalTopic,
-              examTags: tagFromCsv 
-                ? tagFromCsv.split(",").map(t => t.trim()).filter(Boolean) 
-                : (globalExamTags ? globalExamTags.split(",").map(t => t.trim()).filter(Boolean) : ["Practice"]),
-              likes: 0,
-              dislikes: 0
-            };
-          });
-
-        setPreviewQuestions(questions);
-      } catch (err: any) {
-        setCsvError(err.message || "Failed to parse CSV file");
-        setPreviewQuestions([]);
-      }
-    };
-    reader.readAsText(file);
+    if (isExcel) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = new Uint8Array(e.target?.result as ArrayBuffer);
+          const workbook = XLSX.read(data, { type: "array" });
+          const firstSheetName = workbook.SheetNames[0];
+          if (!firstSheetName) {
+            throw new Error(isHindi ? "एक्सेल शीट खाली है।" : "Excel sheet is empty.");
+          }
+          const worksheet = workbook.Sheets[firstSheetName];
+          const csvContent = XLSX.utils.sheet_to_csv(worksheet);
+          processParsedCsvText(csvContent);
+        } catch (err: any) {
+          setCsvError(err.message || (isHindi ? "एक्सेल फाइल पार्स करने में विफल" : "Failed to parse Excel file"));
+          setPreviewQuestions([]);
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    } else {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const text = e.target?.result as string;
+          processParsedCsvText(text);
+        } catch (err: any) {
+          setCsvError(err.message || (isHindi ? "फाइल पार्स करने में विफल" : "Failed to parse CSV file"));
+          setPreviewQuestions([]);
+        }
+      };
+      reader.readAsText(file);
+    }
   };
 
   const handleDrag = (e: DragEvent) => {
@@ -438,15 +467,15 @@ export default function QuestionImportModal({ isOpen, onClose, onQuestionsImport
                 onDragEnter={handleDrag} onDragLeave={handleDrag} onDragOver={handleDrag} onDrop={handleDrop}
                 className={`p-16 border-2 border-dashed rounded-3xl flex flex-col items-center justify-center transition-colors cursor-pointer text-center relative ${dragActive ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-900/10" : "border-slate-350 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-850"}`}
               >
-                <input type="file" accept=".csv" onChange={(e) => e.target.files?.[0] && handleCsvFile(e.target.files[0])} className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" id="template-csv-input" style={{ display: 'none' }} />
+                <input type="file" accept=".csv,.xlsx,.xls" onChange={(e) => e.target.files?.[0] && handleCsvFile(e.target.files[0])} className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" id="template-csv-input" style={{ display: 'none' }} />
                 <label htmlFor="template-csv-input" className="cursor-pointer flex flex-col items-center">
                   <div className="p-4 bg-emerald-100 dark:bg-emerald-950/40 rounded-full text-emerald-600 mb-4">
                     <Upload className="h-8 w-8 animate-bounce" />
                   </div>
                   <p className="font-bold text-slate-700 dark:text-white mb-2 text-xs">
-                    {isHindi ? "यहाँ टेम्पलेट फाइल ड्रैग करें या क्लिक करके ब्राउज़ करें" : "Drag and drop your filled template CSV here or browse"}
+                    {isHindi ? "यहाँ टेम्पलेट (CSV या Excel) फाइल ड्रैग करें या क्लिक करके ब्राउज़ करें" : "Drag and drop your filled CSV or Excel file here or browse"}
                   </p>
-                  <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Supports standard .csv file format only</p>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Supports standard .csv, .xlsx, .xls file formats</p>
                 </label>
               </div>
 
