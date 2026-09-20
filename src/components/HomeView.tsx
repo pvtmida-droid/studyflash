@@ -60,6 +60,7 @@ const LATEST_UPDATES_DATA = [
     date: "12 Sep 2025",
     questionsCount: "100 Questions",
     iconType: "file",
+    targetView: "state-police-selection",
   },
   {
     id: "update-2",
@@ -68,6 +69,7 @@ const LATEST_UPDATES_DATA = [
     date: "15 Sep 2026",
     questionsCount: "100 Questions",
     iconType: "zap",
+    targetView: "central-exam-selection",
   },
   {
     id: "update-3",
@@ -76,6 +78,7 @@ const LATEST_UPDATES_DATA = [
     date: "10 Sep 2026",
     questionsCount: "100 Questions",
     iconType: "trophy",
+    targetView: "all-india-tests",
   },
   {
     id: "update-4",
@@ -84,6 +87,7 @@ const LATEST_UPDATES_DATA = [
     date: "05 Sep 2026",
     questionsCount: "100 Questions",
     iconType: "swords",
+    targetView: "state-police-selection",
   },
   {
     id: "update-5",
@@ -92,6 +96,7 @@ const LATEST_UPDATES_DATA = [
     date: "01 Sep 2026",
     questionsCount: "100 Questions",
     iconType: "flame",
+    targetView: "current-affairs-selection",
   },
 ];
 
@@ -109,6 +114,7 @@ export default function HomeView({
   const [hasAttemptedBattle, setHasAttemptedBattle] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const [currentUpdateIndex, setCurrentUpdateIndex] = useState(0);
+  const [isUpdateHovered, setIsUpdateHovered] = useState(false);
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -118,11 +124,12 @@ export default function HomeView({
   const [isCountingDown, setIsCountingDown] = useState(false);
 
   useEffect(() => {
+    if (isUpdateHovered) return;
     const updateTimer = setInterval(() => {
       setCurrentUpdateIndex((prev) => (prev + 1) % LATEST_UPDATES_DATA.length);
     }, 4000);
     return () => clearInterval(updateTimer);
-  }, []);
+  }, [isUpdateHovered]);
 
   useEffect(() => {
     const battleAttempted = localStorage.getItem("studyflash_battle_attempted");
@@ -172,6 +179,14 @@ export default function HomeView({
           ? "लाइव टेस्ट अभी उपलब्ध नहीं है। कृपया व्यवस्थापक को प्रश्न जोड़ने दें।"
           : "Live Test is not available yet. Please add questions from Admin panel.",
       );
+    }
+  };
+
+  const handleAttemptUpdate = (item: typeof LATEST_UPDATES_DATA[0]) => {
+    if (item.targetView) {
+      setCurrentView(item.targetView);
+    } else {
+      handleAttemptBattle();
     }
   };
 
@@ -423,7 +438,11 @@ export default function HomeView({
           </div>
 
           {/* SINGLE ACTIVE COMBINED ROW ITEM WITH AUTO ROTATION */}
-          <div className="relative z-10 min-h-[96px]">
+          <div 
+            className="relative z-10 min-h-[96px]"
+            onMouseEnter={() => setIsUpdateHovered(true)}
+            onMouseLeave={() => setIsUpdateHovered(false)}
+          >
             {(() => {
               const activeItem = LATEST_UPDATES_DATA[currentUpdateIndex];
               return (
@@ -470,8 +489,8 @@ export default function HomeView({
 
                     {/* Solid Green Attempt Test Button */}
                     <button
-                      onClick={handleAttemptBattle}
-                      className="px-5 py-2 md:py-2.5 rounded-full bg-[#047857] hover:bg-emerald-800 text-white font-extrabold text-xs md:text-sm flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95 shrink-0 self-end sm:self-center"
+                      onClick={() => handleAttemptUpdate(activeItem)}
+                      className="px-5 py-2 md:py-2.5 rounded-full bg-[#047857] hover:bg-emerald-800 text-white font-extrabold text-xs md:text-sm flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95 shrink-0 self-end sm:self-center cursor-pointer"
                     >
                       <span>Attempt Test</span>
                       <ArrowRight className="w-3.5 h-3.5 md:w-4 md:h-4" />
