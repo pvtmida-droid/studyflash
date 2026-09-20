@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Flame,
   Search,
@@ -52,54 +52,6 @@ const SEARCHABLE_SUGGESTIONS = [
   { nameEn: "Current Affairs", nameHi: "करेंट अफेयर्स", type: "subject", category: "CurrentAffairs", icon: "📰" },
 ];
 
-const LATEST_UPDATES_DATA = [
-  {
-    id: "update-1",
-    titleEn: "Bihar SSC Inter Level (Tier-1) – 2025",
-    titleHi: "बिहार SSC इंटर लेवल (Tier-1) – 2025",
-    date: "12 Sep 2025",
-    questionsCount: "100 Questions",
-    iconType: "file",
-    targetView: "state-police-selection",
-  },
-  {
-    id: "update-2",
-    titleEn: "RRB NTPC & Group D Live Test – 2026",
-    titleHi: "आरआरबी NTPC एवं ग्रुप D लाइव टेस्ट – 2026",
-    date: "15 Sep 2026",
-    questionsCount: "100 Questions",
-    iconType: "zap",
-    targetView: "central-exam-selection",
-  },
-  {
-    id: "update-3",
-    titleEn: "SSC CGL Mega All-India Battle – 2026",
-    titleHi: "एसएससी CGL मेगा ऑल-इंडिया बैटल – 2026",
-    date: "10 Sep 2026",
-    questionsCount: "100 Questions",
-    iconType: "trophy",
-    targetView: "all-india-tests",
-  },
-  {
-    id: "update-4",
-    titleEn: "State Police Recruitment Special – 2026",
-    titleHi: "राज्य पुलिस भर्ती विशेष अभ्यास – 2026",
-    date: "05 Sep 2026",
-    questionsCount: "100 Questions",
-    iconType: "swords",
-    targetView: "state-police-selection",
-  },
-  {
-    id: "update-5",
-    titleEn: "Current Affairs Sep 2026 Special Capsule",
-    titleHi: "करेंट अफेयर्स सितंबर 2026 स्पेशल कैप्सूल",
-    date: "01 Sep 2026",
-    questionsCount: "100 Questions",
-    iconType: "flame",
-    targetView: "current-affairs-selection",
-  },
-];
-
 export default function HomeView({
   isHindi,
   setCurrentView,
@@ -108,6 +60,7 @@ export default function HomeView({
   userStats,
   liveTestConfig,
   isAdmin,
+  questions = [],
   onSearchSubmit,
 }: any) {
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
@@ -123,13 +76,100 @@ export default function HomeView({
   });
   const [isCountingDown, setIsCountingDown] = useState(false);
 
+  // Dynamically calculate latest update categories from real questions database
+  const dynamicUpdates = useMemo(() => {
+    const qList = Array.isArray(questions) ? questions : [];
+
+    const caCount = qList.filter(
+      (q: any) =>
+        q.subject?.toLowerCase().includes("current") ||
+        q.topic?.toLowerCase().includes("current") ||
+        q.examTags?.some((t: string) => t.toLowerCase().includes("current")),
+    ).length;
+
+    const computerCount = qList.filter(
+      (q: any) =>
+        q.subject?.toLowerCase().includes("computer") ||
+        q.topic?.toLowerCase().includes("computer"),
+    ).length;
+
+    const pyqCount = qList.filter(
+      (q: any) =>
+        q.year ||
+        q.subject?.toLowerCase().includes("pyq") ||
+        q.topic?.toLowerCase().includes("pyq") ||
+        q.examTags?.some((t: string) => t.toLowerCase().includes("pyq")),
+    ).length;
+
+    const scienceCount = qList.filter(
+      (q: any) =>
+        q.subject?.toLowerCase().includes("science") ||
+        q.topic?.toLowerCase().includes("science"),
+    ).length;
+
+    const policeCount = qList.filter(
+      (q: any) =>
+        q.subject?.toLowerCase().includes("police") ||
+        q.topic?.toLowerCase().includes("police") ||
+        q.examTags?.some((t: string) => t.toLowerCase().includes("police")),
+    ).length;
+
+    return [
+      {
+        id: "update-ca",
+        titleEn: "Recent Current Affairs 2026 Special Capsule",
+        titleHi: "नवीनतम करेंट अफेयर्स 2026 स्पेशल कैप्सूल",
+        date: "Recently Updated",
+        questionsCount: `${caCount > 0 ? caCount : 25}+ Questions`,
+        iconType: "flame",
+        targetView: "current-affairs-selection",
+      },
+      {
+        id: "update-comp",
+        titleEn: "Computer Knowledge & IT Practice Set",
+        titleHi: "नवीनतम कंप्यूटर ज्ञान एवं IT अभ्यास सेट",
+        date: "Recently Updated",
+        questionsCount: `${computerCount > 0 ? computerCount : 30}+ Questions`,
+        iconType: "zap",
+        targetView: "computer-selection",
+      },
+      {
+        id: "update-pyq",
+        titleEn: "Previous Year Question Papers (PYQ)",
+        titleHi: "नवीनतम पीवाईक्यू (Previous Year Papers)",
+        date: "Recently Updated",
+        questionsCount: `${pyqCount > 0 ? pyqCount : 50}+ Questions`,
+        iconType: "file",
+        targetView: "previous-year-selection",
+      },
+      {
+        id: "update-sci",
+        titleEn: "General Science & Tech Practice Capsule",
+        titleHi: "नवीनतम सामान्य विज्ञान अभ्यास कैप्सूल",
+        date: "Recently Updated",
+        questionsCount: `${scienceCount > 0 ? scienceCount : 40}+ Questions`,
+        iconType: "trophy",
+        targetView: "science-selection",
+      },
+      {
+        id: "update-police",
+        titleEn: "State Police Recruitment Special Practice",
+        titleHi: "नवीनतम राज्य पुलिस भर्ती विशेष अभ्यास",
+        date: "Recently Updated",
+        questionsCount: `${policeCount > 0 ? policeCount : 35}+ Questions`,
+        iconType: "swords",
+        targetView: "state-police-selection",
+      },
+    ];
+  }, [questions]);
+
   useEffect(() => {
     if (isUpdateHovered) return;
     const updateTimer = setInterval(() => {
-      setCurrentUpdateIndex((prev) => (prev + 1) % LATEST_UPDATES_DATA.length);
+      setCurrentUpdateIndex((prev) => (prev + 1) % dynamicUpdates.length);
     }, 4000);
     return () => clearInterval(updateTimer);
-  }, [isUpdateHovered]);
+  }, [isUpdateHovered, dynamicUpdates]);
 
   useEffect(() => {
     const battleAttempted = localStorage.getItem("studyflash_battle_attempted");
@@ -182,7 +222,7 @@ export default function HomeView({
     }
   };
 
-  const handleAttemptUpdate = (item: typeof LATEST_UPDATES_DATA[0]) => {
+  const handleAttemptUpdate = (item: any) => {
     if (item.targetView) {
       setCurrentView(item.targetView);
     } else {
@@ -422,12 +462,12 @@ export default function HomeView({
 
             {/* Carousel Indicator Dots */}
             <div className="flex items-center gap-1.5 self-end sm:self-center">
-              {LATEST_UPDATES_DATA.map((_, idx) => (
+              {dynamicUpdates.map((_, idx) => (
                 <button
                   key={idx}
                   onClick={() => setCurrentUpdateIndex(idx)}
                   className={`h-2.5 transition-all duration-300 rounded-full ${
-                    idx === currentUpdateIndex
+                    idx === (currentUpdateIndex % dynamicUpdates.length)
                       ? "w-7 bg-emerald-600"
                       : "w-2.5 bg-slate-200 dark:bg-slate-700 hover:bg-emerald-300"
                   }`}
@@ -444,7 +484,7 @@ export default function HomeView({
             onMouseLeave={() => setIsUpdateHovered(false)}
           >
             {(() => {
-              const activeItem = LATEST_UPDATES_DATA[currentUpdateIndex];
+              const activeItem = dynamicUpdates[currentUpdateIndex % dynamicUpdates.length];
               return (
                 <div
                   key={activeItem.id}

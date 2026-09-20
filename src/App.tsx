@@ -708,6 +708,7 @@ export default function App() {
             userStats={userStats}
             liveTestConfig={liveTestConfig}
             isAdmin={isAdmin}
+            questions={questions}
             onSearchSubmit={(query: string) => {
               handleFilterQuestions("All", query, false);
             }}
