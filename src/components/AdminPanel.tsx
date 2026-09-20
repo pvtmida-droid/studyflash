@@ -214,12 +214,8 @@ export default function AdminPanel({
 
   const handleApprovePayment = async (id: string, testId: string) => {
     try {
-      const raw = localStorage.getItem("studyflash_all_india_payments");
-      const parsed = raw ? JSON.parse(raw) : [];
-      const logs = Array.isArray(parsed) ? parsed : [];
-      
       let targetLog: any = null;
-      const updated = logs.map((log: any) => {
+      const updated = paymentLogs.map((log: any) => {
         if (log.id === id) {
           targetLog = { ...log, status: "approved" };
           return targetLog;
@@ -246,18 +242,14 @@ export default function AdminPanel({
         } catch (fbErr) {}
       }
 
-      triggerToast("Payment Approved! Test unlocked for user.");
+      triggerToast(isHindi ? "पेमेंट स्वीकृत! छात्र के लिए टेस्ट अनलॉक कर दिया गया है।" : "Payment Approved! Test unlocked for user.");
     } catch (e) {}
   };
 
   const handleRejectPayment = async (id: string) => {
     try {
-      const raw = localStorage.getItem("studyflash_all_india_payments");
-      const parsed = raw ? JSON.parse(raw) : [];
-      const logs = Array.isArray(parsed) ? parsed : [];
-      
       let targetLog: any = null;
-      const updated = logs.map((log: any) => {
+      const updated = paymentLogs.map((log: any) => {
         if (log.id === id) {
           targetLog = { ...log, status: "rejected" };
           return targetLog;
@@ -275,16 +267,13 @@ export default function AdminPanel({
         } catch (fbErr) {}
       }
 
-      triggerToast("Payment Rejected.");
+      triggerToast(isHindi ? "पेमेंट निरस्त / अप्रूवल रिवोक कर दिया गया।" : "Approval Revoked / Payment Rejected.");
     } catch (e) {}
   };
 
   const handleDeletePaymentLog = async (id: string) => {
     try {
-      const raw = localStorage.getItem("studyflash_all_india_payments");
-      const parsed = raw ? JSON.parse(raw) : [];
-      const logs = Array.isArray(parsed) ? parsed : [];
-      const updated = logs.filter((log: any) => log.id !== id);
+      const updated = paymentLogs.filter((log: any) => log.id !== id);
       localStorage.setItem("studyflash_all_india_payments", JSON.stringify(updated));
       setPaymentLogs(updated);
 
@@ -293,7 +282,7 @@ export default function AdminPanel({
         await deleteDoc(doc(db, "all_india_payments", id));
       } catch (fbErr) {}
 
-      triggerToast("Log deleted.");
+      triggerToast(isHindi ? "रिकॉर्ड हटा दिया गया! टेस्ट पुनः लॉक हो गया।" : "Record deleted. Test locked for user.");
     } catch (e) {}
   };
 
@@ -2171,23 +2160,32 @@ Sitemap: https://studyflash.co/sitemap.xml`);
                           {log.status !== "approved" && (
                             <button
                               onClick={() => handleApprovePayment(log.id, log.testId)}
-                              className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold text-xs shadow-xs transition-all"
+                              className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold text-xs shadow-xs transition-all cursor-pointer"
                             >
-                              Approve & Unlock
+                              {isHindi ? "स्वीकृत करें (Unlock)" : "Approve & Unlock"}
                             </button>
                           )}
-                          {log.status !== "rejected" && (
+                          {log.status === "approved" && (
                             <button
                               onClick={() => handleRejectPayment(log.id)}
-                              className="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-bold text-xs shadow-xs transition-all"
+                              className="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-bold text-xs shadow-xs transition-all cursor-pointer"
+                              title={isHindi ? "अप्रूवल निरस्त करें और टेस्ट पुनः लॉक करें" : "Revoke approval and lock test for student"}
                             >
-                              Reject
+                              {isHindi ? "रिवोक करें (Lock)" : "Revoke Approval"}
+                            </button>
+                          )}
+                          {log.status === "pending" && (
+                            <button
+                              onClick={() => handleRejectPayment(log.id)}
+                              className="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white rounded-lg font-bold text-xs shadow-xs transition-all cursor-pointer"
+                            >
+                              {isHindi ? "अस्वीकार" : "Reject"}
                             </button>
                           )}
                           <button
                             onClick={() => handleDeletePaymentLog(log.id)}
-                            className="p-1.5 text-slate-400 hover:text-red-600 rounded-lg transition-colors"
-                            title="Delete Log"
+                            className="p-1.5 text-slate-400 hover:text-red-600 rounded-lg transition-colors cursor-pointer"
+                            title={isHindi ? "रिकॉर्ड हटाएं और टेस्ट लॉक करें" : "Delete record & lock test"}
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>

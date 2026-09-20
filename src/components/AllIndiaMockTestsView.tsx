@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import upiQrCode from "../assets/upi_qr_code.png";
 import { db, doc, setDoc, collection, getDocs } from "../lib/firebase";
+import { getDeviceId } from "../utils/deviceId";
 import {
   ArrowLeft,
   Calendar,
@@ -273,34 +274,59 @@ export default function AllIndiaMockTestsView({
             }
           });
 
-          // 2. Sync Payments
+          // 2. Sync Payments (Isolated per device/user to prevent cross-device leakage & handle admin revocation/deletion)
+          const currentDeviceId = getDeviceId();
           const snapshot = await getDocs(collection(db, "all_india_payments"));
+          const firestoreLogs: any[] = [];
           if (!snapshot.empty) {
-            const firestoreLogs: any[] = [];
             snapshot.forEach((docSnap) => {
               const data = docSnap.data();
               if (data && data.id) firestoreLogs.push(data);
             });
-
-            // Merge local and firestore logs by ID
-            const logMap = new Map<string, any>();
-            [...logs, ...firestoreLogs].forEach((item) => {
-              if (item && item.id) logMap.set(item.id, item);
-            });
-            logs = Array.from(logMap.values());
-
-            // Sync approved items to purchased
-            logs.forEach((item) => {
-              if (item.status === "approved" && item.testId && !purchased.includes(item.testId)) {
-                purchased.push(item.testId);
-              }
-            });
-
-            try {
-              localStorage.setItem("studyflash_all_india_payments", JSON.stringify(logs));
-              localStorage.setItem("studyflash_purchased_tests", JSON.stringify(purchased));
-            } catch {}
           }
+
+          const localPaymentIds = new Set(logs.map((l) => l.id));
+          const deviceFirestoreLogs = firestoreLogs.filter(
+            (item) => item.deviceId === currentDeviceId || localPaymentIds.has(item.id)
+          );
+
+          // Overwrite local logs with Firestore logs for this device
+          const logMap = new Map<string, any>();
+          logs.forEach((item) => {
+            if (item && item.id) logMap.set(item.id, item);
+          });
+          deviceFirestoreLogs.forEach((item) => {
+            if (item && item.id) logMap.set(item.id, item);
+          });
+
+          // Filter out logs that were deleted from Firestore by Admin
+          const firestoreDocIds = new Set(firestoreLogs.map((d) => d.id));
+          const finalLogs: any[] = [];
+          logMap.forEach((item, id) => {
+            if (firestoreDocIds.has(id)) {
+              finalLogs.push(item);
+            }
+          });
+          logs = finalLogs;
+
+          // Build exact purchased tests list based ONLY on approved status for this device
+          purchased = Array.from(
+            new Set(
+              logs
+                .filter(
+                  (item) =>
+                    item.status === "approved" &&
+                    item.testId &&
+                    (item.deviceId === currentDeviceId || !item.deviceId)
+                )
+                .map((item) => item.testId)
+            )
+          );
+
+          try {
+            localStorage.setItem("studyflash_all_india_payments", JSON.stringify(logs));
+            localStorage.setItem("studyflash_purchased_tests", JSON.stringify(purchased));
+          } catch {}
         } catch (fbErr) {
           // Firebase offline or network issue - fallback to local
         }
@@ -360,8 +386,10 @@ export default function AllIndiaMockTestsView({
     setIsVerifying(true);
 
     const paymentId = "pay_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
+    const currentDeviceId = getDeviceId();
     const newLog = {
       id: paymentId,
+      deviceId: currentDeviceId,
       studentName: enteredName,
       testId,
       testTitle: currentTestTitle,
