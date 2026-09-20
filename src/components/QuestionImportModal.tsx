@@ -2,6 +2,7 @@ import React, { useState, ChangeEvent, DragEvent, useEffect } from "react";
 import { Upload, X, Check, AlertCircle, Download, Trash2, Edit } from "lucide-react";
 import * as XLSX from "xlsx";
 import { Question } from "../types";
+import { MAIN_SUBJECTS } from "../constants/subjectTopics";
 
 export interface QuestionImportModalProps {
   isOpen: boolean;
@@ -9,30 +10,6 @@ export interface QuestionImportModalProps {
   onQuestionsImported: (questions: Question[]) => void;
   isHindi: boolean;
 }
-
-const COMMON_SUBJECTS = [
-  { id: "GKGS", nameEn: "General Knowledge (GK/GS)", nameHi: "सामान्य ज्ञान (GK/GS)" },
-  { id: "India & Neighboring", nameEn: "GS/GK > India & Neighboring (भारत एवं पड़ोसी देश)", nameHi: "सामान्य अध्ययन > भारत एवं पड़ोसी देश" },
-  { id: "History", nameEn: "GS/GK > History (इतिहास)", nameHi: "सामान्य अध्ययन > इतिहास" },
-  { id: "Geography", nameEn: "GS/GK > Geography (भूगोल)", nameHi: "सामान्य अध्ययन > भूगोल" },
-  { id: "Constitution", nameEn: "GS/GK > Indian Constitution (भारतीय संविधान)", nameHi: "सामान्य अध्ययन > भारतीय संविधान" },
-  { id: "Polity", nameEn: "GS/GK > Polity & Politics (राजनीति)", nameHi: "सामान्य अध्ययन > राजनीति" },
-  { id: "Economics", nameEn: "GS/GK > Economics (अर्थव्यवस्था)", nameHi: "सामान्य अध्ययन > अर्थव्यवस्था" },
-  { id: "Art & Culture", nameEn: "GS/GK > Art & Culture (कला एवं संस्कृति)", nameHi: "सामान्य अध्ययन > कला एवं संस्कृति" },
-  { id: "Sports", nameEn: "GS/GK > Sports & Athletics (खेल)", nameHi: "सामान्य अध्ययन > खेल" },
-  { id: "Awards", nameEn: "GS/GK > Awards & Honors (पुरस्कार एवं सम्मान)", nameHi: "सामान्य अध्ययन > पुरस्कार एवं सम्मान" },
-  { id: "Important Days", nameEn: "GS/GK > Important Days (महत्वपूर्ण दिवस)", nameHi: "सामान्य अध्ययन > महत्वपूर्ण दिवस" },
-  { id: "Scientific Research", nameEn: "GS/GK > Scientific Research (वैज्ञानिक अनुसंधान)", nameHi: "सामान्य अध्ययन > वैज्ञानिक अनुसंधान" },
-  { id: "Current Affairs", nameEn: "Current Affairs", nameHi: "करेंट अफेयर्स" },
-  { id: "Science", nameEn: "General Science", nameHi: "सामान्य विज्ञान" },
-  { id: "Maths", nameEn: "Mathematics", nameHi: "गणित" },
-  { id: "Reasoning", nameEn: "Reasoning", nameHi: "तर्कशक्ति" },
-  { id: "Hindi", nameEn: "Hindi Language", nameHi: "हिन्दी भाषा" },
-  { id: "English", nameEn: "English Language", nameHi: "अंग्रेजी भाषा" },
-  { id: "Computer Knowledge", nameEn: "Computer Knowledge", nameHi: "कंप्यूटर ज्ञान" },
-  { id: "UP Police Exam", nameEn: "UP Police Special", nameHi: "यूपी पुलिस विशेष" },
-  { id: "UP GK", nameEn: "Uttar Pradesh GK", nameHi: "उत्तर प्रदेश सामान्य ज्ञान" }
-];
 
 export default function QuestionImportModal({ isOpen, onClose, onQuestionsImported, isHindi }: QuestionImportModalProps) {
   // Preview / Editor state
@@ -45,10 +22,26 @@ export default function QuestionImportModal({ isOpen, onClose, onQuestionsImport
   const [csvFileName, setCsvFileName] = useState("");
   const [csvError, setCsvError] = useState<string | null>(null);
 
-  // Global UI Categorization state
+  // Global UI Categorization state (2-Tier Cascading Selector)
   const [globalSubject, setGlobalSubject] = useState("GKGS");
-  const [globalTopic, setGlobalTopic] = useState("General");
+  const [globalTopicSelect, setGlobalTopicSelect] = useState("India & Neighboring");
+  const [customTopicInput, setCustomTopicInput] = useState("");
   const [globalExamTags, setGlobalExamTags] = useState("");
+
+  const currentSubjectObj = MAIN_SUBJECTS.find(s => s.id === globalSubject) || MAIN_SUBJECTS[0];
+  const effectiveGlobalTopic = globalTopicSelect === "custom"
+    ? (customTopicInput.trim() || "General")
+    : globalTopicSelect;
+
+  const handleSubjectChange = (newSubId: string) => {
+    setGlobalSubject(newSubId);
+    const subObj = MAIN_SUBJECTS.find(s => s.id === newSubId);
+    if (subObj && subObj.topics.length > 0) {
+      setGlobalTopicSelect(subObj.topics[0].id);
+    } else {
+      setGlobalTopicSelect("custom");
+    }
+  };
 
   // Reset modal state on open/close
   useEffect(() => {
@@ -59,7 +52,8 @@ export default function QuestionImportModal({ isOpen, onClose, onQuestionsImport
       setEditingIndex(null);
       setEditQuestionForm(null);
       setGlobalSubject("GKGS");
-      setGlobalTopic("General");
+      setGlobalTopicSelect("India & Neighboring");
+      setCustomTopicInput("");
       setGlobalExamTags("");
     }
   }, [isOpen]);
@@ -252,7 +246,7 @@ export default function QuestionImportModal({ isOpen, onClose, onQuestionsImport
           explanationEn: getVal("explanationEn"),
           explanationHi: getVal("explanationHi"),
           subject: subFromCsv || globalSubject,
-          topic: topFromCsv || globalTopic,
+          topic: topFromCsv || effectiveGlobalTopic,
           examTags: tagFromCsv 
             ? tagFromCsv.split(",").map(t => t.trim()).filter(Boolean) 
             : (globalExamTags ? globalExamTags.split(",").map(t => t.trim()).filter(Boolean) : ["Practice"]),
@@ -390,14 +384,14 @@ export default function QuestionImportModal({ isOpen, onClose, onQuestionsImport
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-1.5 border-t border-slate-100 dark:border-slate-850/50">
               <div className="space-y-1">
                 <label className="text-[10px] font-bold text-slate-500 block uppercase">
-                  {isHindi ? "विषय (Subject)" : "Subject"}
+                  {isHindi ? "विषय (Subject / Main Card)" : "Subject (Main Card)"}
                 </label>
                 <select
                   value={globalSubject}
-                  onChange={(e) => setGlobalSubject(e.target.value)}
+                  onChange={(e) => handleSubjectChange(e.target.value)}
                   className="w-full p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer"
                 >
-                  {COMMON_SUBJECTS.map((sub) => (
+                  {MAIN_SUBJECTS.map((sub) => (
                     <option key={sub.id} value={sub.id}>
                       {isHindi ? sub.nameHi : sub.nameEn}
                     </option>
@@ -407,15 +401,32 @@ export default function QuestionImportModal({ isOpen, onClose, onQuestionsImport
 
               <div className="space-y-1">
                 <label className="text-[10px] font-bold text-slate-500 block uppercase">
-                  {isHindi ? "अध्याय / टॉपिक (Topic)" : "Topic / Chapter"}
+                  {isHindi ? "अध्याय / सब-कार्ड (Topic / Sub-card)" : "Topic / Sub-card"}
                 </label>
-                <input
-                  type="text"
-                  value={globalTopic}
-                  onChange={(e) => setGlobalTopic(e.target.value)}
-                  placeholder={isHindi ? "जैसे: Percentage, Internet" : "e.g. Percentage, Internet"}
-                  className="w-full p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                />
+                <select
+                  value={globalTopicSelect}
+                  onChange={(e) => setGlobalTopicSelect(e.target.value)}
+                  className="w-full p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer"
+                >
+                  {currentSubjectObj.topics.map((top) => (
+                    <option key={top.id} value={top.id}>
+                      {isHindi ? top.nameHi : top.nameEn}
+                    </option>
+                  ))}
+                  <option value="custom">
+                    {isHindi ? "✍️ + नया टॉपिक टाइप करें..." : "✍️ + Custom Topic..."}
+                  </option>
+                </select>
+
+                {globalTopicSelect === "custom" && (
+                  <input
+                    type="text"
+                    value={customTopicInput}
+                    onChange={(e) => setCustomTopicInput(e.target.value)}
+                    placeholder={isHindi ? "नया टॉपिक का नाम लिखें..." : "Type custom topic name..."}
+                    className="w-full mt-1.5 p-2 bg-white dark:bg-slate-900 border border-indigo-300 dark:border-indigo-700 rounded-xl text-xs dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  />
+                )}
               </div>
 
               <div className="space-y-1">
