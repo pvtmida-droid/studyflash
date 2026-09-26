@@ -48,7 +48,7 @@ const MOCK_TEST_CARDS = [
     id: "mega-test-1",
     titleEn: "All India Mega Test #1",
     titleHi: "ऑल इंडिया मेगा टेस्ट #1",
-    price: 50,
+    price: 10,
     answerKeyPdfUrl: "",
     imageUrl: "https://ibb.co/1GXqn4fy",
     testDate: "15 September 2026",
