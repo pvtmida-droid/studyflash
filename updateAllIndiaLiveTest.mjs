@@ -46,10 +46,24 @@ function parseCSV(text) {
 }
 
 async function run() {
-  const csvPath = "d:/vikash/website/all india mock test.csv";
+  const customPath = process.argv[2];
+  const customTestId = process.argv[3] || "mega-test-1";
+
+  let csvPath = customPath || "d:/vikash/website/all india mock test.csv";
   if (!fs.existsSync(csvPath)) {
-    console.error(`❌ CSV File not found at ${csvPath}`);
-    process.exit(1);
+    // Try fallback paths
+    const alternativePaths = [
+      "d:/vikash/website/rrb.csv",
+      "d:/vikash/website/all_india_mock_test_updated.csv",
+      path.join(process.cwd(), "all india mock test.csv")
+    ];
+    const found = alternativePaths.find(p => fs.existsSync(p));
+    if (found) {
+      csvPath = found;
+    } else {
+      console.error(`❌ CSV File not found at ${csvPath}`);
+      process.exit(1);
+    }
   }
 
   const rawText = fs.readFileSync(csvPath, "utf-8");
@@ -63,19 +77,20 @@ async function run() {
   const headers = parsedData[0].map(h => h.trim().replace(/^\uFEFF/, '')); // strip BOM
   const dataRows = parsedData.slice(1);
 
-  console.log(`📋 Found ${dataRows.length} question rows in CSV.`);
+  console.log(`📋 Found ${dataRows.length} question rows in CSV (${csvPath}) for target: ${customTestId}.`);
 
-  // Map header columns
-  // Header expected: ID,Subject,Topic,Question (EN),Question (HI),Option A (EN),Option B (EN),Option C (EN),Option D (EN),Option A (HI),Option B (HI),Option C (HI),Option D (HI),Correct Answer,Explanation (EN),Explanation (HI),Exam Tags
   const formattedQuestions = [];
   const updatedCsvRows = [headers.join(",")];
 
+  const prefix = customTestId.startsWith("mega-test-") ? customTestId : `live2026`;
+  const testNum = customTestId.replace(/[^0-9]/g, "") || "1";
+
   dataRows.forEach((row, idx) => {
     const qNum = String(idx + 1).padStart(3, '0');
-    const uniqueId = `live2026-${qNum}`;
+    const uniqueId = `${prefix}-${qNum}`;
 
     const subject = row[1]?.trim() || "Static GK";
-    const topic = row[2]?.trim() || "UP GK & All India GK";
+    const topic = customTestId === "mega-test-3" ? "All India Mega Test #3" : (row[2]?.trim() || `All India Mega Test #${testNum}`);
     const questionEn = row[3]?.trim() || "";
     const questionHi = row[4]?.trim() || questionEn;
     const optionAEn = row[5]?.trim() || "";
@@ -98,7 +113,14 @@ async function run() {
     const explanationEn = row[14]?.trim() || "";
     const explanationHi = row[15]?.trim() || explanationEn;
     const rawTag = row[16]?.trim() || "up-police";
-    const examTags = Array.from(new Set(["All India Live Test", "All India Mock Test", "live2026", rawTag, "up-police"]));
+    const examTags = Array.from(new Set([
+      "All India Live Test", 
+      "All India Mock Test", 
+      customTestId, 
+      `Mega Test #${testNum}`,
+      `mega-test-${testNum}`,
+      rawTag
+    ]));
 
     if (questionEn || questionHi) {
       formattedQuestions.push({
@@ -146,18 +168,14 @@ async function run() {
     }
   });
 
-  console.log(`✅ Processed ${formattedQuestions.length} unique questions with IDs (live2026-001 to live2026-${String(formattedQuestions.length).padStart(3, '0')}).`);
+  console.log(`✅ Processed ${formattedQuestions.length} unique questions with IDs (${prefix}-001 to ${prefix}-${String(formattedQuestions.length).padStart(3, '0')}).`);
 
   // 1. Rewrite source CSV with unique IDs if file is not locked by Excel
   try {
     fs.writeFileSync(csvPath, updatedCsvRows.join("\n"), "utf-8");
     console.log(`💾 Source CSV rewritten with unique IDs at ${csvPath}`);
   } catch (err) {
-    console.warn(`⚠️ Could not rewrite source CSV (file may be open in Excel): ${err.message}`);
-    // Save to updated CSV copy
-    const copyPath = "d:/vikash/website/all_india_mock_test_updated.csv";
-    fs.writeFileSync(copyPath, updatedCsvRows.join("\n"), "utf-8");
-    console.log(`💾 Saved updated CSV copy with unique IDs at ${copyPath}`);
+    console.warn(`⚠️ Could not rewrite source CSV: ${err.message}`);
   }
 
   // 2. Upsert into Supabase `questions` table in batches of 50
@@ -171,11 +189,11 @@ async function run() {
     if (error) {
       console.error(`❌ Batch ${i/BATCH_SIZE + 1} upsert error:`, error.message);
     } else {
-      console.log(`🚀 Upserted batch ${i/BATCH_SIZE + 1} (${batch.length} questions) to Supabase questions table.`);
+      console.log(`🚀 Upserted batch ${Math.floor(i/BATCH_SIZE) + 1} (${batch.length} questions) to Supabase questions table on live server.`);
     }
   }
 
-  // 3. Upsert Mock Test in Supabase `mock_tests` table if present
+  // 3. Upsert Mock Test in Supabase `mock_tests` table
   const frontendQuestions = formattedQuestions.map(q => ({
     id: q.id,
     subject: q.subject,
@@ -192,11 +210,14 @@ async function run() {
     dislikes: 0
   }));
 
+  const testTitleEn = customTestId === "mega-test-3" ? "All India Mega Test #3" : `All India Test ${customTestId}`;
+  const testTitleHi = customTestId === "mega-test-3" ? "ऑल इंडिया मेगा टेस्ट #3" : `ऑल इंडिया टेस्ट ${customTestId}`;
+
   const mockTestPayload = {
-    id: "live_mega_test",
-    title_en: "All India Live Test 2026 (160+ Questions)",
-    title_hi: "ऑल इंडिया लाइव टेस्ट 2026 (160+ प्रश्न)",
-    subject: "All India GK & UP Police",
+    id: customTestId,
+    title_en: testTitleEn,
+    title_hi: testTitleHi,
+    subject: "All India Mock Test Series",
     exam: "All India Live Test",
     duration: 120,
     total_questions: frontendQuestions.length,
@@ -213,13 +234,15 @@ async function run() {
   if (mockErr) {
     console.log(`⚠️ Note on mock_tests table: ${mockErr.message}`);
   } else {
-    console.log(`🎉 Upserted All India Mega Live Test to Supabase mock_tests table!`);
+    console.log(`🎉 Upserted ${testTitleEn} (${frontendQuestions.length} questions) directly to Supabase mock_tests table on LIVE SERVER!`);
   }
 
-  // Save a JSON export of questions to src/allIndiaLiveQuestions.json for zero-latency fallback
-  const jsonPath = "d:/vikash/website/studyflash---web/src/allIndiaLiveQuestions.json";
-  fs.writeFileSync(jsonPath, JSON.stringify(frontendQuestions, null, 2), "utf-8");
-  console.log(`📦 Exported JSON of ${frontendQuestions.length} questions to ${jsonPath}`);
+  // Save JSON fallback to src/allIndiaLiveQuestions.json
+  if (customTestId === "mega-test-1" || customTestId === "live_mega_test") {
+    const jsonPath = "d:/vikash/website/studyflash---web/src/allIndiaLiveQuestions.json";
+    fs.writeFileSync(jsonPath, JSON.stringify(frontendQuestions, null, 2), "utf-8");
+    console.log(`📦 Exported JSON of ${frontendQuestions.length} questions to ${jsonPath}`);
+  }
 }
 
 run();
