@@ -236,6 +236,28 @@ export default function QuestionImportModal({ isOpen, onClose, onQuestionsImport
         const topFromCsv = getVal("topic");
         const tagFromCsv = getVal("examTags");
 
+        const rawTags = tagFromCsv 
+          ? tagFromCsv.split(",") 
+          : (globalExamTags ? globalExamTags.split(",") : []);
+        const derivedTags: string[] = Array.from(new Set(rawTags.map(t => t.trim()).filter(Boolean)));
+        
+        const topicLower = (topFromCsv || effectiveGlobalTopic).toLowerCase();
+        if (topicLower.includes("mega test #3") || topicLower.includes("mega test 3") || topicLower.includes("test #3")) {
+          if (!derivedTags.includes("mega-test-3")) derivedTags.push("mega-test-3");
+          if (!derivedTags.includes("Mega Test #3")) derivedTags.push("Mega Test #3");
+        } else if (topicLower.includes("mega test #1") || topicLower.includes("mega test 1") || topicLower.includes("test #1")) {
+          if (!derivedTags.includes("mega-test-1")) derivedTags.push("mega-test-1");
+          if (!derivedTags.includes("Mega Test #1")) derivedTags.push("Mega Test #1");
+        } else if (topicLower.includes("mega test #2") || topicLower.includes("mega test 2") || topicLower.includes("test #2")) {
+          if (!derivedTags.includes("mega-test-2")) derivedTags.push("mega-test-2");
+          if (!derivedTags.includes("Mega Test #2")) derivedTags.push("Mega Test #2");
+        } else if (topicLower.includes("test #4") || topicLower.includes("special test #4")) {
+          if (!derivedTags.includes("mega-test-4")) derivedTags.push("mega-test-4");
+        } else if (topicLower.includes("test #5") || topicLower.includes("practice test #5")) {
+          if (!derivedTags.includes("mega-test-5")) derivedTags.push("mega-test-5");
+        }
+        if (derivedTags.length === 0) derivedTags.push("Practice");
+
         return {
           id: getVal("id") || `csv-import-q-${Date.now()}-${idx}-${Math.floor(Math.random() * 1000)}`,
           questionEn: qEn,
@@ -247,9 +269,7 @@ export default function QuestionImportModal({ isOpen, onClose, onQuestionsImport
           explanationHi: getVal("explanationHi"),
           subject: subFromCsv || globalSubject,
           topic: topFromCsv || effectiveGlobalTopic,
-          examTags: tagFromCsv 
-            ? tagFromCsv.split(",").map(t => t.trim()).filter(Boolean) 
-            : (globalExamTags ? globalExamTags.split(",").map(t => t.trim()).filter(Boolean) : ["Practice"]),
+          examTags: derivedTags,
           likes: 0,
           dislikes: 0
         };

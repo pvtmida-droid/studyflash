@@ -4690,6 +4690,9 @@ Sitemap: https://studyflash.co/sitemap.xml`);
           const combined = [...importedQs, ...questions];
           const uniqueMap = new Map(combined.map(q => [q.id, q]));
           const updatedPool = Array.from(uniqueMap.values());
+          try {
+            localStorage.setItem("studyflash_custom_questions", JSON.stringify(updatedPool));
+          } catch (e) {}
           onSetBulkQuestions(updatedPool);
 
           if (typeof window !== "undefined") {

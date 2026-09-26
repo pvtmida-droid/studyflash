@@ -151,7 +151,17 @@ export default function App() {
   const [selectedFontSize, setSelectedFontSize] = useState(15);
 
   // Db lists states
-  const [questions, setQuestions] = useState<Question[]>(allIndiaLiveQuestions as Question[]);
+  const [questions, setQuestions] = useState<Question[]>(() => {
+    try {
+      const rawCustom = localStorage.getItem("studyflash_custom_questions");
+      const customQs = rawCustom ? JSON.parse(rawCustom) : [];
+      if (Array.isArray(customQs) && customQs.length > 0) {
+        const combined = [...(allIndiaLiveQuestions as Question[]), ...customQs];
+        return Array.from(new Map(combined.map((q: any) => [q.id, q])).values());
+      }
+    } catch (e) {}
+    return allIndiaLiveQuestions as Question[];
+  });
   const [mockTests, setMockTests] = useState<MockTest[]>([]);
 
   // Load mock tests and questions from server
@@ -188,11 +198,13 @@ export default function App() {
 
     const fetchQuestions = async () => {
       try {
+        const rawCustom = localStorage.getItem("studyflash_custom_questions");
+        const customQs = rawCustom ? JSON.parse(rawCustom) : [];
         const res = await fetch("/api/questions");
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data)) {
-            const combined = [...(allIndiaLiveQuestions as Question[]), ...data];
+            const combined = [...(allIndiaLiveQuestions as Question[]), ...customQs, ...data];
             const uniqueQs: Question[] = Array.from(new Map(combined.map((q: any) => [q.id, q])).values());
             setQuestions(uniqueQs);
 
