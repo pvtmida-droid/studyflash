@@ -22,6 +22,7 @@ import { MockTest, Question, UserStats, LiveTestConfig } from "../types";
 import { db, collection, setDoc, doc } from "../lib/firebase";
 
 interface QuizViewProps {
+  key?: string;
   mockTests: MockTest[];
   isHindi: boolean;
   userStats: UserStats;
@@ -119,13 +120,13 @@ export default function QuizView({
   };
 
   useEffect(() => {
-    if (autoStartTestId && !activeTest) {
+    if (autoStartTestId) {
       const test = mockTests.find((t) => t.id === autoStartTestId);
-      if (test) {
+      if (test && (!activeTest || activeTest.id !== autoStartTestId)) {
         handleStartTest(test);
       }
     }
-  }, [autoStartTestId, mockTests, activeTest]);
+  }, [autoStartTestId, mockTests]);
 
   // Timer Effect
   useEffect(() => {

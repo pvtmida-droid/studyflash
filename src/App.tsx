@@ -387,7 +387,48 @@ export default function App() {
         };
       }
 
-      // 3. For mega-test-2 to mega-test-5, pick a distinct set of questions from question bank
+      // 3. Check if questions exist with specific topic, tags or IDs for this test card (e.g. Mega Test #3, mega-test-3)
+      const specificQs = questions.filter((q) => {
+        if (!q) return false;
+        const qId = (q.id || "").toLowerCase();
+        const qTopic = (q.topic || "").toLowerCase();
+        const tags = Array.isArray(q.examTags) ? q.examTags.map((t) => (t || "").toLowerCase()) : [];
+        const cardIdLower = card.id.toLowerCase();
+        const cardNum = `${idx + 1}`;
+
+        return (
+          qId.startsWith(`${cardIdLower}-`) ||
+          tags.includes(cardIdLower) ||
+          tags.includes(`mega-${cardNum}`) ||
+          tags.includes(`mega${cardNum}`) ||
+          tags.includes(`test-${cardNum}`) ||
+          tags.includes(`test${cardNum}`) ||
+          tags.includes(`mega test #${cardNum}`) ||
+          tags.includes(`all india mega test #${cardNum}`) ||
+          qTopic.includes(`mega test #${cardNum}`) ||
+          qTopic.includes(`mega test ${cardNum}`) ||
+          qTopic.includes(`test #${cardNum}`) ||
+          qTopic === card.titleEn.toLowerCase() ||
+          qTopic === card.titleHi.toLowerCase()
+        );
+      });
+
+      if (specificQs.length > 0) {
+        return {
+          id: card.id,
+          titleEn: card.titleEn,
+          titleHi: card.titleHi,
+          subject: "All India Mock Test Series",
+          exam: "Mega Battle",
+          duration: 120,
+          totalQuestions: specificQs.length,
+          totalMarks: specificQs.length * 2,
+          questions: specificQs,
+          isPreviousYear: false,
+        };
+      }
+
+      // 4. Fallback for mega-test-2 to mega-test-5: pick a distinct set of questions from question bank
       let pool = questions.length > 0 ? questions : (liveTestConfig.test.questions || []);
 
       const offset = (idx * 20) % (pool.length || 1);
@@ -759,6 +800,7 @@ export default function App() {
 
         {currentView === "live-test-auto" && (
           <QuizView
+            key={selectedAllIndiaTestId || "mega-test-1"}
             mockTests={[...allIndiaMegaTests, liveTestConfig.test, ...mockTests]}
             isHindi={isHindi}
             userStats={userStats}
