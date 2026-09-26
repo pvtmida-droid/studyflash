@@ -48,6 +48,7 @@ import HindiSelectionView from "./components/HindiSelectionView";
 import EnglishSelectionView from "./components/EnglishSelectionView";
 import StatePoliceSelectionView from "./components/StatePoliceSelectionView";
 import AllIndiaMockTestsView from "./components/AllIndiaMockTestsView";
+import { fetchSupabaseQuestions } from "./lib/supabase";
 
 import {
   auth,
@@ -200,29 +201,44 @@ export default function App() {
       try {
         const rawCustom = localStorage.getItem("studyflash_custom_questions");
         const customQs = rawCustom ? JSON.parse(rawCustom) : [];
-        const res = await fetch("/api/questions");
-        if (res.ok) {
-          const data = await res.json();
-          if (Array.isArray(data)) {
-            const combined = [...(allIndiaLiveQuestions as Question[]), ...customQs, ...data];
-            const uniqueQs: Question[] = Array.from(new Map(combined.map((q: any) => [q.id, q])).values());
-            setQuestions(uniqueQs);
+        let fetchedQs: Question[] = [];
 
-            // Sync live questions from Supabase database
-            const liveQs = uniqueQs.filter((q: Question) => q.id.startsWith("live2026-") || (Array.isArray(q.examTags) && q.examTags.includes("All India Live Test")));
-            if (liveQs.length > 0) {
-              setLiveTestConfig(prev => ({
-                ...prev,
-                test: {
-                  ...prev.test,
-                  totalQuestions: liveQs.length,
-                  totalMarks: liveQs.length * 2,
-                  questions: liveQs
-                }
-              }));
+        try {
+          const res = await fetch("/api/questions");
+          if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data) && data.length > 0) {
+              fetchedQs = data;
             }
-            return;
           }
+        } catch (apiErr) {
+          console.warn("API questions fetch failed, falling back to direct Supabase client:", apiErr);
+        }
+
+        // Direct Supabase SDK fetch fallback if API returns empty
+        if (fetchedQs.length === 0) {
+          const supabaseQs = await fetchSupabaseQuestions();
+          if (supabaseQs.length > 0) {
+            fetchedQs = supabaseQs;
+          }
+        }
+
+        const combined = [...(allIndiaLiveQuestions as Question[]), ...customQs, ...fetchedQs];
+        const uniqueQs: Question[] = Array.from(new Map(combined.map((q: any) => [q.id, q])).values());
+        setQuestions(uniqueQs);
+
+        // Sync live questions from Supabase database
+        const liveQs = uniqueQs.filter((q: Question) => q.id.startsWith("live2026-") || (Array.isArray(q.examTags) && q.examTags.includes("All India Live Test")));
+        if (liveQs.length > 0) {
+          setLiveTestConfig(prev => ({
+            ...prev,
+            test: {
+              ...prev.test,
+              totalQuestions: liveQs.length,
+              totalMarks: liveQs.length * 2,
+              questions: liveQs
+            }
+          }));
         }
       } catch (err) {
         console.error("Failed to fetch questions:", err);
@@ -410,6 +426,8 @@ export default function App() {
 
         return (
           qId.startsWith(`${cardIdLower}-`) ||
+          qId.includes(`mega-test-${cardNum}`) ||
+          qId.includes(`mega test ${cardNum}`) ||
           tags.includes(cardIdLower) ||
           tags.includes(`mega-${cardNum}`) ||
           tags.includes(`mega${cardNum}`) ||
@@ -785,7 +803,7 @@ export default function App() {
 
         {currentView === "quizzes" && (
           <QuizView
-            mockTests={mockTests}
+            mockTests={[...allIndiaMegaTests, liveTestConfig.test, ...mockTests]}
             isHindi={isHindi}
             userStats={userStats}
             onUpdateStats={handleUpdateStats}

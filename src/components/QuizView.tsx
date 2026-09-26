@@ -124,7 +124,25 @@ export default function QuizView({
     if (autoStartTestId) {
       const test = mockTests.find((t) => t.id === autoStartTestId);
       if (test && (!activeTest || activeTest.id !== autoStartTestId)) {
-        handleStartTest(test);
+        const savedName = localStorage.getItem("sf_studentName");
+        const savedFather = localStorage.getItem("sf_fatherName");
+        const savedPhone = localStorage.getItem("sf_phoneNumber");
+
+        if (savedName && savedFather && savedPhone) {
+          setStudentName(savedName);
+          setFatherName(savedFather);
+          setPhoneNumber(savedPhone);
+          setActiveTest(test);
+          setCurrentQuestionIndex(0);
+          setAnswers({});
+          setMarkedForReview({});
+          setSecondsRemaining(test.questions.length * 60);
+          setIsCompleted(false);
+          setStartTime(Date.now());
+          setSelectedTestForSetup(null);
+        } else {
+          handleStartTest(test);
+        }
       }
     }
   }, [autoStartTestId, mockTests]);
@@ -916,7 +934,10 @@ export default function QuizView({
 
         <div className="flex gap-3">
           <button 
-            onClick={() => setSelectedTestForSetup(null)}
+            onClick={() => {
+              setSelectedTestForSetup(null);
+              if (onBack) onBack();
+            }}
             className="w-1/3 py-4 text-slate-600 dark:text-slate-300 font-bold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-all text-lg"
           >
             {isHindi ? "रद्द करें" : "Cancel"}
