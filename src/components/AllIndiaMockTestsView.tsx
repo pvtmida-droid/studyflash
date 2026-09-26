@@ -67,7 +67,7 @@ const MOCK_TEST_CARDS = [
     titleEn: "All India Mega Test #2",
     titleHi: "ऑल इंडिया मेगा टेस्ट #2",
     price: 10,
-    answerKeyPdfUrl: "",
+    answerKeyPdfUrl: "https://drive.google.com/file/d/1Wiu4AH7Jx5I9_Ku-6KwJVLEHoOoxOdni/view?usp=sharing",
     imageUrl: "https://i.ibb.co/s94V58Mc/study-flash-origninal.jpg",
     testDate: "26 September 2026",
     totalMarks: 100,
