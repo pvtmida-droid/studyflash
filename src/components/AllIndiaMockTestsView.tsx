@@ -71,7 +71,7 @@ const MOCK_TEST_CARDS = [
     imageUrl: "https://i.ibb.co/s94V58Mc/study-flash-origninal.jpg",
     testDate: "26 September 2026",
     totalMarks: 100,
-    teacher: "Munna Sir",
+    teacher: "Railway Group D 2025",
     hindi: 20,
     english: 20,
     gkgs: 20,
