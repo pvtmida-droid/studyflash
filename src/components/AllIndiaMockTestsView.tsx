@@ -615,68 +615,68 @@ export default function AllIndiaMockTestsView({
                   </div>
 
                   {/* 5 Subjects Cards Grid */}
-                  <div className="flex-1 grid grid-cols-5 gap-2 items-center justify-between">
+                  <div className="flex-1 grid grid-cols-5 gap-1 sm:gap-2 items-center justify-between overflow-x-auto no-scrollbar py-0.5">
                     {/* Hindi */}
-                    <div className="flex flex-col items-center justify-between p-2.5 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 text-center h-full space-y-2 hover:border-emerald-200 transition-colors">
-                      <div className="w-9 h-9 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 font-extrabold text-base flex items-center justify-center shadow-xs">
+                    <div className="flex flex-col items-center justify-between p-1.5 sm:p-2.5 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 text-center h-full space-y-1 sm:space-y-2 hover:border-emerald-200 transition-colors min-w-[54px] sm:min-w-0">
+                      <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 font-extrabold text-xs sm:text-base flex items-center justify-center shadow-xs">
                         अ
                       </div>
-                      <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">
+                      <span className="text-[10px] sm:text-xs font-semibold text-slate-600 dark:text-slate-300 truncate">
                         Hindi
                       </span>
-                      <div className="w-full py-1 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-800/60 text-emerald-700 dark:text-emerald-400 font-extrabold text-sm rounded-xl">
+                      <div className="w-full py-0.5 sm:py-1 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-800/60 text-emerald-700 dark:text-emerald-400 font-extrabold text-xs sm:text-sm rounded-xl">
                         {testCard.hindi}
                       </div>
                     </div>
 
                     {/* English */}
-                    <div className="flex flex-col items-center justify-between p-2.5 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 text-center h-full space-y-2 hover:border-blue-200 transition-colors">
-                      <div className="w-9 h-9 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300 font-bold text-[10px] flex items-center justify-center shadow-xs leading-tight">
-                        A B C
+                    <div className="flex flex-col items-center justify-between p-1.5 sm:p-2.5 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 text-center h-full space-y-1 sm:space-y-2 hover:border-blue-200 transition-colors min-w-[54px] sm:min-w-0">
+                      <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300 font-bold text-[8px] sm:text-[10px] flex items-center justify-center shadow-xs leading-tight">
+                        ABC
                       </div>
-                      <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">
+                      <span className="text-[10px] sm:text-xs font-semibold text-slate-600 dark:text-slate-300 truncate">
                         English
                       </span>
-                      <div className="w-full py-1 bg-blue-50 dark:bg-blue-950/60 border border-blue-200/80 dark:border-blue-800/60 text-blue-700 dark:text-blue-400 font-extrabold text-sm rounded-xl">
+                      <div className="w-full py-0.5 sm:py-1 bg-blue-50 dark:bg-blue-950/60 border border-blue-200/80 dark:border-blue-800/60 text-blue-700 dark:text-blue-400 font-extrabold text-xs sm:text-sm rounded-xl">
                         {testCard.english}
                       </div>
                     </div>
 
                     {/* GK/GS */}
-                    <div className="flex flex-col items-center justify-between p-2.5 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 text-center h-full space-y-2 hover:border-amber-200 transition-colors">
-                      <div className="w-9 h-9 rounded-full bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300 font-bold text-sm flex items-center justify-center shadow-xs">
-                        <Globe className="w-4 h-4" />
+                    <div className="flex flex-col items-center justify-between p-1.5 sm:p-2.5 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 text-center h-full space-y-1 sm:space-y-2 hover:border-amber-200 transition-colors min-w-[54px] sm:min-w-0">
+                      <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300 font-bold text-xs sm:text-sm flex items-center justify-center shadow-xs">
+                        <Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                       </div>
-                      <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">
+                      <span className="text-[10px] sm:text-xs font-semibold text-slate-600 dark:text-slate-300 truncate">
                         GK/GS
                       </span>
-                      <div className="w-full py-1 bg-amber-50 dark:bg-amber-950/60 border border-amber-200/80 dark:border-amber-800/60 text-amber-700 dark:text-amber-400 font-extrabold text-sm rounded-xl">
+                      <div className="w-full py-0.5 sm:py-1 bg-amber-50 dark:bg-amber-950/60 border border-amber-200/80 dark:border-amber-800/60 text-amber-700 dark:text-amber-400 font-extrabold text-xs sm:text-sm rounded-xl">
                         {testCard.gkgs}
                       </div>
                     </div>
 
                     {/* Math */}
-                    <div className="flex flex-col items-center justify-between p-2.5 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 text-center h-full space-y-2 hover:border-purple-200 transition-colors">
-                      <div className="w-9 h-9 rounded-full bg-purple-100 dark:bg-purple-900/50 text-purple-800 dark:text-purple-300 font-bold text-sm flex items-center justify-center shadow-xs">
-                        <Calculator className="w-4 h-4" />
+                    <div className="flex flex-col items-center justify-between p-1.5 sm:p-2.5 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 text-center h-full space-y-1 sm:space-y-2 hover:border-purple-200 transition-colors min-w-[54px] sm:min-w-0">
+                      <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-purple-100 dark:bg-purple-900/50 text-purple-800 dark:text-purple-300 font-bold text-xs sm:text-sm flex items-center justify-center shadow-xs">
+                        <Calculator className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                       </div>
-                      <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">
+                      <span className="text-[10px] sm:text-xs font-semibold text-slate-600 dark:text-slate-300 truncate">
                         Math
                       </span>
-                      <div className="w-full py-1 bg-purple-50 dark:bg-purple-950/60 border border-purple-200/80 dark:border-purple-800/60 text-purple-700 dark:text-purple-400 font-extrabold text-sm rounded-xl">
+                      <div className="w-full py-0.5 sm:py-1 bg-purple-50 dark:bg-purple-950/60 border border-purple-200/80 dark:border-purple-800/60 text-purple-700 dark:text-purple-400 font-extrabold text-xs sm:text-sm rounded-xl">
                         {testCard.math}
                       </div>
                     </div>
 
                     {/* Reasoning */}
-                    <div className="flex flex-col items-center justify-between p-2.5 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 text-center h-full space-y-2 hover:border-emerald-200 transition-colors">
-                      <div className="w-9 h-9 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 font-bold text-sm flex items-center justify-center shadow-xs">
-                        <Brain className="w-4 h-4" />
+                    <div className="flex flex-col items-center justify-between p-1.5 sm:p-2.5 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 text-center h-full space-y-1 sm:space-y-2 hover:border-emerald-200 transition-colors min-w-[54px] sm:min-w-0">
+                      <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 font-bold text-xs sm:text-sm flex items-center justify-center shadow-xs">
+                        <Brain className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                       </div>
-                      <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">
+                      <span className="text-[10px] sm:text-xs font-semibold text-slate-600 dark:text-slate-300 truncate">
                         Reasoning
                       </span>
-                      <div className="w-full py-1 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-800/60 text-emerald-700 dark:text-emerald-400 font-extrabold text-sm rounded-xl">
+                      <div className="w-full py-0.5 sm:py-1 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-800/60 text-emerald-700 dark:text-emerald-400 font-extrabold text-xs sm:text-sm rounded-xl">
                         {testCard.reasoning}
                       </div>
                     </div>

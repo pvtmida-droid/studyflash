@@ -60,6 +60,7 @@ export default function QuizView({
   const [predictedRank, setPredictedRank] = useState<number>(0);
   const [predictedScore, setPredictedScore] = useState<number>(0);
   const [displayLanguage, setDisplayLanguage] = useState<"en" | "hi">(isHindi ? "hi" : "en");
+  const [showMobilePalette, setShowMobilePalette] = useState<boolean>(false);
 
   useEffect(() => {
     setDisplayLanguage(isHindi ? "hi" : "en");
@@ -630,9 +631,9 @@ export default function QuizView({
         </div>
 
         {/* Live quiz grid */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="flex flex-col md:grid md:grid-cols-4 gap-4 md:gap-6">
           {/* Side Question Palette */}
-          <div className="md:col-span-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 rounded-3xl space-y-4 shadow-sm h-fit">
+          <div className="order-2 md:order-1 md:col-span-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 sm:p-5 rounded-3xl space-y-4 shadow-sm h-fit">
             <span className="text-xs font-bold text-slate-400 uppercase tracking-widest block">
               {isHindi ? "प्रश्न पैलेट / नैविगेशन" : "QUESTION PALETTE"}
             </span>
@@ -688,7 +689,7 @@ export default function QuizView({
           </div>
 
           {/* Active Question Panel */}
-          <div className="md:col-span-3 space-y-4">
+          <div className="order-1 md:order-2 md:col-span-3 space-y-4">
             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm">
               <div className="flex justify-between items-center pb-3 border-b border-slate-100 dark:border-slate-800 mb-5">
                 <span className="text-xs font-bold text-slate-400">
