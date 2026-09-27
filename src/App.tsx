@@ -116,8 +116,27 @@ export default function App() {
     return mapping;
   }, []);
 
+  const extractTestIdFromPath = (pathname: string): string | null => {
+    const rawPath = pathname.length > 1 ? pathname.replace(/\/$/, "") : pathname;
+    const match1 = rawPath.match(/^\/(?:all-india-test|live-test)\/([^/]+)$/i);
+    if (match1 && match1[1]) return match1[1];
+
+    const match2 = rawPath.match(/^\/(mega-test-\d+)$/i);
+    if (match2 && match2[1]) return match2[1];
+
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const testFromUrl = params.get("test") || params.get("testId");
+      if (testFromUrl) return testFromUrl;
+    } catch (e) {}
+
+    return null;
+  };
+
   const getInitialView = () => {
     const rawPath = window.location.pathname;
+    const testId = extractTestIdFromPath(rawPath);
+    if (testId) return "live-test-auto";
     const path = rawPath.length > 1 ? rawPath.replace(/\/$/, "") : rawPath;
     return pathToView[path] || "home";
   };
@@ -127,7 +146,10 @@ export default function App() {
   const setCurrentView = (viewOrFn: any) => {
     setRawView((prev) => {
       const nextView = typeof viewOrFn === "function" ? viewOrFn(prev) : viewOrFn;
-      const path = viewToPath[nextView];
+      let path = viewToPath[nextView];
+      if (nextView === "live-test-auto") {
+        path = `/all-india-test/${selectedAllIndiaTestId || "mega-test-1"}`;
+      }
       if (path && window.location.pathname !== path) {
         window.history.pushState({ view: nextView }, "", path);
       }
@@ -138,6 +160,12 @@ export default function App() {
   useEffect(() => {
     const handlePopState = () => {
       const rawPath = window.location.pathname;
+      const testId = extractTestIdFromPath(rawPath);
+      if (testId) {
+        setSelectedAllIndiaTestId(testId);
+        setRawView("live-test-auto");
+        return;
+      }
       const path = rawPath.length > 1 ? rawPath.replace(/\/$/, "") : rawPath;
       const view = pathToView[path] || "home";
       setRawView(view);
@@ -386,7 +414,28 @@ export default function App() {
     }
   };
 
-  const [selectedAllIndiaTestId, setSelectedAllIndiaTestId] = useState<string>("mega-test-1");
+  const [selectedAllIndiaTestId, setSelectedAllIndiaTestId] = useState<string>(() => {
+    const testId = extractTestIdFromPath(window.location.pathname);
+    if (testId) return testId;
+    try {
+      const stored = sessionStorage.getItem("studyflash_selected_test_id");
+      if (stored) return stored;
+    } catch (e) {}
+    return "mega-test-1";
+  });
+
+  const handleStartAllIndiaTest = (testId?: string) => {
+    const targetId = testId || "mega-test-1";
+    setSelectedAllIndiaTestId(targetId);
+    try {
+      sessionStorage.setItem("studyflash_selected_test_id", targetId);
+      const targetUrl = `/all-india-test/${targetId}`;
+      if (window.location.pathname !== targetUrl) {
+        window.history.pushState({ view: "live-test-auto", testId: targetId }, "", targetUrl);
+      }
+    } catch (e) {}
+    setRawView("live-test-auto");
+  };
 
   // Generate distinct mock test objects for each of the 5 All India tests
   const allIndiaMegaTests = useMemo(() => {
@@ -774,6 +823,7 @@ export default function App() {
           <HomeView
             isHindi={isHindi}
             setCurrentView={setCurrentView}
+            onAttemptTest={(testId: string) => handleStartAllIndiaTest(testId)}
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
             userStats={userStats}
@@ -914,8 +964,7 @@ export default function App() {
             isHindi={isHindi}
             onBack={() => setCurrentView("home")}
             onAttemptTest={(testId) => {
-              if (testId) setSelectedAllIndiaTestId(testId);
-              setCurrentView("live-test-auto");
+              handleStartAllIndiaTest(testId);
             }}
             onViewResults={() => setCurrentView("battle_results")}
           />

@@ -55,6 +55,7 @@ const SEARCHABLE_SUGGESTIONS = [
 export default function HomeView({
   isHindi,
   setCurrentView,
+  onAttemptTest,
   searchQuery,
   setSearchQuery,
   userStats,
@@ -199,7 +200,7 @@ export default function HomeView({
     return () => clearInterval(timer);
   }, []);
 
-  const handleAttemptBattle = () => {
+  const handleAttemptBattle = (testId?: string) => {
     if (new Date() < new Date("2026-06-25T00:00:00") && !isAdmin) {
       alert(
         isHindi
@@ -212,7 +213,11 @@ export default function HomeView({
     if (liveTestConfig && liveTestConfig.test.questions.length > 0) {
       localStorage.setItem("studyflash_battle_attempted", "true");
       setHasAttemptedBattle(true);
-      setCurrentView("live-test-auto");
+      if (onAttemptTest) {
+        onAttemptTest(testId || "mega-test-1");
+      } else {
+        setCurrentView("live-test-auto");
+      }
     } else {
       alert(
         isHindi
