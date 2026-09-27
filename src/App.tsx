@@ -489,15 +489,13 @@ export default function App() {
           qId.includes(`mega-test-${cardNum}`) ||
           qId.includes(`mega test ${cardNum}`) ||
           tags.includes(cardIdLower) ||
-          tags.includes(`mega-${cardNum}`) ||
-          tags.includes(`mega${cardNum}`) ||
-          tags.includes(`test-${cardNum}`) ||
-          tags.includes(`test${cardNum}`) ||
+          tags.includes(`mega-test-${cardNum}`) ||
           tags.includes(`mega test #${cardNum}`) ||
+          tags.includes(`mega test ${cardNum}`) ||
           tags.includes(`all india mega test #${cardNum}`) ||
-          qTopic.includes(`mega test #${cardNum}`) ||
-          qTopic.includes(`mega test ${cardNum}`) ||
-          qTopic.includes(`test #${cardNum}`) ||
+          tags.includes(`all india mega test ${cardNum}`) ||
+          qTopic === `mega test #${cardNum}` ||
+          qTopic === `mega test ${cardNum}` ||
           qTopic === card.titleEn.toLowerCase() ||
           qTopic === card.titleHi.toLowerCase()
         );
