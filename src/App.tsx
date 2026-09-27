@@ -182,12 +182,12 @@ export default function App() {
   // Db lists states
   const [questions, setQuestions] = useState<Question[]>(() => {
     try {
+      const rawDeleted = localStorage.getItem("studyflash_deleted_question_ids");
+      const deletedIds: string[] = rawDeleted ? JSON.parse(rawDeleted) : [];
       const rawCustom = localStorage.getItem("studyflash_custom_questions");
       const customQs = rawCustom ? JSON.parse(rawCustom) : [];
-      if (Array.isArray(customQs) && customQs.length > 0) {
-        const combined = [...(allIndiaLiveQuestions as Question[]), ...customQs];
-        return Array.from(new Map(combined.map((q: any) => [q.id, q])).values());
-      }
+      const combined = [...(allIndiaLiveQuestions as Question[]), ...customQs].filter(q => !deletedIds.includes(q.id));
+      return Array.from(new Map(combined.map((q: any) => [q.id, q])).values());
     } catch (e) {}
     return allIndiaLiveQuestions as Question[];
   });
@@ -227,6 +227,8 @@ export default function App() {
 
     const fetchQuestions = async () => {
       try {
+        const rawDeleted = localStorage.getItem("studyflash_deleted_question_ids");
+        const deletedIds: string[] = rawDeleted ? JSON.parse(rawDeleted) : [];
         const rawCustom = localStorage.getItem("studyflash_custom_questions");
         const customQs = rawCustom ? JSON.parse(rawCustom) : [];
         let fetchedQs: Question[] = [];
@@ -251,8 +253,17 @@ export default function App() {
           }
         }
 
-        const combined = [...(allIndiaLiveQuestions as Question[]), ...customQs, ...fetchedQs];
-        const uniqueQs: Question[] = Array.from(new Map(combined.map((q: any) => [q.id, q])).values());
+        let combined: Question[] = [];
+        if (fetchedQs.length > 0) {
+          const fetchedIds = new Set(fetchedQs.map(q => q.id));
+          const extraDefaultQs = (allIndiaLiveQuestions as Question[]).filter(q => !fetchedIds.has(q.id));
+          combined = [...fetchedQs, ...customQs, ...extraDefaultQs];
+        } else {
+          combined = [...(allIndiaLiveQuestions as Question[]), ...customQs];
+        }
+
+        const filteredQs = combined.filter(q => !deletedIds.includes(q.id));
+        const uniqueQs: Question[] = Array.from(new Map(filteredQs.map((q: any) => [q.id, q])).values());
         setQuestions(uniqueQs);
 
         // Sync live questions from Supabase database
@@ -718,12 +729,39 @@ export default function App() {
         }
       });
       if (res.ok) {
+        // Track deleted ID in localStorage so fallback JSON won't resurrect it
+        try {
+          const rawDeleted = localStorage.getItem("studyflash_deleted_question_ids");
+          const deletedIds: string[] = rawDeleted ? JSON.parse(rawDeleted) : [];
+          if (!deletedIds.includes(qId)) {
+            deletedIds.push(qId);
+            localStorage.setItem("studyflash_deleted_question_ids", JSON.stringify(deletedIds));
+          }
+
+          const rawCustom = localStorage.getItem("studyflash_custom_questions");
+          if (rawCustom) {
+            const customQs: Question[] = JSON.parse(rawCustom);
+            const updatedCustom = customQs.filter(q => q.id !== qId);
+            localStorage.setItem("studyflash_custom_questions", JSON.stringify(updatedCustom));
+          }
+        } catch (e) {}
+
         setQuestions((prev) => prev.filter((q) => q.id !== qId));
       } else {
         console.error("DELETE Error:", await res.text());
       }
     } catch (err) {
       console.error("Failed to delete question from DB:", err);
+      // Fallback local deletion
+      try {
+        const rawDeleted = localStorage.getItem("studyflash_deleted_question_ids");
+        const deletedIds: string[] = rawDeleted ? JSON.parse(rawDeleted) : [];
+        if (!deletedIds.includes(qId)) {
+          deletedIds.push(qId);
+          localStorage.setItem("studyflash_deleted_question_ids", JSON.stringify(deletedIds));
+        }
+      } catch (e) {}
+      setQuestions((prev) => prev.filter((q) => q.id !== qId));
     } finally {
       setIsSyncing(false);
     }
