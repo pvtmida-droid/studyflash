@@ -444,8 +444,10 @@ export default function App() {
       const specificQs = questions.filter((q) => {
         if (!q) return false;
         const qId = (q.id || "").toLowerCase();
-        const qTopic = (q.topic || "").toLowerCase();
-        const tags = Array.isArray(q.examTags) ? q.examTags.map((t) => (t || "").toLowerCase()) : [];
+        const qTopic = (q.topic || "").toLowerCase().replace(/^#+/, "").trim();
+        const tags = Array.isArray(q.examTags)
+          ? q.examTags.map((t) => (t || "").toLowerCase().replace(/^#+/, "").trim())
+          : [];
 
         return (
           qId.startsWith(`${cardIdLower}-`) ||
@@ -457,8 +459,10 @@ export default function App() {
           tags.includes(`mega test ${cardNum}`) ||
           tags.includes(`all india mega test #${cardNum}`) ||
           tags.includes(`all india mega test ${cardNum}`) ||
+          tags.some((t) => t.includes("mega") && t.includes(cardNum)) ||
           qTopic === `mega test #${cardNum}` ||
           qTopic === `mega test ${cardNum}` ||
+          (qTopic.includes("mega") && qTopic.includes(cardNum)) ||
           qTopic === card.titleEn.toLowerCase() ||
           qTopic === card.titleHi.toLowerCase()
         );
