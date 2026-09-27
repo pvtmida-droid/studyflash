@@ -459,30 +459,15 @@ export default function App() {
     ];
 
     return cards.map((card, idx) => {
-      // 1. If admin added/saved a custom test with this ID in mockTests, use that
-      const customTest = mockTests.find((t) => t.id === card.id);
-      if (customTest && customTest.questions && customTest.questions.length > 0) {
-        return customTest;
-      }
+      const cardIdLower = card.id.toLowerCase();
+      const cardNum = `${idx + 1}`;
 
-      // 2. For mega-test-1, use liveTestConfig.test
-      if (card.id === "mega-test-1") {
-        return {
-          ...liveTestConfig.test,
-          id: "mega-test-1",
-          titleEn: card.titleEn,
-          titleHi: card.titleHi,
-        };
-      }
-
-      // 3. Check if questions exist with specific topic, tags or IDs for this test card (e.g. Mega Test #3, mega-test-3)
+      // 1. First priority: Check if questions exist with specific topic, tags or IDs for this test card (e.g. Mega Test #3, mega-test-3)
       const specificQs = questions.filter((q) => {
         if (!q) return false;
         const qId = (q.id || "").toLowerCase();
         const qTopic = (q.topic || "").toLowerCase();
         const tags = Array.isArray(q.examTags) ? q.examTags.map((t) => (t || "").toLowerCase()) : [];
-        const cardIdLower = card.id.toLowerCase();
-        const cardNum = `${idx + 1}`;
 
         return (
           qId.startsWith(`${cardIdLower}-`) ||
@@ -513,6 +498,22 @@ export default function App() {
           totalMarks: specificQs.length * 2,
           questions: specificQs,
           isPreviousYear: false,
+        };
+      }
+
+      // 2. If admin added/saved a custom test with this ID in mockTests, use that
+      const customTest = mockTests.find((t) => t.id === card.id);
+      if (customTest && customTest.questions && customTest.questions.length > 0) {
+        return customTest;
+      }
+
+      // 3. For mega-test-1, use liveTestConfig.test
+      if (card.id === "mega-test-1" && liveTestConfig?.test?.questions?.length > 0) {
+        return {
+          ...liveTestConfig.test,
+          id: "mega-test-1",
+          titleEn: card.titleEn,
+          titleHi: card.titleHi,
         };
       }
 
