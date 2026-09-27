@@ -180,17 +180,7 @@ export default function App() {
   const [selectedFontSize, setSelectedFontSize] = useState(15);
 
   // Db lists states
-  const [questions, setQuestions] = useState<Question[]>(() => {
-    try {
-      const rawDeleted = localStorage.getItem("studyflash_deleted_question_ids");
-      const deletedIds: string[] = rawDeleted ? JSON.parse(rawDeleted) : [];
-      const rawCustom = localStorage.getItem("studyflash_custom_questions");
-      const customQs = rawCustom ? JSON.parse(rawCustom) : [];
-      const combined = [...(allIndiaLiveQuestions as Question[]), ...customQs].filter(q => !deletedIds.includes(q.id));
-      return Array.from(new Map(combined.map((q: any) => [q.id, q])).values());
-    } catch (e) {}
-    return allIndiaLiveQuestions as Question[];
-  });
+  const [questions, setQuestions] = useState<Question[]>([]);
   const [mockTests, setMockTests] = useState<MockTest[]>([]);
 
   // Load mock tests and questions from server
@@ -227,10 +217,6 @@ export default function App() {
 
     const fetchQuestions = async () => {
       try {
-        const rawDeleted = localStorage.getItem("studyflash_deleted_question_ids");
-        const deletedIds: string[] = rawDeleted ? JSON.parse(rawDeleted) : [];
-        const rawCustom = localStorage.getItem("studyflash_custom_questions");
-        const customQs = rawCustom ? JSON.parse(rawCustom) : [];
         let fetchedQs: Question[] = [];
 
         try {
@@ -253,20 +239,12 @@ export default function App() {
           }
         }
 
-        let combined: Question[] = [];
-        if (fetchedQs.length > 0) {
-          const fetchedIds = new Set(fetchedQs.map(q => q.id));
-          const extraDefaultQs = (allIndiaLiveQuestions as Question[]).filter(q => !fetchedIds.has(q.id));
-          combined = [...fetchedQs, ...customQs, ...extraDefaultQs];
-        } else {
-          combined = [...(allIndiaLiveQuestions as Question[]), ...customQs];
-        }
-
-        const filteredQs = combined.filter(q => !deletedIds.includes(q.id));
-        const uniqueQs: Question[] = Array.from(new Map(filteredQs.map((q: any) => [q.id, q])).values());
+        // Strict DB Questions: if database returns questions, use ONLY DB questions (no hardcoded JSON appending)
+        const targetList = fetchedQs.length > 0 ? fetchedQs : (allIndiaLiveQuestions as Question[]);
+        const uniqueQs: Question[] = Array.from(new Map(targetList.map((q: any) => [q.id, q])).values());
         setQuestions(uniqueQs);
 
-        // Sync live questions from Supabase database
+        // Sync live questions from database
         const liveQs = uniqueQs.filter((q: Question) => q.id.startsWith("live2026-") || (Array.isArray(q.examTags) && q.examTags.includes("All India Live Test")));
         if (liveQs.length > 0) {
           setLiveTestConfig(prev => ({
