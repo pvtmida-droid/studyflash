@@ -123,25 +123,34 @@ export default function QuizView({
   useEffect(() => {
     if (autoStartTestId) {
       const test = mockTests.find((t) => t.id === autoStartTestId);
-      if (test && (!activeTest || activeTest.id !== autoStartTestId)) {
-        const savedName = localStorage.getItem("sf_studentName");
-        const savedFather = localStorage.getItem("sf_fatherName");
-        const savedPhone = localStorage.getItem("sf_phoneNumber");
+      if (test) {
+        const isDifferentTest = !activeTest || activeTest.id !== autoStartTestId;
+        const isQuestionsUpdated =
+          activeTest &&
+          activeTest.id === autoStartTestId &&
+          (activeTest.questions.length !== test.questions.length ||
+            activeTest.questions[0]?.id !== test.questions[0]?.id);
 
-        if (savedName && savedFather && savedPhone) {
-          setStudentName(savedName);
-          setFatherName(savedFather);
-          setPhoneNumber(savedPhone);
-          setActiveTest(test);
-          setCurrentQuestionIndex(0);
-          setAnswers({});
-          setMarkedForReview({});
-          setSecondsRemaining(test.questions.length * 60);
-          setIsCompleted(false);
-          setStartTime(Date.now());
-          setSelectedTestForSetup(null);
-        } else {
-          handleStartTest(test);
+        if (isDifferentTest || isQuestionsUpdated) {
+          const savedName = localStorage.getItem("sf_studentName");
+          const savedFather = localStorage.getItem("sf_fatherName");
+          const savedPhone = localStorage.getItem("sf_phoneNumber");
+
+          if (savedName && savedFather && savedPhone) {
+            setStudentName(savedName);
+            setFatherName(savedFather);
+            setPhoneNumber(savedPhone);
+            setActiveTest(test);
+            setCurrentQuestionIndex(0);
+            setAnswers({});
+            setMarkedForReview({});
+            setSecondsRemaining(test.questions.length * 60);
+            setIsCompleted(false);
+            setStartTime(Date.now());
+            setSelectedTestForSetup(null);
+          } else {
+            handleStartTest(test);
+          }
         }
       }
     }

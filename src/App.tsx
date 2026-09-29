@@ -469,6 +469,12 @@ export default function App() {
       });
 
       if (specificQs.length > 0) {
+        specificQs.sort((a, b) => {
+          const numA = parseInt((a.id || "").replace(/\D/g, ""), 10) || 0;
+          const numB = parseInt((b.id || "").replace(/\D/g, ""), 10) || 0;
+          return numA - numB;
+        });
+
         return {
           id: card.id,
           titleEn: card.titleEn,
