@@ -182,6 +182,7 @@ export default function App() {
   // Db lists states
   const [questions, setQuestions] = useState<Question[]>([]);
   const [mockTests, setMockTests] = useState<MockTest[]>([]);
+  const [isLoadingQuestions, setIsLoadingQuestions] = useState<boolean>(true);
 
   // Load mock tests and questions from server
   useEffect(() => {
@@ -216,6 +217,7 @@ export default function App() {
     fetchMockTests();
 
     const fetchQuestions = async () => {
+      setIsLoadingQuestions(true);
       try {
         let fetchedQs: Question[] = [];
 
@@ -259,6 +261,8 @@ export default function App() {
         }
       } catch (err) {
         console.error("Failed to fetch questions:", err);
+      } finally {
+        setIsLoadingQuestions(false);
       }
     };
     fetchQuestions();
@@ -885,6 +889,7 @@ export default function App() {
             selectedFontSize={selectedFontSize}
             liveTestConfig={liveTestConfig}
             isAdmin={isAdmin}
+            isLoadingQuestions={isLoadingQuestions}
             onBack={() => setCurrentView("home")}
           />
         )}
@@ -899,6 +904,7 @@ export default function App() {
             autoStartTestId={pyqTestId}
             liveTestConfig={liveTestConfig}
             isAdmin={isAdmin}
+            isLoadingQuestions={isLoadingQuestions}
             onBack={() => setCurrentView("previous-year-selection")}
           />
         )}
@@ -914,6 +920,7 @@ export default function App() {
             autoStartTestId={selectedAllIndiaTestId || "mega-test-1"}
             liveTestConfig={liveTestConfig}
             isAdmin={isAdmin}
+            isLoadingQuestions={isLoadingQuestions}
             onBack={() => setCurrentView("all-india-tests")}
           />
         )}

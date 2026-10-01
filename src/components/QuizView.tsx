@@ -32,6 +32,7 @@ interface QuizViewProps {
   onBack?: () => void;
   liveTestConfig?: LiveTestConfig;
   isAdmin?: boolean;
+  isLoadingQuestions?: boolean;
 }
 
 export default function QuizView({
@@ -44,6 +45,7 @@ export default function QuizView({
   onBack,
   liveTestConfig,
   isAdmin,
+  isLoadingQuestions = false,
 }: QuizViewProps) {
   const [activeTest, setActiveTest] = useState<MockTest | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -121,6 +123,8 @@ export default function QuizView({
   };
 
   useEffect(() => {
+    if (isLoadingQuestions) return;
+
     if (autoStartTestId) {
       const test = mockTests.find((t) => t.id === autoStartTestId);
       if (test) {
@@ -154,7 +158,7 @@ export default function QuizView({
         }
       }
     }
-  }, [autoStartTestId, mockTests]);
+  }, [autoStartTestId, mockTests, isLoadingQuestions]);
 
   // Timer Effect
   useEffect(() => {
@@ -304,6 +308,40 @@ export default function QuizView({
     const sec = secs % 60;
     return `${min}:${sec < 10 ? "0" : ""}${sec}`;
   };
+
+  if (isLoadingQuestions) {
+    return (
+      <div className="min-h-[65vh] flex flex-col items-center justify-center p-4 sm:p-8 text-center">
+        <div className="bg-slate-900/90 dark:bg-slate-900/95 border border-slate-800 rounded-3xl p-8 max-w-md w-full shadow-2xl backdrop-blur-md">
+          {/* Animated Spinner Icon */}
+          <div className="relative w-20 h-20 mx-auto mb-6 flex items-center justify-center">
+            <div className="absolute inset-0 rounded-full border-4 border-indigo-500/20 border-t-indigo-500 animate-spin"></div>
+            <div className="absolute inset-2 rounded-full border-4 border-emerald-500/20 border-b-emerald-500 animate-spin [animation-duration:1.5s]"></div>
+            <Sparkles className="w-8 h-8 text-indigo-400 animate-pulse" />
+          </div>
+
+          <h2 className="text-2xl font-bold text-white mb-2 tracking-wide">
+            {isHindi ? "प्रश्न लोड हो रहे हैं..." : "Loading Questions..."}
+          </h2>
+          <p className="text-slate-400 text-sm mb-6">
+            {isHindi
+              ? "डेटाबेस (Supabase Server) से ऑल इंडिया टेस्ट डेटा सिंक किया जा रहा है..."
+              : "Syncing All India Test questions from Supabase database..."}
+          </p>
+
+          {/* Animated Progress Bar */}
+          <div className="w-full bg-slate-800/80 rounded-full h-3 overflow-hidden p-0.5 border border-slate-700/60 relative shadow-inner">
+            <div className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-400 rounded-full animate-[pulse_1s_infinite] w-full"></div>
+          </div>
+
+          <div className="mt-4 flex items-center justify-center gap-2 text-xs text-indigo-400 font-medium">
+            <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+            <span>{isHindi ? "कृपया प्रतीक्षा करें..." : "Please wait..."}</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (activeTest && isCompleted) {
     const isAllIndia = activeTest.titleEn.toLowerCase().includes("all india");
