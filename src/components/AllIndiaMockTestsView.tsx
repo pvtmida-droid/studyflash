@@ -38,6 +38,7 @@ interface AllIndiaMockTestsViewProps {
   onBack: () => void;
   onAttemptTest: (testId?: string) => void;
   onViewResults: () => void;
+  initialTestId?: string;
 }
 
 const DEFAULT_UPI_ID = "blasterking@ybl";
@@ -141,9 +142,23 @@ export default function AllIndiaMockTestsView({
   onBack,
   onAttemptTest,
   onViewResults,
+  initialTestId,
 }: AllIndiaMockTestsViewProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTestForPayment, setSelectedTestForPayment] = useState<any | null>(null);
+
+  // Auto popup payment modal if initialTestId is specified and not approved
+  useEffect(() => {
+    if (initialTestId) {
+      const card = MOCK_TEST_CARDS.find((t) => t.id === initialTestId);
+      if (card) {
+        const safePurchased = Array.isArray(purchasedTests) ? purchasedTests : [];
+        if (!safePurchased.includes(card.id)) {
+          setSelectedTestForPayment(card);
+        }
+      }
+    }
+  }, [initialTestId]);
   const [studentName, setStudentName] = useState("");
   const [utrNumber, setUtrNumber] = useState("");
   const [transactionId, setTransactionId] = useState("");

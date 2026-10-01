@@ -49,6 +49,7 @@ import EnglishSelectionView from "./components/EnglishSelectionView";
 import StatePoliceSelectionView from "./components/StatePoliceSelectionView";
 import AllIndiaMockTestsView from "./components/AllIndiaMockTestsView";
 import { fetchSupabaseQuestions } from "./lib/supabase";
+import { isTestUnlocked } from "./utils/accessControl";
 
 import {
   auth,
@@ -136,7 +137,13 @@ export default function App() {
   const getInitialView = () => {
     const rawPath = window.location.pathname;
     const testId = extractTestIdFromPath(rawPath);
-    if (testId) return "live-test-auto";
+    if (testId) {
+      const isAdminSession = sessionStorage.getItem("admin_session") === "true";
+      if (!isTestUnlocked(testId, isAdminSession)) {
+        return "all-india-tests";
+      }
+      return "live-test-auto";
+    }
     const path = rawPath.length > 1 ? rawPath.replace(/\/$/, "") : rawPath;
     return pathToView[path] || "home";
   };
@@ -163,7 +170,12 @@ export default function App() {
       const testId = extractTestIdFromPath(rawPath);
       if (testId) {
         setSelectedAllIndiaTestId(testId);
-        setRawView("live-test-auto");
+        const isAdminSession = sessionStorage.getItem("admin_session") === "true";
+        if (!isTestUnlocked(testId, isAdminSession)) {
+          setRawView("all-india-tests");
+        } else {
+          setRawView("live-test-auto");
+        }
         return;
       }
       const path = rawPath.length > 1 ? rawPath.replace(/\/$/, "") : rawPath;
@@ -427,7 +439,12 @@ export default function App() {
         window.history.pushState({ view: "live-test-auto", testId: targetId }, "", targetUrl);
       }
     } catch (e) {}
-    setRawView("live-test-auto");
+
+    if (!isTestUnlocked(targetId, isAdmin)) {
+      setRawView("all-india-tests");
+    } else {
+      setRawView("live-test-auto");
+    }
   };
 
   // Generate distinct mock test objects for each of the 5 All India tests
@@ -994,6 +1011,7 @@ export default function App() {
         {currentView === "all-india-tests" && (
           <AllIndiaMockTestsView
             isHindi={isHindi}
+            initialTestId={selectedAllIndiaTestId}
             onBack={() => setCurrentView("home")}
             onAttemptTest={(testId) => {
               handleStartAllIndiaTest(testId);

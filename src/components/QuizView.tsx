@@ -17,9 +17,12 @@ import {
   TrendingDown,
   Info,
   Calendar,
+  Lock,
+  CreditCard,
 } from "lucide-react";
 import { MockTest, Question, UserStats, LiveTestConfig } from "../types";
 import { db, collection, setDoc, doc } from "../lib/firebase";
+import { isTestUnlocked } from "../utils/accessControl";
 
 interface QuizViewProps {
   key?: string;
@@ -337,6 +340,50 @@ export default function QuizView({
           <div className="mt-4 flex items-center justify-center gap-2 text-xs text-indigo-400 font-medium">
             <RefreshCw className="w-3.5 h-3.5 animate-spin" />
             <span>{isHindi ? "कृपया प्रतीक्षा करें..." : "Please wait..."}</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (autoStartTestId && !isTestUnlocked(autoStartTestId, isAdmin)) {
+    const testCard = mockTests.find((t) => t.id === autoStartTestId);
+    const testTitle = testCard ? (isHindi ? testCard.titleHi : testCard.titleEn) : "All India Test";
+
+    return (
+      <div className="min-h-[65vh] flex flex-col items-center justify-center p-4 sm:p-8 text-center">
+        <div className="bg-slate-900/95 border border-amber-500/30 rounded-3xl p-8 max-w-md w-full shadow-2xl backdrop-blur-md relative overflow-hidden">
+          <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center mx-auto mb-5 shadow-lg">
+            <Lock className="w-8 h-8" />
+          </div>
+
+          <span className="px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 font-extrabold text-xs uppercase tracking-wider border border-amber-500/30 inline-block mb-3">
+            {isHindi ? "प्रीमियम एक्सेस आवश्यक" : "Payment Required"}
+          </span>
+
+          <h2 className="text-2xl font-black text-white mb-2">{testTitle}</h2>
+
+          <p className="text-slate-300 text-sm mb-6 leading-relaxed">
+            {isHindi
+              ? "यह टेस्ट locked श्रेणी में है। इसे अनलॉक करने और अटेंप्ट करने के लिए भुगतान आवश्यक है।"
+              : "This test is locked. Payment is required to unlock and attempt this test."}
+          </p>
+
+          <div className="space-y-3">
+            <button
+              onClick={onBack}
+              className="w-full py-3.5 px-6 font-extrabold rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-lg shadow-emerald-900/30 flex items-center justify-center gap-2 text-base transition-all"
+            >
+              <CreditCard className="w-5 h-5" />
+              <span>{isHindi ? "टेस्ट अनलॉक करें (Unlock Now)" : "Unlock Test (Buy Now)"}</span>
+            </button>
+
+            <button
+              onClick={onBack}
+              className="w-full py-3 px-6 font-bold rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm transition-all"
+            >
+              {isHindi ? "वापस जाएं" : "Go Back"}
+            </button>
           </div>
         </div>
       </div>
